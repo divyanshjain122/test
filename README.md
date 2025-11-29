@@ -126,8 +126,8 @@ jsf-core/
 
 ### Development Roadmap
 
-**Phase 1** (Current): Foundation & Project Structure ✅  
-**Phase 2**: Core Configuration System  
+**Phase 1**: Foundation & Project Structure ✅  
+**Phase 2**: Core Configuration System ✅  
 **Phase 3**: Data Loading Infrastructure  
 **Phase 4-6**: Signal Framework  
 **Phase 7-9**: Strategy Templates  
@@ -174,5 +174,6 @@ GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
 
 ---
 
-**Status**: 🚧 Active Development (v0.1.0-dev)  
-**Phase**: 1/20 - Foundation Complete
+**Status**: 🚧 Active Development (v0.2.0-dev)  
+**Phase**: 2/20 - Configuration System Complete  
+**Next**: Phase 3 - Data Loading Infrastructure
