@@ -74,6 +74,7 @@ data/
 results/
 experiments/
 *.log
+phase.txt
 
 # Jupyter
 .ipynb_checkpoints/
