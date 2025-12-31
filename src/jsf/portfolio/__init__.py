@@ -46,6 +46,14 @@ from jsf.portfolio.constraints import (
     SectorConstraint,
     TurnoverConstraint,
     LeverageConstraint,
+    ConcentrationConstraint,
+)
+
+# Constructors
+from jsf.portfolio.constructors import (
+    SimplePortfolioConstructor,
+    OptimizedPortfolioConstructor,
+    HybridPortfolioConstructor,
 )
 
 __all__ = [
@@ -77,4 +85,9 @@ __all__ = [
     "SectorConstraint",
     "TurnoverConstraint",
     "LeverageConstraint",
+    "ConcentrationConstraint",
+    # Constructors
+    "SimplePortfolioConstructor",
+    "OptimizedPortfolioConstructor",
+    "HybridPortfolioConstructor",
 ]
