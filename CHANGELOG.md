@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 4: Signal Framework (Part 1)
+
+#### Added
+- **Base signal infrastructure**:
+  - `Signal` - Abstract base class for all signals
+  - `SignalType` - Enumeration for signal types (technical, statistical, fundamental, sentiment, composite)
+  - `SignalDirection` - Signal direction indicators (long, short, neutral)
+  - `SignalMetadata` - Dataclass for signal metadata
+  - `SignalError` - Custom exception for signal errors
+  - `CompositeSignal` - Combine multiple signals with various methods
+- **Signal caching system**:
+  - Automatic caching of generated signals
+  - Cache enable/disable functionality
+  - Cache key generation from inputs
+- **Technical indicator signals** (6 signals):
+  - `MomentumSignal` - Rate of change momentum
+  - `MovingAverageCrossSignal` - MA crossover strategy
+  - `RSISignal` - Relative Strength Index
+  - `BollingerBandsSignal` - Price position in bands
+  - `MACDSignal` - MACD line crossover
+  - `VolumeWeightedSignal` - Volume-confirmed momentum
+- **Statistical signals** (5 signals):
+  - `MeanReversionSignal` - Z-score based mean reversion
+  - `PairsSignal` - Pairs trading spread
+  - `TrendStrengthSignal` - Linear regression trend
+  - `VolatilitySignal` - Volatility regime detection
+  - `CorrelationSignal` - Rolling correlation signals
+- **Signal composition**:
+  - Average combination method
+  - Weighted average with custom weights
+  - Voting mechanism (majority vote)
+  - Max/min signal selection
+  - Automatic signal alignment
+- **Comprehensive test suite** (26 tests):
+  - Technical signal tests (12 tests)
+  - Statistical signal tests (5 tests)
+  - Composite signal tests (5 tests)
+  - Base functionality tests (4 tests)
+  - 100% test pass rate
+- **Full module exports** in `__init__.py`
+
 ### Phase 3: Data Loading Infrastructure
 
 #### Added
