@@ -174,13 +174,8 @@ class MultiTimeframeSignal(Signal):
                 tf_data = price_data
             else:
                 # Simple resampling (every N periods)
-                resampled_close = close_prices.iloc[::timeframe]
-                tf_data = PriceData(
-                    data={"close": resampled_close},
-                    symbols=price_data.symbols,
-                    start_date=price_data.start_date,
-                    end_date=price_data.end_date,
-                )
+                resampled = price_data.data.iloc[::timeframe]
+                tf_data = PriceData(data=resampled)
             
             # Generate signal at this timeframe
             tf_signal = self.base_signal.generate(tf_data, **kwargs)
