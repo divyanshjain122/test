@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 5-6: Signal Framework Completion
+
+#### Added
+- **Fundamental analysis signals** (5 signals):
+  - `ValueSignal` - Value investing using P/B ratios or price proxies
+  - `QualitySignal` - Stability and quality metrics (Sharpe-like, downside deviation)
+  - `GrowthSignal` - Multi-period growth trends (price + volume)
+  - `SizeSignal` - Market cap factor (small vs large cap preference)
+  - `DividendSignal` - Dividend yield strategies
+- **Sentiment and market regime signals** (6 signals):
+  - `MarketRegimeSignal` - Bull/bear/neutral regime detection
+  - `BreadthSignal` - Market breadth (advancing vs declining stocks)
+  - `RelativeStrengthSignal` - Performance vs benchmark
+  - `NewHighLowSignal` - New highs/lows detection
+  - `VolumeShockSignal` - Unusual volume spike detection
+  - `SeasonalitySignal` - Calendar effects and patterns (monthly, quarterly, day-of-week)
+- **Advanced composite patterns** (5 composite types):
+  - `RotationSignal` - Top-N rotation strategies with rebalancing
+  - `MultiTimeframeSignal` - Multi-timeframe confirmation
+  - `AdaptiveWeightSignal` - Performance-based dynamic weight adjustment
+  - `ThresholdFilterSignal` - Signal filtering by threshold (absolute/percentile)
+  - `ConsensusSignal` - Require agreement across multiple signals
+- **Signal transformation utilities**:
+  - `normalize_signal` - Multiple normalization methods (z-score, min-max, rank, percentile, tanh)
+  - `rank_signal` - Cross-sectional, time-series, and hybrid ranking
+  - `smooth_signal` - Noise reduction (SMA, EMA, Gaussian)
+  - `clip_signal` - Value clipping to ranges
+  - `winsorize_signal` - Outlier handling
+  - `demean_signal` - Cross-sectional and time-series demeaning
+  - `neutralize_signal` - Factor neutralization via regression
+  - `apply_decay` - Exponential decay with configurable half-life
+  - `combine_signals` - Multiple signal aggregation (average, median, max, min)
+  - `score_signals` - Convert signals to portfolio scores (z-score, percentile, exponential)
+  - `NormalizationMethod` - Enum for normalization types
+  - `RankingMethod` - Enum for ranking methods
+- **Comprehensive test suite** (31 tests):
+  - Fundamental signal tests (6 tests)
+  - Sentiment signal tests (6 tests)
+  - Advanced composite tests (5 tests)
+  - Transformation utility tests (14 tests)
+  - 100% test pass rate
+  - 57% overall coverage (88% fundamental, 86% sentiment, 84% composites, 61% transforms)
+- **Full module exports** in `signals/__init__.py`
+
+#### Technical Details
+- All signals follow consistent interface (generate method, get_metadata)
+- Fundamental signals support both actual fundamental data and price-based proxies
+- Sentiment signals work with price/volume data when sentiment data unavailable
+- Advanced composites enable sophisticated multi-signal strategies
+- Transformation utilities provide complete signal preprocessing pipeline
+- Enums provide type safety for normalization and ranking methods
+
 ### Phase 4: Signal Framework (Part 1)
 
 #### Added

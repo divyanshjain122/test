@@ -129,7 +129,7 @@ jsf-core/
 **Phase 1**: Foundation & Project Structure ✅  
 **Phase 2**: Core Configuration System ✅  
 **Phase 3**: Data Loading Infrastructure ✅  
-**Phase 4-6**: Signal Framework ✅ (Phase 4 complete)  
+**Phase 4-6**: Signal Framework ✅  
 **Phase 7-9**: Strategy Templates  
 **Phase 10-11**: Backtesting Engine  
 **Phase 12-13**: Evaluation & Robustness  
@@ -174,6 +174,6 @@ GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
 
 ---
 
-**Status**: 🚧 Active Development (v0.4.0-dev)  
-**Phase**: 4/20 - Signal Framework Phase 1 Complete  
-**Next**: Phase 5-6 - Signal Framework Completion
+**Status**: 🚧 Active Development (v0.5.0-dev)  
+**Phase**: 6/20 - Signal Framework Complete  
+**Next**: Phase 7 - Portfolio Construction
