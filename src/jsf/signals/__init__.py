@@ -33,6 +33,50 @@ from jsf.signals.statistical import (
     CorrelationSignal,
 )
 
+# Fundamental signals
+from jsf.signals.fundamental import (
+    ValueSignal,
+    QualitySignal,
+    GrowthSignal,
+    SizeSignal,
+    DividendSignal,
+)
+
+# Sentiment signals
+from jsf.signals.sentiment import (
+    MarketRegimeSignal,
+    BreadthSignal,
+    RelativeStrengthSignal,
+    NewHighLowSignal,
+    VolumeShockSignal,
+    SeasonalitySignal,
+)
+
+# Advanced composites
+from jsf.signals.composites import (
+    RotationSignal,
+    MultiTimeframeSignal,
+    AdaptiveWeightSignal,
+    ThresholdFilterSignal,
+    ConsensusSignal,
+)
+
+# Transformation utilities
+from jsf.signals.transforms import (
+    normalize_signal,
+    rank_signal,
+    smooth_signal,
+    clip_signal,
+    winsorize_signal,
+    demean_signal,
+    neutralize_signal,
+    apply_decay,
+    combine_signals,
+    score_signals,
+    NormalizationMethod,
+    RankingMethod,
+)
+
 __all__ = [
     # Base
     "Signal",
@@ -54,4 +98,36 @@ __all__ = [
     "TrendStrengthSignal",
     "VolatilitySignal",
     "CorrelationSignal",
+    # Fundamental
+    "ValueSignal",
+    "QualitySignal",
+    "GrowthSignal",
+    "SizeSignal",
+    "DividendSignal",
+    # Sentiment
+    "MarketRegimeSignal",
+    "BreadthSignal",
+    "RelativeStrengthSignal",
+    "NewHighLowSignal",
+    "VolumeShockSignal",
+    "SeasonalitySignal",
+    # Advanced Composites
+    "RotationSignal",
+    "MultiTimeframeSignal",
+    "AdaptiveWeightSignal",
+    "ThresholdFilterSignal",
+    "ConsensusSignal",
+    # Transforms
+    "normalize_signal",
+    "rank_signal",
+    "smooth_signal",
+    "clip_signal",
+    "winsorize_signal",
+    "demean_signal",
+    "neutralize_signal",
+    "apply_decay",
+    "combine_signals",
+    "score_signals",
+    "NormalizationMethod",
+    "RankingMethod",
 ]
