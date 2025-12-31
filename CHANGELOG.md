@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 7: Portfolio Construction
+
+#### Added
+- **Base portfolio infrastructure**:
+  - `Portfolio` - Container for weights with exposure/turnover tracking
+  - `PortfolioConstructor` - Abstract base for portfolio construction
+  - `PositionSizer` - Abstract base for position sizing
+  - `WeightOptimizer` - Abstract base for weight optimization
+  - `Rebalancer` - Abstract base for rebalancing logic
+  - `RebalanceFrequency` - Enum for rebalancing schedules
+- **Position sizing methods** (5 methods):
+  - `EqualWeightSizer` - Equal weight allocation
+  - `SignalWeightedSizer` - Proportional to signal strength
+  - `VolatilityScaledSizer` - Inverse volatility weighting (risk parity)
+  - `RiskParitySizer` - Equal risk contribution (iterative optimization)
+  - `KellyCriterionSizer` - Kelly formula with fractional sizing
+- **Weight optimization methods** (5 optimizers):
+  - `MinimumVarianceOptimizer` - Minimize portfolio variance
+  - `MaxSharpeOptimizer` - Maximize risk-adjusted returns
+  - `MeanVarianceOptimizer` - Balance expected return and risk
+  - `RiskParityOptimizer` - Equalize risk contributions
+  - `MaxDiversificationOptimizer` - Maximize diversification ratio
+- **Rebalancing strategies** (5 strategies):
+  - `PeriodicRebalancer` - Time-based rebalancing (daily/weekly/monthly/etc)
+  - `ThresholdRebalancer` - Drift-based rebalancing
+  - `VolatilityTargetRebalancer` - Maintain target volatility
+  - `BandRebalancer` - Rebalance when outside allowed bands
+  - `SmartRebalancer` - Combine multiple triggers intelligently
+- **Portfolio constraints** (6 constraints):
+  - `PortfolioConstraints` - Manage multiple constraints
+  - `PositionLimitConstraint` - Individual position limits
+  - `SectorConstraint` - Sector exposure limits
+  - `TurnoverConstraint` - Limit trading turnover
+  - `LeverageConstraint` - Gross/net exposure limits
+  - `ConcentrationConstraint` - Herfindahl-based concentration limits
+- **Portfolio constructors** (3 types):
+  - `SimplePortfolioConstructor` - Basic signal-to-weights conversion
+  - `OptimizedPortfolioConstructor` - Optimization-based construction
+  - `HybridPortfolioConstructor` - Blend signals and optimization
+- **Complete portfolio workflow**:
+  - Signal → Position Sizing → Optimization → Constraints → Rebalancing → Portfolio
+  - Support for long-only and long-short portfolios
+  - Full exposure and turnover tracking
+  - Comprehensive metadata capture
+
+#### Technical Details
+- All optimizers use scipy.optimize with SLSQP method
+- Position sizing supports long-only and long-short modes
+- Constraints support both check() and enforce() methods
+- Rebalancing supports full and partial rebalancing
+- Portfolio tracking includes gross/net/long/short exposure
+- Complete end-to-end portfolio construction pipeline
+
 ### Phase 5-6: Signal Framework Completion
 
 #### Added
