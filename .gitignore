@@ -31,6 +31,10 @@ MANIFEST
 *.manifest
 *.spec
 
+#.md s
+*.md
+!README.md
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
@@ -66,7 +70,7 @@ venv.bak/
 Thumbs.db
 
 # Project specific
-data/
+/data/
 *.csv
 *.parquet
 *.h5
