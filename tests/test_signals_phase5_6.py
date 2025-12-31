@@ -108,7 +108,7 @@ class TestGrowthSignal:
     
     def test_basic_generation(self, sample_price_data):
         """Test basic growth signal generation."""
-        signal = GrowthSignal(periods=[20, 60, 120])
+        signal = GrowthSignal(growth_periods=(20, 60, 120))
         result = signal.generate(sample_price_data)
         
         assert result.shape == sample_price_data.get_close_prices().shape
@@ -120,7 +120,7 @@ class TestSizeSignal:
     
     def test_basic_generation(self, sample_price_data):
         """Test basic size signal generation."""
-        signal = SizeSignal(small_cap_preference=True)
+        signal = SizeSignal(favor_small=True)
         result = signal.generate(sample_price_data)
         
         assert result.shape == sample_price_data.get_close_prices().shape
