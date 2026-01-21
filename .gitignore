@@ -48,6 +48,11 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.pytest/
+
+# Test outputs
+test_results/
+test_reports/
 
 # Environments
 .env
