@@ -87,6 +87,14 @@ class BacktestResult:
         drawdown = (cumulative - running_max) / running_max
         return drawdown.min()
     
+    @property
+    def calmar_ratio(self) -> float:
+        """Calmar ratio (CAGR / abs(max_drawdown))."""
+        md = abs(self.max_drawdown)
+        if md == 0:
+            return 0.0
+        return self.cagr / md
+    
     def summary(self) -> pd.Series:
         """Get summary statistics."""
         return pd.Series({
