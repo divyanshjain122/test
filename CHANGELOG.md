@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 11: Parameter Optimization
+
+#### Added
+- **Grid search optimization** (`jsf.optimization`):
+  - `GridSearchOptimizer` - Systematic parameter search engine
+  - `ParameterGrid` - Iterator over parameter combinations
+  - `OptimizationResult` - Results container with best params and summary
+  - `optimize_strategy` - Convenience function for quick optimization
+- **Optimization features**:
+  - Support for multiple parameters simultaneously
+  - Customizable optimization metrics (Sharpe, return, Calmar, etc.)
+  - Progress tracking with tqdm
+  - Summary DataFrame with all tested combinations
+  - Sorted results by metric
+- **BacktestResult enhancements**:
+  - Added `calmar_ratio` property (CAGR / abs(max_drawdown))
+
+#### Examples
+- Created `optimization_example.py` with 4 comprehensive examples
+- Example 1: Single-parameter optimization (lookback period)
+- Example 2: Multi-parameter optimization (lookback + long_only)
+- Example 3: Compare optimized strategies
+- Example 4: Optimize using different metrics
+
+#### Testing
+- Tested with momentum strategy optimization
+- Found optimal parameters: lookback=30 (Sharpe 0.735)
+- Multi-parameter: lookback=120, long_only=True (Sharpe 2.00, 95.65% return)
+- Strategy comparison: Momentum beats Mean Reversion after optimization
+
 ### Phase 10: Visualization & Reporting
 
 #### Added
