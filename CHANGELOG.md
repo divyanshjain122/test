@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 8: Strategy Templates
+
+#### Added
+- **Base strategy infrastructure**:
+  - `Strategy` - Abstract base class for all trading strategies
+  - `StrategyType` - Enum for strategy classification (momentum, mean_reversion, trend_following, etc.)
+  - `StrategyMetadata` - Metadata container for strategy documentation
+- **Pre-built strategy templates** (3 templates):
+  - `MomentumStrategy` - Classic momentum (buy winners, sell/avoid losers)
+  - `MeanReversionStrategy` - Mean reversion (buy oversold, sell/avoid overbought)
+  - `TrendFollowingStrategy` - Trend following with MA crossover + trend strength
+- **Complete pipeline**:
+  - Signal generation → Portfolio construction → Strategy execution
+  - Configurable portfolio construction methods
+  - Support for long-only and long-short strategies
+  - Comprehensive parameter management
+
+#### Technical Details
+- All strategies implement run() method for complete execution
+- Strategies combine multiple signals intelligently
+- Full metadata tracking for reproducibility
+- Extensible architecture for custom strategies
+
 ### Phase 7: Portfolio Construction
 
 #### Added
