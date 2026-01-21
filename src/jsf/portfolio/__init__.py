@@ -12,6 +12,7 @@ from jsf.portfolio.base import (
     PositionSizer,
     WeightOptimizer,
     Rebalancer,
+    RebalanceFrequency,
 )
 
 # Position sizing methods
@@ -37,6 +38,8 @@ from jsf.portfolio.rebalancing import (
     PeriodicRebalancer,
     ThresholdRebalancer,
     VolatilityTargetRebalancer,
+    BandRebalancer,
+    SmartRebalancer,
 )
 
 # Constraints
@@ -63,6 +66,7 @@ __all__ = [
     "PositionSizer",
     "WeightOptimizer",
     "Rebalancer",
+    "RebalanceFrequency",
     # Position Sizing
     "EqualWeightSizer",
     "SignalWeightedSizer",
@@ -79,6 +83,8 @@ __all__ = [
     "PeriodicRebalancer",
     "ThresholdRebalancer",
     "VolatilityTargetRebalancer",
+    "BandRebalancer",
+    "SmartRebalancer",
     # Constraints
     "PortfolioConstraints",
     "PositionLimitConstraint",
