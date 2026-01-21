@@ -9,6 +9,7 @@ from jsf.data import load_data
 from jsf.strategies import MomentumStrategy, MeanReversionStrategy, TrendFollowingStrategy
 from jsf.simulation import BacktestEngine, BacktestConfig
 from jsf.simulation import calculate_all_metrics
+from jsf.visualization import plot_performance_summary
 
 def example_1_basic_backtest():
     """Example 1: Basic momentum strategy backtest."""
@@ -216,6 +217,45 @@ def example_4_transaction_costs():
     print("\nNote: Higher transaction costs reduce returns proportionally to trading frequency")
 
 
+def example_5_visualization():
+    """Example 5: Visualizing backtest results."""
+    print("\n\n" + "=" * 70)
+    print("Example 5: Visualization")
+    print("=" * 70)
+    
+    # Load data and run backtest
+    data = load_data(
+        source='synthetic',
+        symbols=['TECH_A', 'TECH_B', 'TECH_C'],
+        start_date='2021-01-01',
+        end_date='2023-12-31',
+        seed=999
+    )
+    
+    strategy = MomentumStrategy(lookback=90)
+    engine = BacktestEngine(BacktestConfig(initial_capital=100000))
+    result = engine.run_strategy(strategy, data)
+    
+    print(f"\nBacktest complete: {result.total_return:.2%} return, {result.sharpe_ratio:.2f} Sharpe")
+    
+    # Generate comprehensive performance dashboard
+    print("\nGenerating performance dashboard...")
+    plot_performance_summary(
+        result,
+        title="Example 5: Momentum Strategy Performance",
+        show=False,
+        save_path="example_5_dashboard.png"
+    )
+    
+    print("  ✓ Saved: example_5_dashboard.png")
+    print("\nThe dashboard includes:")
+    print("  - Equity curve over time")
+    print("  - Drawdown chart")
+    print("  - Returns distribution")
+    print("  - Rolling 60-day Sharpe ratio")
+    print("  - Complete performance metrics table")
+
+
 def main():
     """Run all examples."""
     print("\n")
@@ -231,6 +271,7 @@ def main():
         example_2_compare_strategies()
         example_3_detailed_metrics()
         example_4_transaction_costs()
+        example_5_visualization()
         
         print("\n" + "=" * 70)
         print("ALL EXAMPLES COMPLETE!")
@@ -242,6 +283,9 @@ def main():
         print("  - Strategy templates")
         print("  - Backtesting engine")
         print("  - Performance metrics")
+        print("  - Professional visualizations")
+        print("\nGenerated files:")
+        print("  - example_5_dashboard.png (comprehensive performance analysis)")
         print("\nNext steps:")
         print("  - Test with real market data")
         print("  - Optimize strategy parameters")

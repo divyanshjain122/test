@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 10: Visualization & Reporting
+
+#### Added
+- **Comprehensive plotting module** (`jsf.visualization`):
+  - `plot_equity_curve` - Portfolio value over time with key statistics
+  - `plot_drawdown` - Equity + drawdown chart with max drawdown highlight
+  - `plot_returns_distribution` - Histogram + Q-Q plot with normality test
+  - `plot_rolling_metrics` - 6-panel dashboard (returns, volatility, Sharpe, max DD, win rate, cumulative)
+  - `plot_monthly_returns` - Heatmap of monthly performance by year
+  - `plot_performance_summary` - Complete dashboard with all key metrics
+- **Professional styling**:
+  - Seaborn-based theme
+  - Publication-quality charts (300 DPI)
+  - Automatic date formatting
+  - Currency formatting
+  - Color-coded performance indicators
+- **Export capabilities**:
+  - Save to PNG files
+  - Configurable titles
+  - Optional display control
+
+#### Technical Details
+- Uses matplotlib + seaborn for plotting
+- GridSpec layouts for multi-panel dashboards
+- Automatic handling of date indices
+- Statistics boxes on charts
+- Q-Q plots for normality analysis
+- Heatmaps for periodic returns
+
+#### Examples
+- Created `visualization_example.py` demonstrating all 6 plot types
+- Updated `complete_backtest_example.py` with visualization
+- All plots tested and verified working
+
 ### Phase 9: Backtesting & Simulation Engine
 
 #### Added
