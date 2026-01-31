@@ -452,7 +452,7 @@ class LiveTradingEngine:
             prices: Current prices
         """
         account = self.broker.get_account()
-        positions = self.broker.get_positions()
+        positions = self.get_positions()  # Use the dict version
         
         # Calculate current weights
         current_weights = {}
@@ -516,8 +516,9 @@ class LiveTradingEngine:
     # ==========================================================================
     
     def get_positions(self) -> Dict[str, Position]:
-        """Get current positions."""
-        return self.broker.get_positions()
+        """Get current positions as a dictionary."""
+        positions_list = self.broker.get_positions()
+        return {p.symbol: p for p in positions_list}
     
     def get_position(self, symbol: str) -> Optional[Position]:
         """Get position for a symbol."""
@@ -615,7 +616,7 @@ class LiveTradingEngine:
             state=self._state,
             equity=account.equity,
             cash=account.cash,
-            positions=self.broker.get_positions(),
+            positions=self.get_positions(),
             prices=dict(prices),
             daily_pnl=self.daily_pnl,
             daily_return=self.daily_return,

@@ -219,7 +219,7 @@ class OrderManager:
             "on_order_expired": [],
         }
         
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()  # Use RLock for reentrant safety
         
         # Register for broker callbacks
         self._setup_broker_callbacks()
@@ -228,8 +228,8 @@ class OrderManager:
     
     def _setup_broker_callbacks(self) -> None:
         """Set up callbacks from broker."""
-        self.broker.register_callback("on_fill", self._handle_fill)
-        self.broker.register_callback("on_order_update", self._handle_order_update)
+        self.broker.on_fill(self._handle_fill)
+        self.broker.on_order_update(self._handle_order_update)
     
     # ==========================================================================
     # Order Submission
@@ -248,6 +248,9 @@ class OrderManager:
         Raises:
             OrderManagerError: If order cannot be submitted
         """
+        # Create tracker FIRST (before broker call) so fills can find it
+        tracker = OrderTracker(order=order)
+        
         with self._lock:
             # Check pending order limit
             if len(self._active_order_ids) >= self._max_pending_orders:
@@ -255,20 +258,35 @@ class OrderManager:
                     f"Maximum pending orders ({self._max_pending_orders}) reached"
                 )
             
-            # Create tracker
-            tracker = OrderTracker(order=order)
+            # Register tracker before broker submission
+            # This ensures fill callbacks can find the tracker
             self._orders[order.order_id] = tracker
             self._orders_by_symbol[order.symbol].append(order.order_id)
             self._active_order_ids.add(order.order_id)
         
         # Submit to broker (outside lock)
+        # Note: For paper broker, this may fill synchronously and trigger
+        # the fill callback before returning
         try:
             result = self.broker.submit_order(order)
             
             with self._lock:
-                tracker.state = OrderState.SUBMITTED
+                # Only update state if not already filled by callback
+                if tracker.state == OrderState.PENDING_SUBMIT:
+                    tracker.state = OrderState.SUBMITTED
                 tracker.submitted_at = datetime.now()
-                tracker.broker_order_id = result.broker_order_id
+                # Store broker's order ID if available
+                if result.order:
+                    tracker.broker_order_id = result.order.order_id
+                    # Check if order was already filled (market orders)
+                    if result.order.status == OrderStatus.FILLED:
+                        if tracker.state != OrderState.FILLED:
+                            # Create fill from order info if callback didn't fire
+                            tracker.filled_quantity = result.order.filled_quantity
+                            tracker.average_fill_price = result.order.avg_fill_price
+                            tracker.state = OrderState.FILLED
+                            tracker.filled_at = datetime.now()
+                            self._active_order_ids.discard(order.order_id)
             
             logger.info(
                 f"Submitted order {order.order_id}: "

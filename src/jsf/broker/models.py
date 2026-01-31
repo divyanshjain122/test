@@ -117,7 +117,7 @@ class Order:
     metadata: Dict[str, Any] = field(default_factory=dict)
     
     def __post_init__(self):
-        """Validate order parameters."""
+        """Validate order parameters and generate IDs if needed."""
         if self.quantity <= 0:
             raise ValueError("Order quantity must be positive")
         
@@ -128,6 +128,11 @@ class Order:
         if self.order_type in (OrderType.STOP, OrderType.STOP_LIMIT, OrderType.TRAILING_STOP):
             if self.stop_price is None or self.stop_price <= 0:
                 raise ValueError(f"{self.order_type.value} order requires positive stop_price")
+        
+        # Auto-generate order_id if not provided
+        if self.order_id is None:
+            import uuid
+            self.order_id = f"ord_{uuid.uuid4().hex[:12]}"
         
         if self.created_at is None:
             self.created_at = datetime.now()

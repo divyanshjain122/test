@@ -243,8 +243,9 @@ class PaperBroker(Broker):
                 error_code="NO_PRICE"
             )
         
-        # Assign order ID
-        order.order_id = f"ord_{uuid.uuid4().hex[:12]}"
+        # Assign order ID if not already set
+        if order.order_id is None:
+            order.order_id = f"ord_{uuid.uuid4().hex[:12]}"
         order.status = OrderStatus.SUBMITTED
         order.updated_at = datetime.now()
         
