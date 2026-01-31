@@ -28,6 +28,31 @@ from .config import (
     quick_config,
 )
 
+# Broker exports
+from .broker import (
+    # Base classes
+    Broker,
+    # Implementations
+    PaperBroker,
+    AlpacaBroker,
+    # Models
+    Order,
+    OrderSide,
+    OrderType,
+    OrderStatus,
+    TimeInForce,
+    Position,
+    Fill,
+    Trade,
+    AccountInfo,
+    OrderResult,
+    # Exceptions
+    BrokerError,
+    OrderError,
+    ConnectionError,
+    InsufficientFundsError,
+)
+
 # Core exports will be added as modules are developed
 __all__ = [
     "__version__",
@@ -45,4 +70,22 @@ __all__ = [
     "create_experiment_config",
     "get_default_strategy_config",
     "quick_config",
+    # Broker
+    "Broker",
+    "PaperBroker",
+    "AlpacaBroker",
+    "Order",
+    "OrderSide",
+    "OrderType",
+    "OrderStatus",
+    "TimeInForce",
+    "Position",
+    "Fill",
+    "Trade",
+    "AccountInfo",
+    "OrderResult",
+    "BrokerError",
+    "OrderError",
+    "ConnectionError",
+    "InsufficientFundsError",
 ]
