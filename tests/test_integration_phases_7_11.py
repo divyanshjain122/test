@@ -1,9 +1,9 @@
 """
-Comprehensive integration tests for Phases 7-11.
+Comprehensive integration tests for Phases 7-12.
 
 This test suite validates the complete end-to-end functionality
 of the portfolio construction, strategies, backtesting, visualization,
-and optimization modules.
+optimization, and walk-forward analysis modules.
 """
 
 import pytest
@@ -30,7 +30,14 @@ from jsf.visualization import (
     plot_returns_distribution,
     plot_performance_summary,
 )
-from jsf.optimization import optimize_strategy, GridSearchOptimizer, ParameterGrid
+from jsf.optimization import (
+    optimize_strategy,
+    GridSearchOptimizer,
+    ParameterGrid,
+    WalkForwardOptimizer,
+    WalkForwardResult,
+    walk_forward_analysis,
+)
 
 
 class TestPhase7Portfolio:
@@ -478,6 +485,174 @@ class TestEndToEndIntegration:
         print(f"  Trades: {len(result.trades)}")
         print(f"  Optimized Params: {opt_result.best_params}")
         print(f"  Optimized Sharpe: {opt_result.best_score:.2f}")
+
+
+class TestPhase12WalkForward:
+    """Test Phase 12: Walk-Forward Analysis."""
+    
+    @pytest.fixture
+    def long_data(self):
+        """Load 4 years of data for walk-forward testing."""
+        return load_data(
+            source='synthetic',
+            symbols=['AAPL', 'GOOGL', 'MSFT'],
+            start_date='2020-01-01',
+            end_date='2023-12-31',
+            seed=42
+        )
+    
+    def test_walk_forward_optimizer_creation(self):
+        """Test WalkForwardOptimizer initialization."""
+        optimizer = WalkForwardOptimizer(
+            is_days=252,
+            oos_days=63,
+            metric='sharpe_ratio',
+        )
+        
+        assert optimizer.is_days == 252
+        assert optimizer.oos_days == 63
+        assert optimizer.metric == 'sharpe_ratio'
+        assert optimizer.expanding == False
+    
+    def test_walk_forward_basic(self, long_data):
+        """Test basic walk-forward analysis."""
+        result = walk_forward_analysis(
+            strategy_class=MomentumStrategy,
+            param_grid={'lookback': [30, 60]},
+            data=long_data,
+            is_days=252,
+            oos_days=63,
+            metric='sharpe_ratio',
+            verbose=False,
+        )
+        
+        assert isinstance(result, WalkForwardResult)
+        assert result.n_windows > 0
+        assert result.avg_is_score is not None
+        assert result.avg_oos_score is not None
+        assert result.efficiency_ratio is not None
+        assert result.parameter_stability is not None
+        
+        print(f"\nWalk-Forward Test Results:")
+        print(f"  Windows: {result.n_windows}")
+        print(f"  Avg IS Sharpe: {result.avg_is_score:.3f}")
+        print(f"  Avg OOS Sharpe: {result.avg_oos_score:.3f}")
+        print(f"  Efficiency: {result.efficiency_ratio:.2%}")
+        print(f"  Param Stability: {result.parameter_stability:.2%}")
+        print(f"  Overfitted: {result.is_overfitted}")
+    
+    def test_walk_forward_rolling_windows(self, long_data):
+        """Test walk-forward with rolling windows."""
+        optimizer = WalkForwardOptimizer(
+            is_days=252,
+            oos_days=63,
+            step_days=63,  # Non-overlapping OOS
+            expanding=False,
+            metric='sharpe_ratio',
+        )
+        
+        result = optimizer.optimize(
+            strategy_class=MomentumStrategy,
+            param_grid={'lookback': [30, 60, 90]},
+            data=long_data,
+            verbose=False,
+        )
+        
+        # Check all windows have results
+        for window in result.windows:
+            assert window.best_params is not None
+            assert window.is_score is not None
+            assert window.oos_score is not None
+        
+        # Check summary DataFrame
+        summary = result.get_summary()
+        assert len(summary) == result.n_windows
+        assert 'is_score' in summary.columns
+        assert 'oos_score' in summary.columns
+    
+    def test_walk_forward_expanding_windows(self, long_data):
+        """Test walk-forward with expanding windows."""
+        optimizer = WalkForwardOptimizer(
+            is_days=252,
+            oos_days=63,
+            expanding=True,
+            min_is_days=126,
+            metric='sharpe_ratio',
+        )
+        
+        result = optimizer.optimize(
+            strategy_class=MomentumStrategy,
+            param_grid={'lookback': [30, 60]},
+            data=long_data,
+            verbose=False,
+        )
+        
+        assert result.n_windows > 0
+        
+        # Expanding window: each IS period should start from beginning
+        for window in result.windows:
+            # All IS periods start from the first date
+            assert window.is_start == long_data.start_date
+    
+    def test_walk_forward_overfitting_detection(self, long_data):
+        """Test that walk-forward can detect overfitting signals."""
+        result = walk_forward_analysis(
+            strategy_class=MomentumStrategy,
+            param_grid={'lookback': [30, 60, 90]},
+            data=long_data,
+            is_days=252,
+            oos_days=63,
+            verbose=False,
+        )
+        
+        # Check overfitting metrics exist and are sensible
+        assert 0 <= result.efficiency_ratio <= 2.0  # Can be > 1 if OOS beats IS
+        assert 0 <= result.parameter_stability <= 1.0
+        assert result.is_overfitted in [True, False]  # Boolean check
+        
+        # Combined OOS metrics should exist
+        assert result.oos_total_return is not None
+        assert result.oos_sharpe_ratio is not None
+        assert result.oos_max_drawdown is not None
+    
+    def test_walk_forward_parameter_summary(self, long_data):
+        """Test parameter summary across windows."""
+        result = walk_forward_analysis(
+            strategy_class=MomentumStrategy,
+            param_grid={'lookback': [30, 60, 90]},
+            data=long_data,
+            is_days=252,
+            oos_days=63,
+            verbose=False,
+        )
+        
+        param_summary = result.get_parameter_summary()
+        
+        assert len(param_summary) == result.n_windows
+        assert 'lookback' in param_summary.columns
+        assert 'window' in param_summary.columns
+        
+        # All lookback values should be from the grid
+        assert all(param_summary['lookback'].isin([30, 60, 90]))
+    
+    def test_walk_forward_string_output(self, long_data):
+        """Test string representation of results."""
+        result = walk_forward_analysis(
+            strategy_class=MomentumStrategy,
+            param_grid={'lookback': [30, 60]},
+            data=long_data,
+            is_days=252,
+            oos_days=63,
+            verbose=False,
+        )
+        
+        output = str(result)
+        
+        assert 'WALK-FORWARD ANALYSIS RESULTS' in output
+        assert 'IN-SAMPLE PERFORMANCE' in output
+        assert 'OUT-OF-SAMPLE PERFORMANCE' in output
+        assert 'Efficiency Ratio' in output
+        assert 'Parameter Stability' in output
 
 
 if __name__ == "__main__":
