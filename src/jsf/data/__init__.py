@@ -23,6 +23,14 @@ from .preprocessing import (
     calculate_volatility,
 )
 
+# External data sources (Phase 13)
+from .sources import (
+    YahooFinanceLoader,
+    load_yahoo_data,
+    EnhancedCSVLoader,
+    load_csv_data,
+)
+
 __all__ = [
     # Base classes
     "DataLoader",
@@ -34,6 +42,11 @@ __all__ = [
     "InMemoryLoader",
     "SyntheticDataLoader",
     "load_data",
+    # External sources (Phase 13)
+    "YahooFinanceLoader",
+    "load_yahoo_data",
+    "EnhancedCSVLoader",
+    "load_csv_data",
     # Universe
     "Universe",
     "UniverseFilter",
