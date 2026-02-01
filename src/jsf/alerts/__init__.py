@@ -39,6 +39,13 @@ from jsf.alerts.base import (
 
 from jsf.alerts.manager import AlertManager, create_default_manager
 from jsf.alerts.console import ConsoleAlerter
+from jsf.alerts.integration import (
+    create_order_alert,
+    create_position_alert,
+    create_risk_alert,
+    create_strategy_alert,
+    create_system_alert,
+)
 
 # Conditional imports
 try:
@@ -63,4 +70,10 @@ __all__ = [
     "ConsoleAlerter",
     "TelegramAlerter",
     "TelegramChannelAlerter",
+    # Integration helpers
+    "create_order_alert",
+    "create_position_alert",
+    "create_risk_alert",
+    "create_strategy_alert",
+    "create_system_alert",
 ]
