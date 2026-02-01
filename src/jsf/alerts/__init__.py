@@ -37,13 +37,15 @@ from jsf.alerts.base import (
     AlertError,
 )
 
-from jsf.alerts.manager import AlertManager
+from jsf.alerts.manager import AlertManager, create_default_manager
+from jsf.alerts.console import ConsoleAlerter
 
 # Conditional imports
 try:
-    from jsf.alerts.telegram import TelegramAlerter
+    from jsf.alerts.telegram import TelegramAlerter, TelegramChannelAlerter
 except ImportError:
     TelegramAlerter = None
+    TelegramChannelAlerter = None
 
 __all__ = [
     # Models
@@ -56,6 +58,9 @@ __all__ = [
     "AlertError",
     # Manager
     "AlertManager",
+    "create_default_manager",
     # Alerters
+    "ConsoleAlerter",
     "TelegramAlerter",
+    "TelegramChannelAlerter",
 ]
