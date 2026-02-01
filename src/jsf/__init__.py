@@ -70,6 +70,28 @@ from .live import (
     TradingState,
     EngineConfig,
 )
+
+# Dashboard exports
+from .dashboard import (
+    # Models
+    DashboardState,
+    DashboardConfig,
+    PortfolioSnapshot,
+    PositionSnapshot,
+    TradeRecord,
+    RiskMetrics,
+    PerformanceMetrics,
+    # Collectors
+    DataCollector,
+    MockDataCollector,
+    SnapshotHistory,
+    # Metrics
+    MetricsCalculator,
+    calculate_drawdown,
+    calculate_sharpe,
+    calculate_sortino,
+    calculate_var,
+)
 __all__ = [
     "__version__",
     "__author__",
@@ -116,4 +138,20 @@ __all__ = [
     "LiveTradingEngine",
     "TradingState",
     "EngineConfig",
+    # Dashboard
+    "DashboardState",
+    "DashboardConfig",
+    "PortfolioSnapshot",
+    "PositionSnapshot",
+    "TradeRecord",
+    "RiskMetrics",
+    "PerformanceMetrics",
+    "DataCollector",
+    "MockDataCollector",
+    "SnapshotHistory",
+    "MetricsCalculator",
+    "calculate_drawdown",
+    "calculate_sharpe",
+    "calculate_sortino",
+    "calculate_var",
 ]
