@@ -247,8 +247,9 @@ class TestOptimizationConfig:
     """Test OptimizationConfig schema."""
     
     def test_default_creation(self) -> None:
-        """Test creation with defaults."""
-        config = OptimizationConfig()
+        """Test creation with defaults for random search."""
+        # Default method is random_search, which doesn't require parameter_grid
+        config = OptimizationConfig(method="random_search")
         assert config.n_trials == 100
         assert config.maximize is True
     
