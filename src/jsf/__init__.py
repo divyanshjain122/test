@@ -53,7 +53,23 @@ from .broker import (
     InsufficientFundsError,
 )
 
-# Core exports will be added as modules are developed
+# Live Trading exports
+from .live import (
+    # Data handlers
+    DataHandler,
+    PriceUpdate,
+    BarData,
+    PollingDataHandler,
+    RealtimeDataHandler,
+    SimulatedDataHandler,
+    # Order management
+    OrderManager,
+    OrderTracker,
+    # Engine
+    LiveTradingEngine,
+    TradingState,
+    EngineConfig,
+)
 __all__ = [
     "__version__",
     "__author__",
@@ -88,4 +104,16 @@ __all__ = [
     "OrderError",
     "ConnectionError",
     "InsufficientFundsError",
+    # Live Trading
+    "DataHandler",
+    "PriceUpdate",
+    "BarData",
+    "PollingDataHandler",
+    "RealtimeDataHandler",
+    "SimulatedDataHandler",
+    "OrderManager",
+    "OrderTracker",
+    "LiveTradingEngine",
+    "TradingState",
+    "EngineConfig",
 ]
