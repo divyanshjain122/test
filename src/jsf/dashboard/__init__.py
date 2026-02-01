@@ -30,6 +30,7 @@ from .models import (
 from .collectors import (
     DataCollector,
     SnapshotHistory,
+    MockDataCollector,
 )
 
 from .metrics import (
@@ -52,6 +53,7 @@ __all__ = [
     # Collectors
     "DataCollector",
     "SnapshotHistory",
+    "MockDataCollector",
     # Metrics
     "MetricsCalculator",
     "calculate_drawdown",
