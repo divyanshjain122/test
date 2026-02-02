@@ -152,11 +152,11 @@ class TestRebalanceFrequency:
     
     def test_frequency_values(self):
         """Test all frequency enum values exist."""
-        assert RebalanceFrequency.DAILY == "daily"
-        assert RebalanceFrequency.WEEKLY == "weekly"
-        assert RebalanceFrequency.MONTHLY == "monthly"
-        assert RebalanceFrequency.QUARTERLY == "quarterly"
-        assert RebalanceFrequency.YEARLY == "yearly"
+        assert RebalanceFrequency.DAILY.value == "daily"
+        assert RebalanceFrequency.WEEKLY.value == "weekly"
+        assert RebalanceFrequency.MONTHLY.value == "monthly"
+        assert RebalanceFrequency.QUARTERLY.value == "quarterly"
+        assert RebalanceFrequency.YEARLY.value == "yearly"
 
 
 # ============================================================================

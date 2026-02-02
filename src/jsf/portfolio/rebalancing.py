@@ -98,6 +98,49 @@ class ThresholdRebalancer(Rebalancer):
     """
     Threshold-based rebalancing.
     
+    Rebalances when weights drift beyond threshold.
+    """
+    
+    def __init__(
+        self,
+        drift_threshold: float = 0.05,
+        name: str = "threshold",
+    ):
+        """
+        Initialize threshold rebalancer.
+        
+        Args:
+            drift_threshold: Maximum allowed drift from target
+            name: Rebalancer name
+        """
+        super().__init__(name=name, drift_threshold=drift_threshold)
+        self.drift_threshold = drift_threshold
+    
+    def should_rebalance(
+        self,
+        current_weights: pd.Series,
+        target_weights: pd.Series,
+        date: datetime,
+        **kwargs: Any
+    ) -> bool:
+        """Check if drift exceeds threshold."""
+        drift = (current_weights - target_weights).abs().sum()
+        return drift > self.drift_threshold
+    
+    def rebalance(
+        self,
+        current_weights: pd.Series,
+        target_weights: pd.Series,
+        **kwargs: Any
+    ) -> pd.Series:
+        """Rebalance to target weights."""
+        return target_weights
+
+
+class VolatilityTargetRebalancer(Rebalancer):
+    """
+    Volatility-target rebalancing.
+    
     Rebalances when position drift exceeds threshold.
     """
     
@@ -168,6 +211,7 @@ class VolatilityTargetRebalancer(Rebalancer):
         self,
         target_volatility: float = 0.10,
         lookback: int = 60,
+        tolerance: float = 0.02,
         rebalance_frequency: int = 5,
         name: str = "volatility_target",
     ):
@@ -177,6 +221,7 @@ class VolatilityTargetRebalancer(Rebalancer):
         Args:
             target_volatility: Target annualized volatility
             lookback: Lookback period for volatility estimation
+            tolerance: Tolerance band around target (e.g., 0.02 = 2%)
             rebalance_frequency: Check volatility every N days
             name: Rebalancer name
         """
@@ -184,10 +229,12 @@ class VolatilityTargetRebalancer(Rebalancer):
             name=name,
             target_volatility=target_volatility,
             lookback=lookback,
+            tolerance=tolerance,
             rebalance_frequency=rebalance_frequency,
         )
         self.target_volatility = target_volatility
         self.lookback = lookback
+        self.tolerance = tolerance
         self.rebalance_frequency = rebalance_frequency
         self.last_rebalance: Optional[datetime] = None
         self.check_counter = 0
@@ -252,6 +299,7 @@ class BandRebalancer(Rebalancer):
         lower_band: float = -0.05,
         upper_band: float = 0.05,
         partial_rebalance: bool = True,
+        rebalance_to_target: bool = True,
         name: str = "band",
     ):
         """
@@ -261,6 +309,7 @@ class BandRebalancer(Rebalancer):
             lower_band: Lower deviation band
             upper_band: Upper deviation band
             partial_rebalance: If True, only rebalance drifted positions
+            rebalance_to_target: If True, rebalance to target; else to band edge
             name: Rebalancer name
         """
         super().__init__(
@@ -268,10 +317,12 @@ class BandRebalancer(Rebalancer):
             lower_band=lower_band,
             upper_band=upper_band,
             partial_rebalance=partial_rebalance,
+            rebalance_to_target=rebalance_to_target,
         )
         self.lower_band = lower_band
         self.upper_band = upper_band
         self.partial_rebalance = partial_rebalance
+        self.rebalance_to_target = rebalance_to_target
     
     def should_rebalance(
         self,
@@ -333,6 +384,7 @@ class SmartRebalancer(Rebalancer):
     def __init__(
         self,
         min_days: int = 5,
+        min_days_between: int = None,  # Alias for min_days
         max_days: int = 30,
         threshold: float = 0.10,
         vol_threshold: float = 0.20,
@@ -343,11 +395,16 @@ class SmartRebalancer(Rebalancer):
         
         Args:
             min_days: Minimum days between rebalances
+            min_days_between: Alias for min_days
             max_days: Maximum days between rebalances
             threshold: Position drift threshold
             vol_threshold: Volatility change threshold
             name: Rebalancer name
         """
+        # Handle alias
+        if min_days_between is not None:
+            min_days = min_days_between
+        
         super().__init__(
             name=name,
             min_days=min_days,
@@ -356,6 +413,7 @@ class SmartRebalancer(Rebalancer):
             vol_threshold=vol_threshold,
         )
         self.min_days = min_days
+        self.min_days_between = min_days  # Store alias
         self.max_days = max_days
         self.threshold = threshold
         self.vol_threshold = vol_threshold

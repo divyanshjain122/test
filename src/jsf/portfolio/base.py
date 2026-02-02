@@ -20,7 +20,8 @@ class RebalanceFrequency(Enum):
     WEEKLY = "weekly"
     MONTHLY = "monthly"
     QUARTERLY = "quarterly"
-    ANNUALLY = "annually"
+    YEARLY = "yearly"
+    ANNUALLY = "annually"  # Alias for YEARLY
     CUSTOM = "custom"
 
 
@@ -30,23 +31,65 @@ class Portfolio:
     Portfolio container holding positions and weights.
     
     Attributes:
-        weights: DataFrame of portfolio weights (date x symbol)
+        weights: DataFrame/Series of portfolio weights
         metadata: Additional portfolio metadata
         cash: Cash position over time
         leverage: Leverage ratio over time
+        timestamp: Portfolio timestamp (for single-period portfolios)
+        previous_weights: Previous weights for turnover calculation
     """
-    weights: pd.DataFrame
+    weights: Any  # pd.DataFrame or pd.Series
     metadata: Dict[str, Any] = field(default_factory=dict)
     cash: Optional[pd.Series] = None
     leverage: Optional[pd.Series] = None
+    timestamp: Optional[Any] = None
+    previous_weights: Optional[pd.Series] = None
     
     def __post_init__(self):
-        """Validate portfolio data."""
-        if not isinstance(self.weights, pd.DataFrame):
-            raise ValueError("weights must be a pandas DataFrame")
-        
-        if not isinstance(self.weights.index, pd.DatetimeIndex):
-            raise ValueError("weights index must be DatetimeIndex")
+        """Validate portfolio data and calculate metrics."""
+        # Handle both Series and DataFrame
+        if isinstance(self.weights, pd.Series):
+            # Single period portfolio - convert to DataFrame for consistency
+            self._weights_series = self.weights
+            # Store original series for property access
+        elif isinstance(self.weights, pd.DataFrame):
+            if not isinstance(self.weights.index, pd.DatetimeIndex):
+                raise ValueError("weights index must be DatetimeIndex")
+            self._weights_series = None
+        else:
+            raise ValueError("weights must be a pandas Series or DataFrame")
+    
+    @property
+    def long_exposure(self) -> float:
+        """Calculate long exposure."""
+        weights = self._weights_series if self._weights_series is not None else self.weights.iloc[-1]
+        return weights.clip(lower=0).sum()
+    
+    @property
+    def short_exposure(self) -> float:
+        """Calculate short exposure."""
+        weights = self._weights_series if self._weights_series is not None else self.weights.iloc[-1]
+        return weights.clip(upper=0).abs().sum()
+    
+    @property
+    def net_exposure(self) -> float:
+        """Calculate net exposure."""
+        weights = self._weights_series if self._weights_series is not None else self.weights.iloc[-1]
+        return weights.sum()
+    
+    @property
+    def gross_exposure(self) -> float:
+        """Calculate gross exposure."""
+        weights = self._weights_series if self._weights_series is not None else self.weights.iloc[-1]
+        return weights.abs().sum()
+    
+    @property
+    def turnover(self) -> float:
+        """Calculate turnover from previous weights."""
+        if self.previous_weights is None:
+            return 0.0
+        weights = self._weights_series if self._weights_series is not None else self.weights.iloc[-1]
+        return (weights - self.previous_weights).abs().sum() / 2
     
     def get_positions(self, date: Optional[datetime] = None) -> pd.Series:
         """
@@ -226,6 +269,26 @@ class PositionSizer(ABC):
             DataFrame of position weights
         """
         pass
+    
+    def size_positions(self, signals: Any, price_data: Optional[Any] = None, **kwargs: Any) -> Any:
+        """
+        Alias for size() method to support legacy API.
+        
+        Args:
+            signals: Signal Series or DataFrame
+            price_data: Price data for calculations
+            **kwargs: Additional parameters
+        
+        Returns:
+            Position weights (Series or DataFrame)
+        """
+        # Handle Series input by converting to DataFrame
+        if isinstance(signals, pd.Series):
+            signals_df = pd.DataFrame([signals])
+            result = self.size(signals_df, price_data, **kwargs)
+            return result.iloc[0]  # Return as Series
+        else:
+            return self.size(signals, price_data, **kwargs)
 
 
 class WeightOptimizer(ABC):

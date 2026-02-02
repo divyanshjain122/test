@@ -28,7 +28,8 @@ class SimplePortfolioConstructor(PortfolioConstructor):
     
     def __init__(
         self,
-        position_sizer: PositionSizer,
+        position_sizer: PositionSizer = None,
+        sizer: PositionSizer = None,  # Alias for position_sizer
         rebalancer: Optional[Rebalancer] = None,
         constraints: Optional[PortfolioConstraints] = None,
         name: str = "simple_portfolio",
@@ -38,22 +39,39 @@ class SimplePortfolioConstructor(PortfolioConstructor):
         
         Args:
             position_sizer: Position sizing method
+            sizer: Alias for position_sizer
             rebalancer: Rebalancing strategy (optional)
             constraints: Portfolio constraints (optional)
             name: Constructor name
         """
         super().__init__(name=name)
+        # Handle sizer alias
+        if sizer is not None:
+            position_sizer = sizer
+        if position_sizer is None:
+            raise ValueError("Must specify either position_sizer or sizer")
+        
         self.position_sizer = position_sizer
+        self.sizer = position_sizer  # Store alias too
         self.rebalancer = rebalancer
         self.constraints = constraints or PortfolioConstraints()
     
     def construct(
         self,
-        signals: pd.DataFrame,
+        signals: pd.DataFrame | pd.Series,
         price_data: PriceData,
+        timestamp: Any = None,
         **kwargs: Any
     ) -> Portfolio:
         """Construct portfolio from signals."""
+        # Handle Series (single row) input
+        if isinstance(signals, pd.Series):
+            if timestamp is None:
+                timestamp = signals.name if hasattr(signals, 'name') else pd.Timestamp.now()
+            signals_df = pd.DataFrame([signals])
+            signals_df.index = [timestamp]
+            signals = signals_df
+        
         self.validate_signals(signals)
         
         # Generate initial weights from signals
@@ -103,11 +121,21 @@ class SimplePortfolioConstructor(PortfolioConstructor):
             
             weights = rebalanced_weights
         
-        return Portfolio(weights=weights, metadata={
-            "constructor": self.name,
-            "position_sizer": self.position_sizer.name,
-            "rebalancer": self.rebalancer.name if self.rebalancer else None,
-        })
+        # Extract timestamp if single row
+        ts = timestamp if timestamp is not None else (weights.index[0] if len(weights) == 1 else None)
+        
+        # Convert to Series if single row (for backward compatibility)
+        final_weights = weights.iloc[0] if len(weights) == 1 else weights
+        
+        return Portfolio(
+            weights=final_weights,
+            timestamp=ts,
+            metadata={
+                "constructor": self.name,
+                "position_sizer": self.position_sizer.name,
+                "rebalancer": self.rebalancer.name if self.rebalancer else None,
+            }
+        )
 
 
 class OptimizedPortfolioConstructor(PortfolioConstructor):
@@ -143,11 +171,20 @@ class OptimizedPortfolioConstructor(PortfolioConstructor):
     
     def construct(
         self,
-        signals: pd.DataFrame,
+        signals: pd.DataFrame | pd.Series,
         price_data: PriceData,
+        timestamp: Any = None,
         **kwargs: Any
     ) -> Portfolio:
         """Construct optimized portfolio."""
+        # Handle Series (single row) input
+        if isinstance(signals, pd.Series):
+            if timestamp is None:
+                timestamp = signals.name if hasattr(signals, 'name') else pd.Timestamp.now()
+            signals_df = pd.DataFrame([signals])
+            signals_df.index = [timestamp]
+            signals = signals_df
+        
         self.validate_signals(signals)
         
         returns = price_data.get_returns(periods=1)
@@ -229,12 +266,22 @@ class OptimizedPortfolioConstructor(PortfolioConstructor):
             
             weights = rebalanced_weights
         
-        return Portfolio(weights=weights, metadata={
-            "constructor": self.name,
-            "optimizer": self.optimizer.name,
-            "lookback": self.lookback,
-            "rebalancer": self.rebalancer.name if self.rebalancer else None,
-        })
+        # Extract timestamp if single row
+        ts = timestamp if timestamp is not None else (weights.index[0] if len(weights) == 1 else None)
+        
+        # Convert to Series if single row (for backward compatibility)
+        final_weights = weights.iloc[0] if len(weights) == 1 else weights
+        
+        return Portfolio(
+            weights=final_weights,
+            timestamp=ts,
+            metadata={
+                "constructor": self.name,
+                "optimizer": self.optimizer.name,
+                "lookback": self.lookback,
+                "rebalancer": self.rebalancer.name if self.rebalancer else None,
+            }
+        )
 
 
 class HybridPortfolioConstructor(PortfolioConstructor):
@@ -246,9 +293,11 @@ class HybridPortfolioConstructor(PortfolioConstructor):
     
     def __init__(
         self,
-        position_sizer: PositionSizer,
+        position_sizer: PositionSizer = None,
+        sizer: PositionSizer = None,  # Alias
         optimizer: Optional[WeightOptimizer] = None,
         signal_weight: float = 0.5,
+        blend_alpha: float = None,  # Alias for signal_weight
         lookback: int = 60,
         rebalancer: Optional[Rebalancer] = None,
         constraints: Optional[PortfolioConstraints] = None,
@@ -259,28 +308,51 @@ class HybridPortfolioConstructor(PortfolioConstructor):
         
         Args:
             position_sizer: Position sizing method
+            sizer: Alias for position_sizer
             optimizer: Weight optimizer (optional)
             signal_weight: Weight for signal-based allocation (0-1)
+            blend_alpha: Alias for signal_weight
             lookback: Lookback for risk calculations
             rebalancer: Rebalancing strategy (optional)
             constraints: Portfolio constraints (optional)
             name: Constructor name
         """
         super().__init__(name=name)
+        # Handle sizer alias
+        if sizer is not None:
+            position_sizer = sizer
+        if position_sizer is None:
+            raise ValueError("Must specify either position_sizer or sizer")
+        
+        # Handle blend_alpha alias
+        if blend_alpha is not None:
+            signal_weight = blend_alpha
+        
         self.position_sizer = position_sizer
+        self.sizer = position_sizer  # Store alias
         self.optimizer = optimizer
         self.signal_weight = signal_weight
+        self.blend_alpha = signal_weight  # Store alias
         self.lookback = lookback
         self.rebalancer = rebalancer
         self.constraints = constraints or PortfolioConstraints()
     
     def construct(
         self,
-        signals: pd.DataFrame,
+        signals: pd.DataFrame | pd.Series,
         price_data: PriceData,
+        timestamp: Any = None,
         **kwargs: Any
     ) -> Portfolio:
         """Construct hybrid portfolio."""
+        # Handle Series (single row) input
+        if isinstance(signals, pd.Series):
+            if timestamp is None:
+                timestamp = signals.name if hasattr(signals, 'name') else pd.Timestamp.now()
+            signals_df = pd.DataFrame([signals])
+            signals_df.index = [timestamp]
+            signals = signals_df
+        
         self.validate_signals(signals)
         
         # Get signal-based weights
@@ -371,9 +443,19 @@ class HybridPortfolioConstructor(PortfolioConstructor):
             
             final_weights = rebalanced_weights
         
-        return Portfolio(weights=final_weights, metadata={
-            "constructor": self.name,
-            "position_sizer": self.position_sizer.name,
-            "optimizer": self.optimizer.name if self.optimizer else None,
-            "signal_weight": self.signal_weight,
-        })
+        # Extract timestamp if single row
+        ts = timestamp if timestamp is not None else (final_weights.index[0] if len(final_weights) == 1 else None)
+        
+        # Convert to Series if single row (for backward compatibility)
+        result_weights = final_weights.iloc[0] if len(final_weights) == 1 else final_weights
+        
+        return Portfolio(
+            weights=result_weights,
+            timestamp=ts,
+            metadata={
+                "constructor": self.name,
+                "position_sizer": self.position_sizer.name,
+                "optimizer": self.optimizer.name if self.optimizer else None,
+                "signal_weight": self.signal_weight,
+            }
+        )

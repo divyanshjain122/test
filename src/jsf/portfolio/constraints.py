@@ -62,6 +62,10 @@ class PortfolioConstraints:
         self.constraints.append(constraint)
         logger.info(f"Added constraint: {constraint.name}")
     
+    def check(self, weights: pd.Series, **kwargs: Any) -> bool:
+        """Alias for check_all."""
+        return self.check_all(weights, **kwargs)
+    
     def check_all(self, weights: pd.Series, **kwargs: Any) -> bool:
         """Check if all constraints are satisfied."""
         for constraint in self.constraints:
@@ -111,10 +115,14 @@ class PositionLimitConstraint(Constraint):
     def check(self, weights: pd.Series, **kwargs: Any) -> bool:
         """Check if position limits satisfied."""
         if self.apply_to_shorts:
-            return (weights.abs() <= self.max_weight).all()
+            # Check absolute values
+            violations = weights.abs() > self.max_weight
+            return not violations.any()
         else:
+            # Only check long positions
             long_positions = weights[weights > 0]
-            return (long_positions <= self.max_weight).all()
+            violations = long_positions > self.max_weight
+            return not violations.any()
     
     def enforce(self, weights: pd.Series, **kwargs: Any) -> pd.Series:
         """Enforce position limits."""
@@ -146,6 +154,7 @@ class SectorConstraint(Constraint):
         self,
         sector_map: Dict[str, str],
         max_sector_weight: float = 0.5,
+        max_sector_exposure: float = None,  # Alias for max_sector_weight
         min_sector_weight: float = 0.0,
     ):
         """
@@ -154,9 +163,14 @@ class SectorConstraint(Constraint):
         Args:
             sector_map: Mapping of symbol -> sector
             max_sector_weight: Maximum weight per sector
+            max_sector_exposure: Alias for max_sector_weight
             min_sector_weight: Minimum weight per sector
         """
         super().__init__(name="sector")
+        # Handle alias
+        if max_sector_exposure is not None:
+            max_sector_weight = max_sector_exposure
+        
         self.sector_map = sector_map
         self.max_sector_weight = max_sector_weight
         self.min_sector_weight = min_sector_weight
@@ -227,9 +241,11 @@ class TurnoverConstraint(Constraint):
         super().__init__(name="turnover")
         self.max_turnover = max_turnover
     
-    def check(self, weights: pd.Series, **kwargs: Any) -> bool:
+    def check(self, weights: pd.Series, previous_weights: pd.Series = None, **kwargs: Any) -> bool:
         """Check if turnover is within limit."""
-        previous_weights = kwargs.get("previous_weights", None)
+        # Get previous weights from kwargs if not provided directly
+        if previous_weights is None:
+            previous_weights = kwargs.get("previous_weights", None)
         
         if previous_weights is None:
             return True  # No previous weights to compare
@@ -355,15 +371,22 @@ class ConcentrationConstraint(Constraint):
     def __init__(
         self,
         max_herfindahl: float = 0.2,
+        max_concentration: float = None,  # Alias for max_herfindahl
     ):
         """
         Initialize concentration constraint.
         
         Args:
             max_herfindahl: Maximum Herfindahl index
+            max_concentration: Alias for max_herfindahl
         """
+        # Handle alias
+        if max_concentration is not None:
+            max_herfindahl = max_concentration
+        
         super().__init__(name="concentration")
         self.max_herfindahl = max_herfindahl
+        self.max_concentration = max_herfindahl  # Store alias
     
     def check(self, weights: pd.Series, **kwargs: Any) -> bool:
         """Check if concentration limit satisfied."""

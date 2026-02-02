@@ -21,7 +21,8 @@ class EqualWeightSizer(PositionSizer):
     
     def __init__(
         self,
-        long_only: bool = True,
+        long_only: bool = False,
+        max_positions: Optional[int] = None,
         name: str = "equal_weight",
     ):
         """
@@ -29,13 +30,16 @@ class EqualWeightSizer(PositionSizer):
         
         Args:
             long_only: If True, only take long positions
+            max_positions: Maximum number of positions (None = unlimited)
             name: Sizer name
         """
         super().__init__(
             name=name,
             long_only=long_only,
+            max_positions=max_positions,
         )
         self.long_only = long_only
+        self.max_positions = max_positions
     
     def size(
         self,
@@ -45,13 +49,6 @@ class EqualWeightSizer(PositionSizer):
     ) -> pd.DataFrame:
         """Calculate equal-weighted positions."""
         weights = signals.copy()
-        
-        # Filter signals
-        if self.long_only:
-            weights[weights <= 0] = 0
-        
-        # Count non-zero positions
-        n_positions = (weights != 0).sum(axis=1)
         
         # Assign equal weight
         result = pd.DataFrame(
@@ -64,18 +61,22 @@ class EqualWeightSizer(PositionSizer):
             row = weights.loc[idx]
             active = row != 0
             
-            if active.sum() > 0:
+            if self.long_only:
+                # Only consider non-negative signals
+                active = active & (row > 0)
+            
+            # Apply max_positions limit if specified
+            if self.max_positions is not None and active.sum() > self.max_positions:
+                # Select top positions by absolute signal value
+                top_positions = row.abs().nlargest(self.max_positions).index
+                active = row.index.isin(top_positions)
                 if self.long_only:
-                    result.loc[idx, active] = 1.0 / active.sum()
-                else:
-                    # Long and short separately
-                    long_mask = row > 0
-                    short_mask = row < 0
-                    
-                    if long_mask.sum() > 0:
-                        result.loc[idx, long_mask] = 0.5 / long_mask.sum()
-                    if short_mask.sum() > 0:
-                        result.loc[idx, short_mask] = -0.5 / short_mask.sum()
+                    active = active & (row > 0)
+            
+            if active.sum() > 0:
+                # Equal absolute weight (always positive)
+                equal_weight = 1.0 / active.sum()
+                result.loc[idx, active] = equal_weight
             else:
                 result.loc[idx] = 0.0
         
@@ -92,7 +93,8 @@ class SignalWeightedSizer(PositionSizer):
     def __init__(
         self,
         normalize: bool = True,
-        long_only: bool = True,
+        long_only: bool = False,
+        signal_scale: float = 1.0,
         name: str = "signal_weighted",
     ):
         """
@@ -101,15 +103,18 @@ class SignalWeightedSizer(PositionSizer):
         Args:
             normalize: If True, normalize weights to sum to 1
             long_only: If True, only take long positions
+            signal_scale: Scaling factor for signals
             name: Sizer name
         """
         super().__init__(
             name=name,
             normalize=normalize,
             long_only=long_only,
+            signal_scale=signal_scale,
         )
         self.normalize = normalize
         self.long_only = long_only
+        self.signal_scale = signal_scale
     
     def size(
         self,
@@ -318,6 +323,7 @@ class KellyCriterionSizer(PositionSizer):
         self,
         lookback: int = 60,
         fraction: float = 0.5,
+        kelly_fraction: float = None,  # Alias for fraction
         long_only: bool = True,
         name: str = "kelly",
     ):
@@ -327,9 +333,14 @@ class KellyCriterionSizer(PositionSizer):
         Args:
             lookback: Lookback for return/variance estimation
             fraction: Fraction of Kelly (0.5 = half Kelly)
+            kelly_fraction: Alias for fraction parameter
             long_only: If True, only take long positions
             name: Sizer name
         """
+        # Handle kelly_fraction alias
+        if kelly_fraction is not None:
+            fraction = kelly_fraction
+        
         super().__init__(
             name=name,
             lookback=lookback,
