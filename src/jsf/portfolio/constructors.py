@@ -365,10 +365,11 @@ class HybridPortfolioConstructor(PortfolioConstructor):
             # Blend signal weights with optimized weights
             returns = price_data.get_returns(periods=1)
             
+            # Initialize with zeros (not NaN) to avoid blending issues
             optimized_weights = pd.DataFrame(
+                0.0,  # Fill with 0
                 index=signals.index,
                 columns=signals.columns,
-                dtype=float,
             )
             
             for i, date in enumerate(signals.index):

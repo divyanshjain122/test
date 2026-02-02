@@ -159,11 +159,25 @@ class MaxSharpeOptimizer(WeightOptimizer):
     def optimize(
         self,
         signals: pd.DataFrame,
-        covariance: pd.DataFrame,
-        expected_returns: pd.Series,
+        covariance_or_price_data: Any,
+        expected_returns: Optional[pd.Series] = None,
         **kwargs: Any
     ) -> pd.Series:
         """Optimize for maximum Sharpe ratio."""
+        # Handle price_data vs covariance
+        if hasattr(covariance_or_price_data, 'get_returns'):
+            # It's a PriceData object
+            returns = covariance_or_price_data.get_returns(periods=1)
+            # Filter to only include symbols in signals
+            common_symbols = signals.index.intersection(returns.columns)
+            returns = returns[common_symbols]
+            covariance = returns.cov()
+            expected_returns = returns.mean()
+            signals = signals[common_symbols]
+        else:
+            # It's a covariance matrix
+            covariance = covariance_or_price_data
+        
         n = len(signals)
         
         # Objective: maximize Sharpe (minimize negative Sharpe)
@@ -243,11 +257,25 @@ class MeanVarianceOptimizer(WeightOptimizer):
     def optimize(
         self,
         signals: pd.DataFrame,
-        covariance: pd.DataFrame,
-        expected_returns: pd.Series,
+        covariance_or_price_data: Any,
+        expected_returns: Optional[pd.Series] = None,
         **kwargs: Any
     ) -> pd.Series:
-        """Optimize mean-variance utility."""
+        """Optimize mean-variance objective."""
+        # Handle price_data vs covariance
+        if hasattr(covariance_or_price_data, 'get_returns'):
+            # It's a PriceData object
+            returns = covariance_or_price_data.get_returns(periods=1)
+            # Filter to only include symbols in signals
+            common_symbols = signals.index.intersection(returns.columns)
+            returns = returns[common_symbols]
+            covariance = returns.cov()
+            expected_returns = returns.mean()
+            signals = signals[common_symbols]
+        else:
+            # It's a covariance matrix
+            covariance = covariance_or_price_data
+        
         n = len(signals)
         
         # Objective: maximize return - risk_aversion * variance
@@ -323,11 +351,24 @@ class RiskParityOptimizer(WeightOptimizer):
     def optimize(
         self,
         signals: pd.DataFrame,
-        covariance: pd.DataFrame,
+        covariance_or_price_data: Any,
         expected_returns: Optional[pd.Series] = None,
         **kwargs: Any
     ) -> pd.Series:
         """Optimize for risk parity."""
+        # Handle price_data vs covariance
+        if hasattr(covariance_or_price_data, 'get_returns'):
+            # It's a PriceData object
+            returns = covariance_or_price_data.get_returns(periods=1)
+            # Filter to only include symbols in signals
+            common_symbols = signals.index.intersection(returns.columns)
+            returns = returns[common_symbols]
+            covariance = returns.cov()
+            signals = signals[common_symbols]
+        else:
+            # It's a covariance matrix
+            covariance = covariance_or_price_data
+        
         n = len(signals)
         
         # Objective: minimize sum of squared differences in risk contributions
@@ -403,12 +444,26 @@ class MaxDiversificationOptimizer(WeightOptimizer):
     def optimize(
         self,
         signals: pd.DataFrame,
-        covariance: pd.DataFrame,
+        covariance_or_price_data: Any,
         expected_returns: Optional[pd.Series] = None,
         **kwargs: Any
     ) -> pd.Series:
         """Optimize for maximum diversification."""
+        # Handle price_data vs covariance
+        if hasattr(covariance_or_price_data, 'get_returns'):
+            # It's a PriceData object
+            returns = covariance_or_price_data.get_returns(periods=1)
+            # Filter to only include symbols in signals
+            common_symbols = signals.index.intersection(returns.columns)
+            returns = returns[common_symbols]
+            covariance = returns.cov()
+            signals = signals[common_symbols]
+        else:
+            # It's a covariance matrix
+            covariance = covariance_or_price_data
+        
         n = len(signals)
+        volatility = np.sqrt(np.diag(covariance))
         
         # Calculate individual volatilities
         individual_vols = np.sqrt(np.diag(covariance))

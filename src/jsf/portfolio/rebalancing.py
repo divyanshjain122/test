@@ -118,12 +118,34 @@ class ThresholdRebalancer(Rebalancer):
     
     def should_rebalance(
         self,
-        current_weights: pd.Series,
-        target_weights: pd.Series,
-        date: datetime,
+        *args,
         **kwargs: Any
     ) -> bool:
-        """Check if drift exceeds threshold."""
+        """
+        Check if drift exceeds threshold.
+        
+        Supports multiple signatures for backward compatibility:
+        - (current_weights, target_weights, date, **kwargs)
+        - (date, current_weights, date2, target_weights)
+        """
+        # Parse flexible arguments
+        if len(args) >= 4:
+            # Legacy API: (date, current, date, target)
+            current_weights = args[1]
+            target_weights = args[3]
+        elif len(args) == 3:
+            # New API: (current, target, date)
+            current_weights = args[0]
+            target_weights = args[1]
+        else:
+            # Kwargs
+            current_weights = kwargs.get('current_weights', args[0] if len(args) > 0 else None)
+            target_weights = kwargs.get('target_weights', args[1] if len(args) > 1 else None)
+        
+        # Skip if either is None
+        if current_weights is None or target_weights is None:
+            return False
+        
         drift = (current_weights - target_weights).abs().sum()
         return drift > self.drift_threshold
     
@@ -241,17 +263,24 @@ class VolatilityTargetRebalancer(Rebalancer):
     
     def should_rebalance(
         self,
-        current_weights: pd.Series,
-        target_weights: pd.Series,
-        date: datetime,
+        *args,
         **kwargs: Any
     ) -> bool:
-        """Check if volatility check is due."""
+        """
+        Check if volatility check is due.
+        
+        Supports multiple signatures for backward compatibility.
+        """
         self.check_counter += 1
         
         if self.check_counter >= self.rebalance_frequency:
             self.check_counter = 0
-            self.last_rebalance = date
+            # Extract date if provided
+            date = None
+            if len(args) >= 3:
+                date = args[2]
+            if date is not None:
+                self.last_rebalance = date
             return True
         
         return False
@@ -326,20 +355,36 @@ class BandRebalancer(Rebalancer):
     
     def should_rebalance(
         self,
-        current_weights: pd.Series,
-        target_weights: pd.Series,
-        date: datetime,
+        *args,
         **kwargs: Any
     ) -> bool:
-        """Check if any position is outside bands."""
+        """
+        Check if any position is outside bands.
+        
+        Supports multiple signatures for backward compatibility.
+        """
+        # Parse flexible arguments
+        if len(args) >= 4:
+            # Legacy API: (date, current, date, target)
+            current_weights = args[1]
+            target_weights = args[3]
+        elif len(args) == 3:
+            # New API: (current, target, date)
+            current_weights = args[0]
+            target_weights = args[1]
+        else:
+            current_weights = kwargs.get('current_weights', args[0] if len(args) > 0 else None)
+            target_weights = kwargs.get('target_weights', args[1] if len(args) > 1 else None)
+        
+        if current_weights is None or target_weights is None:
+            return False
+        
         common_idx = current_weights.index.intersection(target_weights.index)
         current = current_weights.reindex(common_idx, fill_value=0)
         target = target_weights.reindex(common_idx, fill_value=0)
         
-        deviation = current - target
-        
-        # Check if any position is outside bands
-        outside_bands = (deviation < self.lower_band) | (deviation > self.upper_band)
+        # Check if any position is outside absolute weight bands
+        outside_bands = (current < self.lower_band) | (current > self.upper_band)
         
         return outside_bands.any()
     
@@ -387,7 +432,10 @@ class SmartRebalancer(Rebalancer):
         min_days_between: int = None,  # Alias for min_days
         max_days: int = 30,
         threshold: float = 0.10,
+        drift_threshold: float = None,  # Alias for threshold
         vol_threshold: float = 0.20,
+        volatility_target: float = None,  # Volatility target level
+        volatility_tolerance: float = None,  # Alias for vol_threshold
         name: str = "smart",
     ):
         """
@@ -398,12 +446,19 @@ class SmartRebalancer(Rebalancer):
             min_days_between: Alias for min_days
             max_days: Maximum days between rebalances
             threshold: Position drift threshold
+            drift_threshold: Alias for threshold
             vol_threshold: Volatility change threshold
+            volatility_target: Target volatility level
+            volatility_tolerance: Alias for vol_threshold
             name: Rebalancer name
         """
-        # Handle alias
+        # Handle aliases
         if min_days_between is not None:
             min_days = min_days_between
+        if drift_threshold is not None:
+            threshold = drift_threshold
+        if volatility_tolerance is not None:
+            vol_threshold = volatility_tolerance
         
         super().__init__(
             name=name,
@@ -416,20 +471,48 @@ class SmartRebalancer(Rebalancer):
         self.min_days_between = min_days  # Store alias
         self.max_days = max_days
         self.threshold = threshold
+        self.drift_threshold = threshold  # Store alias
         self.vol_threshold = vol_threshold
+        self.volatility_target = volatility_target
+        self.volatility_tolerance = vol_threshold  # Store alias
         self.last_rebalance: Optional[datetime] = None
     
     def should_rebalance(
         self,
-        current_weights: pd.Series,
-        target_weights: pd.Series,
-        date: datetime,
+        *args,
         **kwargs: Any
     ) -> bool:
-        """Smart rebalancing logic."""
+        """
+        Smart rebalancing logic.
+        
+        Supports multiple signatures for backward compatibility.
+        """
+        # Parse flexible arguments
+        if len(args) >= 4:
+            # Legacy API: (current_date, current_weights, last_rebalance, target_weights)
+            date = args[0]
+            current_weights = args[1]
+            last_rebal = args[2]
+            target_weights = args[3]
+            if last_rebal is not None:
+                self.last_rebalance = last_rebal
+        elif len(args) == 3:
+            # New API: (current, target, date)
+            current_weights = args[0]
+            target_weights = args[1]
+            date = args[2]
+        else:
+            current_weights = kwargs.get('current_weights')
+            target_weights = kwargs.get('target_weights')
+            date = kwargs.get('date')
+        
         if self.last_rebalance is None:
-            self.last_rebalance = date
+            if date is not None:
+                self.last_rebalance = date
             return True
+        
+        if date is None:
+            return False
         
         days_since = (date - self.last_rebalance).days
         
@@ -442,16 +525,17 @@ class SmartRebalancer(Rebalancer):
             self.last_rebalance = date
             return True
         
-        # Check drift threshold
-        common_idx = current_weights.index.intersection(target_weights.index)
-        current = current_weights.reindex(common_idx, fill_value=0)
-        target = target_weights.reindex(common_idx, fill_value=0)
-        
-        max_drift = (current - target).abs().max()
-        
-        if max_drift > self.threshold:
-            self.last_rebalance = date
-            return True
+        # Check drift threshold (only if we have weights)
+        if current_weights is not None and target_weights is not None:
+            common_idx = current_weights.index.intersection(target_weights.index)
+            current = current_weights.reindex(common_idx, fill_value=0)
+            target = target_weights.reindex(common_idx, fill_value=0)
+            
+            max_drift = (current - target).abs().max()
+            
+            if max_drift > self.threshold:
+                self.last_rebalance = date
+                return True
         
         # Check volatility change if provided
         realized_vol = kwargs.get("realized_volatility", None)

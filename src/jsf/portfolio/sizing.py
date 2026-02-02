@@ -125,26 +125,16 @@ class SignalWeightedSizer(PositionSizer):
         """Calculate signal-weighted positions."""
         weights = signals.copy()
         
+        # Apply signal scaling
+        weights = weights * self.signal_scale
+        
         if self.long_only:
             weights = weights.clip(lower=0)
         
         if self.normalize:
-            # Normalize row-wise
-            if self.long_only:
-                row_sums = weights.sum(axis=1)
-                weights = weights.div(row_sums, axis=0).fillna(0)
-            else:
-                # Normalize long and short separately
-                long_weights = weights.clip(lower=0)
-                short_weights = weights.clip(upper=0)
-                
-                long_sums = long_weights.sum(axis=1)
-                short_sums = short_weights.abs().sum(axis=1)
-                
-                long_weights = long_weights.div(long_sums, axis=0).fillna(0) * 0.5
-                short_weights = short_weights.div(short_sums, axis=0).fillna(0) * 0.5
-                
-                weights = long_weights + short_weights
+            # Normalize based on absolute values to sum to 1
+            abs_sums = weights.abs().sum(axis=1)
+            weights = weights.div(abs_sums, axis=0).fillna(0)
         
         return weights
 
@@ -192,26 +182,43 @@ class VolatilityScaledSizer(PositionSizer):
         # Calculate returns
         returns = price_data.get_returns(periods=1)
         
+        # Filter to only symbols in signals
+        common_symbols = signals.columns.intersection(returns.columns)
+        returns = returns[common_symbols]
+        signals = signals[common_symbols]
+        
         # Calculate rolling volatility
         volatility = returns.rolling(window=self.lookback).std()
         
+        # Get the last valid volatility row
+        last_vol = volatility.iloc[-1]
+        
         # Inverse volatility weights
-        inv_vol = 1.0 / (volatility + 1e-10)
+        inv_vol = 1.0 / (last_vol + 1e-10)
         
-        # Apply signal direction
-        if self.long_only:
-            signal_direction = (signals > 0).astype(float)
-        else:
-            signal_direction = np.sign(signals)
+        # Create result DataFrame with same index as signals
+        result = pd.DataFrame(index=signals.index, columns=common_symbols, dtype=float)
         
-        # Combine signal with inverse volatility
-        weights = inv_vol * signal_direction * abs(signals)
+        for idx in signals.index:
+            row_signals = signals.loc[idx]
+            
+            # Apply signal direction
+            if self.long_only:
+                signal_direction = (row_signals > 0).astype(float)
+            else:
+                signal_direction = np.sign(row_signals)
+            
+            # Combine signal with inverse volatility
+            weights = inv_vol * signal_direction * abs(row_signals)
+            
+            # Normalize to sum to 1
+            total = weights.abs().sum()
+            if total > 0:
+                weights = weights / total
+            
+            result.loc[idx] = weights
         
-        # Normalize to target volatility
-        row_sums = weights.abs().sum(axis=1)
-        weights = weights.div(row_sums, axis=0).fillna(0)
-        
-        return weights
+        return result.fillna(0)
 
 
 class RiskParitySizer(PositionSizer):
@@ -256,26 +263,29 @@ class RiskParitySizer(PositionSizer):
         """Calculate risk parity positions."""
         returns = price_data.get_returns(periods=1)
         
+        # Filter returns to only include signal columns
+        common_symbols = signals.columns.intersection(returns.columns)
+        returns = returns[common_symbols]
+        signals = signals[common_symbols]
+        
         weights = pd.DataFrame(
             index=signals.index,
-            columns=signals.columns,
+            columns=common_symbols,
             dtype=float,
         )
         
         for idx in signals.index:
             # Get active signals
             sig_row = signals.loc[idx]
-            active = sig_row != 0
+            active_symbols = sig_row[sig_row != 0].index.tolist()
             
-            if active.sum() < 2:
+            if len(active_symbols) < 2:
                 # Not enough assets for risk parity
                 weights.loc[idx] = 0.0
                 continue
             
-            # Get historical returns for active assets
-            hist_start = max(0, signals.index.get_loc(idx) - self.lookback)
-            hist_returns = returns.iloc[hist_start:signals.index.get_loc(idx), :]
-            hist_returns = hist_returns.loc[:, active]
+            # Get historical returns for active assets using .tail()
+            hist_returns = returns[active_symbols].tail(self.lookback)
             
             if len(hist_returns) < 10:
                 weights.loc[idx] = 0.0
@@ -285,7 +295,7 @@ class RiskParitySizer(PositionSizer):
             cov_matrix = hist_returns.cov()
             
             # Risk parity optimization (simplified iterative approach)
-            n_assets = active.sum()
+            n_assets = len(active_symbols)
             w = np.ones(n_assets) / n_assets  # Start with equal weights
             
             for _ in range(self.max_iterations):
@@ -304,10 +314,12 @@ class RiskParitySizer(PositionSizer):
                     break
             
             # Apply signal direction
-            w = w * np.sign(sig_row[active].values)
+            w = w * np.sign(sig_row[active_symbols].values)
             
-            weights.loc[idx, active] = w
-            weights.loc[idx, ~active] = 0.0
+            # Assign weights to the active symbols
+            weights.loc[idx] = 0.0  # Reset all to 0
+            for i, sym in enumerate(active_symbols):
+                weights.loc[idx, sym] = w[i]
         
         return weights.fillna(0)
 
@@ -360,31 +372,45 @@ class KellyCriterionSizer(PositionSizer):
         """Calculate Kelly criterion positions."""
         returns = price_data.get_returns(periods=1)
         
-        # Calculate rolling mean and variance
-        expected_returns = returns.rolling(window=self.lookback).mean()
-        variance = returns.rolling(window=self.lookback).var()
+        # Filter returns to only include signal columns
+        common_symbols = signals.columns.intersection(returns.columns)
+        returns = returns[common_symbols]
+        signals = signals[common_symbols]
+        
+        # Get last valid statistics
+        expected_returns = returns.tail(self.lookback).mean()
+        variance = returns.tail(self.lookback).var()
         
         # Kelly formula: f = mu / sigma^2
         kelly_weights = expected_returns / (variance + 1e-10)
         kelly_weights = kelly_weights * self.fraction  # Fractional Kelly
         
-        # Apply signal direction and strength
-        if self.long_only:
-            signal_filter = (signals > 0).astype(float)
-        else:
-            signal_filter = np.sign(signals)
+        # Create result DataFrame
+        result = pd.DataFrame(index=signals.index, columns=common_symbols, dtype=float)
         
-        weights = kelly_weights * signal_filter * abs(signals)
+        for idx in signals.index:
+            row_signals = signals.loc[idx]
+            
+            # Apply signal direction and strength
+            if self.long_only:
+                signal_filter = (row_signals > 0).astype(float)
+            else:
+                signal_filter = np.sign(row_signals)
+            
+            weights = kelly_weights * signal_filter * abs(row_signals)
+            
+            # Clip extreme values
+            weights = weights.clip(lower=-1.0, upper=1.0)
+            
+            # Normalize
+            if self.long_only:
+                total = weights.clip(lower=0).sum()
+            else:
+                total = weights.abs().sum()
+            
+            if total > 0:
+                weights = weights / total
+            
+            result.loc[idx] = weights
         
-        # Clip extreme values
-        weights = weights.clip(lower=-1.0, upper=1.0)
-        
-        # Normalize
-        if self.long_only:
-            row_sums = weights.clip(lower=0).sum(axis=1)
-        else:
-            row_sums = weights.abs().sum(axis=1)
-        
-        weights = weights.div(row_sums, axis=0).fillna(0)
-        
-        return weights
+        return result.fillna(0)

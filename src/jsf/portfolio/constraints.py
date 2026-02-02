@@ -74,6 +74,10 @@ class PortfolioConstraints:
                 return False
         return True
     
+    def enforce(self, weights: pd.Series, **kwargs: Any) -> pd.Series:
+        """Alias for enforce_all."""
+        return self.enforce_all(weights, **kwargs)
+    
     def enforce_all(self, weights: pd.Series, **kwargs: Any) -> pd.Series:
         """Enforce all constraints sequentially."""
         result = weights.copy()
@@ -114,30 +118,69 @@ class PositionLimitConstraint(Constraint):
     
     def check(self, weights: pd.Series, **kwargs: Any) -> bool:
         """Check if position limits satisfied."""
+        tol = 1e-6  # Tolerance for floating point comparisons
         if self.apply_to_shorts:
             # Check absolute values
-            violations = weights.abs() > self.max_weight
+            violations = weights.abs() > self.max_weight + tol
             return not violations.any()
         else:
             # Only check long positions
             long_positions = weights[weights > 0]
-            violations = long_positions > self.max_weight
+            violations = long_positions > self.max_weight + tol
             return not violations.any()
     
     def enforce(self, weights: pd.Series, **kwargs: Any) -> pd.Series:
-        """Enforce position limits."""
+        """Enforce position limits by redistributing excess weight."""
         result = weights.copy()
+        tol = 1e-9
         
-        if self.apply_to_shorts:
-            # Clip both long and short positions
-            result = result.clip(lower=-self.max_weight, upper=self.max_weight)
-        else:
-            # Only clip long positions
-            result[result > 0] = result[result > 0].clip(upper=self.max_weight)
+        # Iteratively redistribute excess weight
+        max_iterations = 50
+        for _ in range(max_iterations):
+            if self.apply_to_shorts:
+                # Find overweight positions
+                overweight_mask = result.abs() > self.max_weight + tol
+                if not overweight_mask.any():
+                    break
+                
+                # Calculate excess
+                excess = 0.0
+                for idx in result.index:
+                    if overweight_mask[idx]:
+                        sign = 1 if result[idx] > 0 else -1
+                        excess += abs(result[idx]) - self.max_weight
+                        result[idx] = sign * self.max_weight
+                
+                # Redistribute excess to underweight positions
+                underweight_mask = result.abs() < self.max_weight - tol
+                if underweight_mask.any():
+                    room = (self.max_weight - result[underweight_mask].abs()).sum()
+                    if room > tol:
+                        scale = min(1.0, excess / room) if room > 0 else 0
+                        for idx in result[underweight_mask].index:
+                            add = scale * (self.max_weight - abs(result[idx]))
+                            if result[idx] >= 0:
+                                result[idx] += add
+                            else:
+                                result[idx] -= add
+            else:
+                # Only handle long positions
+                overweight_mask = result > self.max_weight + tol
+                if not overweight_mask.any():
+                    break
+                excess = (result[overweight_mask] - self.max_weight).sum()
+                result[overweight_mask] = self.max_weight
+                
+                underweight_mask = (result > 0) & (result < self.max_weight - tol)
+                if underweight_mask.any():
+                    room = (self.max_weight - result[underweight_mask]).sum()
+                    if room > tol:
+                        scale = min(1.0, excess / room) if room > 0 else 0
+                        result[underweight_mask] += scale * (self.max_weight - result[underweight_mask])
         
-        # Renormalize
+        # Final normalization to ensure sum = 1
         total = result.abs().sum()
-        if total > 0:
+        if abs(total - 1.0) > tol and total > 0:
             result = result / total
         
         return result
@@ -177,35 +220,47 @@ class SectorConstraint(Constraint):
     
     def check(self, weights: pd.Series, **kwargs: Any) -> bool:
         """Check if sector limits satisfied."""
+        tol = 1e-6  # Tolerance for floating point comparisons
         sector_weights = self._calculate_sector_weights(weights)
         
         return (
-            (sector_weights >= self.min_sector_weight).all() and
-            (sector_weights <= self.max_sector_weight).all()
+            (sector_weights >= self.min_sector_weight - tol).all() and
+            (sector_weights <= self.max_sector_weight + tol).all()
         )
     
     def enforce(self, weights: pd.Series, **kwargs: Any) -> pd.Series:
-        """Enforce sector limits."""
+        """Enforce sector limits with iterative scaling."""
         result = weights.copy()
-        sector_weights = self._calculate_sector_weights(result)
         
-        # Scale down overweight sectors
-        for sector, sector_weight in sector_weights.items():
-            if sector_weight > self.max_sector_weight:
-                # Get symbols in this sector
-                sector_symbols = [
-                    sym for sym, sec in self.sector_map.items()
-                    if sec == sector and sym in result.index
-                ]
-                
-                # Scale down proportionally
-                scale = self.max_sector_weight / sector_weight
-                result[sector_symbols] = result[sector_symbols] * scale
-        
-        # Renormalize
-        total = result.abs().sum()
-        if total > 0:
-            result = result / total
+        # Iterative enforcement to handle renormalization effects
+        max_iterations = 20
+        for _ in range(max_iterations):
+            sector_weights = self._calculate_sector_weights(result)
+            
+            # Scale down overweight sectors
+            scaled = result.copy()
+            for sector, sector_weight in sector_weights.items():
+                if sector_weight > self.max_sector_weight:
+                    # Get symbols in this sector
+                    sector_symbols = [
+                        sym for sym, sec in self.sector_map.items()
+                        if sec == sector and sym in result.index
+                    ]
+                    
+                    # Scale down proportionally
+                    scale = self.max_sector_weight / sector_weight
+                    scaled[sector_symbols] = scaled[sector_symbols] * scale
+            
+            # Renormalize to sum to 1
+            total = scaled.abs().sum()
+            if total > 0:
+                result = scaled / total
+            else:
+                result = scaled
+            
+            # Check if converged
+            if self.check(result):
+                break
         
         return result
     
