@@ -50,6 +50,20 @@ pip install jsf-core
 
 ## 🚀 Quick Start
 
+### Setup Telegram Alerts (Optional, 2 minutes)
+
+Get real-time paper trading alerts on your phone:
+
+```bash
+# Interactive setup wizard
+python -m jsf.cli.setup_telegram
+
+# Or follow the guide
+# See: docs/QUICKSTART_TELEGRAM.md
+```
+
+### Your First Strategy
+
 ```python
 from jsf.data import load_data
 from jsf.strategies import MomentumStrategy

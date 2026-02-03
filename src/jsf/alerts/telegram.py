@@ -217,9 +217,18 @@ class TelegramAlerter(BaseAlerter):
         
         emoji = severity_emoji.get(alert.severity, "📢")
         
+        # Check if this is paper trading or live
+        mode_indicator = ""
+        if alert.metadata:
+            mode = alert.metadata.get('mode', '').lower()
+            if mode == 'paper':
+                mode_indicator = " `[PAPER]`"
+            elif mode == 'live':
+                mode_indicator = " `[LIVE]`"
+        
         # Build message
         parts = [
-            f"{emoji} *{alert.title}*",
+            f"{emoji} *{alert.title}*{mode_indicator}",
             "",
             alert.message,
         ]

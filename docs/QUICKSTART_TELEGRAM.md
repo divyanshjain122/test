@@ -1,24 +1,48 @@
-# 🚀 Quick Start: Telegram Alerts for Your Team
+# 🚀 Quick Start: Telegram Alerts for Paper Trading
 
 ## TL;DR (30 seconds)
 
-1. **One person creates bot**: Message `@BotFather` → `/newbot` → Get token
-2. **Everyone gets chat_id**: Message `@userinfobot` → Copy your ID
-3. **Everyone starts bot**: Search for your team bot → Click "Start"
+**Guided Setup (Recommended):**
+```bash
+python -m jsf.cli.setup_telegram
+```
+Follow the wizard → Done in 2 minutes! ✅
+
+**Manual Setup:**
+1. **Create bot**: Message `@BotFather` → `/newbot` → Get token
+2. **Get chat_id**: Message `@userinfobot` → Copy your ID
+3. **Start bot**: Search for your bot → Click "Start"
 4. **Configure `.env`**:
    ```bash
    cp .env.example .env
    # Edit .env and paste:
    TELEGRAM_BOT_TOKEN=123456789:ABC...
-   TELEGRAM_CHAT_IDS=987654321,876543210,765432109
+   TELEGRAM_CHAT_IDS=987654321
    ```
-5. **Install & test**:
+5. **Test**:
    ```bash
-   pip install python-telegram-bot
    python examples/setup_telegram.py
    ```
 
-✅ **Done!** Everyone receives alerts via Telegram.
+✅ **Done!** You'll receive paper trading alerts via Telegram.
+
+---
+
+## 📊 What Are Paper Trading Alerts?
+
+**Paper Trading** = Simulated trading with fake money
+- ✅ Perfect for learning and testing strategies
+- ✅ No real money at risk
+- ✅ Same alerts as live trading (for practice)
+- ✅ Safe to share with learning groups
+
+**Alerts Include:**
+- 📈 Trade signals and executions
+- ⚠️  Risk warnings and limits
+- 📊 Strategy performance updates
+- 🔔 System status changes
+
+All alerts show `[PAPER]` tag so you know it's simulation.
 
 ---
 
@@ -31,12 +55,20 @@ from jsf.alerts import create_alert_manager_from_config, Alert, AlertSeverity
 # Auto-loads from .env - zero configuration needed!
 manager = create_alert_manager_from_config()
 
-# Send alerts
+# Send paper trading alerts (mode tag appears automatically)
 manager.send(Alert(
     title="🎯 Signal Detected",
     message="Strong buy signal for AAPL (confidence: 87%)",
-    severity=AlertSeverity.WARNING
+    severity=AlertSeverity.WARNING,
+    metadata={'mode': 'paper'}  # Shows [PAPER] in Telegram
 ))
+```
+
+**Alert appears as:**
+```
+⚠️ Signal Detected [PAPER]
+
+Strong buy signal for AAPL (confidence: 87%)
 ```
 
 ### That's it! 
@@ -57,17 +89,31 @@ JBAC-Strategy-Foundry/
 │   └── TELEGRAM_SETUP.md ← Full guide with troubleshooting
 ├── examples/
 │   └── setup_telegram.py ← Test your configuration
-└── src/jsf/
-    ├── config.py         ← Configuration management
-    └── alerts/
-        └── factory.py    ← Easy setup functions
-```
-
----
-
 ## Security Checklist
 
 - ✅ `.env` is in `.gitignore` (already done)
+- ✅ Use `.env.example` as template
+- ✅ Keep bot token SECRET (don't share publicly)
+- ✅ **Paper trading only** - use demo credentials
+- ✅ Never hardcode tokens in code
+- ❌ Don't commit `.env` file
+- ❌ Don't screenshot tokens
+- ❌ Don't use live broker credentials for testing
+
+---
+
+## ⚠️  Before Live Trading
+
+**IMPORTANT:** Paper trading alerts are for learning. Before going live:
+
+1. ✅ Test extensively with paper trading (weeks/months)
+2. ✅ Verify strategy performance and risk management  
+3. ✅ Consider separate bot for live alerts (different token)
+4. ✅ Use live broker's paper trading mode first
+5. ✅ Start with small position sizes
+6. ⚠️  Live trading alerts will show `[LIVE]` tag
+
+--- `.env` is in `.gitignore` (already done)
 - ✅ Use `.env.example` as template
 - ✅ Share bot token via **secure channel** (Signal, 1Password)
 - ✅ Never hardcode tokens in code
