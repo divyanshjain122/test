@@ -87,12 +87,29 @@ class TelegramAlerter(BaseAlerter):
     def connect(self) -> bool:
         """Initialize Telegram bot."""
         try:
+            import asyncio
             self.bot = Bot(token=self.bot_token)
-            # Test connection
-            bot_info = self.bot.get_me()
-            logger.info(f"Connected to Telegram bot: {bot_info.username}")
-            self._connected = True
-            return True
+            
+            # Test connection (handle async)
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # Can't test in running loop, just assume it works
+                    logger.info(f"Telegram bot initialized (token: ...{self.bot_token[-8:]})")
+                    self._connected = True
+                    return True
+                else:
+                    bot_info = loop.run_until_complete(self.bot.get_me())
+                    logger.info(f"Connected to Telegram bot: {bot_info.username}")
+                    self._connected = True
+                    return True
+            except RuntimeError:
+                # No event loop, create one
+                bot_info = asyncio.run(self.bot.get_me())
+                logger.info(f"Connected to Telegram bot: {bot_info.username}")
+                self._connected = True
+                return True
+                
         except Exception as e:
             logger.error(f"Failed to connect to Telegram: {e}")
             self._connected = False
@@ -135,15 +152,39 @@ class TelegramAlerter(BaseAlerter):
                 return False
         
         try:
+            import asyncio
             # Format message for Telegram
             message = self._format_telegram_message(alert)
             
-            # Send message
-            self.bot.send_message(
-                chat_id=self.chat_id,
-                text=message,
-                parse_mode=self.parse_mode,
-            )
+            # Send message (handle async)
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # Schedule coroutine in existing loop
+                    asyncio.create_task(
+                        self.bot.send_message(
+                            chat_id=self.chat_id,
+                            text=message,
+                            parse_mode=self.parse_mode,
+                        )
+                    )
+                else:
+                    loop.run_until_complete(
+                        self.bot.send_message(
+                            chat_id=self.chat_id,
+                            text=message,
+                            parse_mode=self.parse_mode,
+                        )
+                    )
+            except RuntimeError:
+                # No event loop, create one
+                asyncio.run(
+                    self.bot.send_message(
+                        chat_id=self.chat_id,
+                        text=message,
+                        parse_mode=self.parse_mode,
+                    )
+                )
             
             logger.debug(f"Sent Telegram alert: {alert.title}")
             return True

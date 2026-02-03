@@ -31,9 +31,11 @@ MANIFEST
 *.manifest
 *.spec
 
-#.md s
+# Documentation (allow important guides)
 *.md
 !README.md
+!docs/*.md
+!docs/**/*.md
 
 # Unit test / coverage reports
 htmlcov/

@@ -59,7 +59,7 @@ This guide will help your team set up a single shared Telegram bot for trading a
    ```python
    from jsf.alerts import create_alert_manager_from_config
    from jsf.alerts import Alert, AlertSeverity
-   from jsf.config import get_config, validate_config
+   from jsf.settings import get_config, validate_config
    
    # Check configuration
    warnings = validate_config()
@@ -197,7 +197,7 @@ For team-wide announcements (only important alerts):
 ### Alerts not sending
 - **Solution**: 
   ```python
-  from jsf.config import validate_config
+  from jsf.settings import validate_config
   warnings = validate_config()
   print(warnings)
   ```

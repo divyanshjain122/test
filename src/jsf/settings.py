@@ -31,6 +31,11 @@ def load_env_file():
                     key, value = line.split("=", 1)
                     key = key.strip()
                     value = value.strip()
+                    
+                    # Remove inline comments (after #)
+                    if "#" in value:
+                        value = value.split("#")[0].strip()
+                    
                     # Only set if not already in environment
                     if key and value and key not in os.environ:
                         os.environ[key] = value

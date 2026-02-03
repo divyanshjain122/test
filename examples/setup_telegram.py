@@ -9,7 +9,7 @@ from jsf.alerts import (
     Alert,
     AlertSeverity,
 )
-from jsf.config import get_config, validate_config
+from jsf.settings import get_config, validate_config
 
 
 def main():

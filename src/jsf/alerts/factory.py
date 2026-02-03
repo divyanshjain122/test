@@ -54,7 +54,7 @@ def create_alert_manager_from_config(
         ...     severity=AlertSeverity.INFO
         ... ))
     """
-    from jsf.config import get_config
+    from jsf.settings import get_config
     
     if config is None:
         config = get_config()
@@ -89,8 +89,12 @@ def create_alert_manager_from_config(
                     min_severity=AlertSeverity[config.min_alert_severity],
                     parse_mode=config.telegram.parse_mode,
                 )
-                manager.add_alerter(telegram)
-                logger.info(f"Added Telegram alerter: {name} (chat_id: {chat_id[:8]}...)")
+                # Connect the alerter
+                if telegram.connect():
+                    manager.add_alerter(telegram)
+                    logger.info(f"Added Telegram alerter: {name} (chat_id: {chat_id[:8]}...)")
+                else:
+                    logger.warning(f"Failed to connect Telegram alerter: {name}")
             
             # Add channel alerter if configured
             if config.telegram.channel_id:
@@ -101,17 +105,17 @@ def create_alert_manager_from_config(
                     min_severity=AlertSeverity.WARNING,  # Only send important alerts to channel
                     parse_mode=config.telegram.parse_mode,
                 )
-                manager.add_alerter(channel)
-                logger.info("Added Telegram channel alerter")
+                if channel.connect():
+                    manager.add_alerter(channel)
+                    logger.info("Added Telegram channel alerter")
+                else:
+                    logger.warning("Failed to connect Telegram channel alerter")
     
     elif config.enable_telegram_alerts and not config.telegram.is_configured:
         logger.warning(
             "Telegram alerts enabled but not configured. "
             "Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_IDS in .env file."
         )
-    
-    # Connect all alerters
-    manager.connect_all()
     
     logger.info(f"Alert manager created with {len(manager.alerters)} alerter(s)")
     return manager
@@ -172,9 +176,9 @@ def create_simple_alert_manager(
                     name=name,
                     min_severity=min_severity,
                 )
-                manager.add_alerter(telegram)
+                if telegram.connect():
+                    manager.add_alerter(telegram)
     
-    manager.connect_all()
     return manager
 
 
