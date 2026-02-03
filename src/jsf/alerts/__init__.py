@@ -46,6 +46,10 @@ from jsf.alerts.integration import (
     create_strategy_alert,
     create_system_alert,
 )
+from jsf.alerts.factory import (
+    create_alert_manager_from_config,
+    create_simple_alert_manager,
+)
 
 # Conditional imports
 try:
@@ -70,6 +74,9 @@ __all__ = [
     "ConsoleAlerter",
     "TelegramAlerter",
     "TelegramChannelAlerter",
+    # Factory (recommended for production)
+    "create_alert_manager_from_config",
+    "create_simple_alert_manager",
     # Integration helpers
     "create_order_alert",
     "create_position_alert",

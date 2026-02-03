@@ -3,12 +3,13 @@
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://img.shields.io/badge/tests-197%20passing-brightgreen.svg)](tests/)
-[![Progress](https://img.shields.io/badge/progress-17%2F20%20phases%20(85%25)-brightgreen.svg)](#development-roadmap)
+[![Tests](https://img.shields.io/badge/tests-477%20passing-brightgreen.svg)](tests/)
+[![Progress](https://img.shields.io/badge/progress-18%2F20%20phases%20(90%25)-brightgreen.svg)](#development-roadmap)
+[![Version](https://img.shields.io/badge/version-0.6.0--dev-blue.svg)](src/jsf/__init__.py)
 
 **JSF-Core** is a production-grade, open-source quantitative research engine for building, backtesting, and optimizing trading strategies. Built by JBAC EdTech, it provides a modular, type-safe, and extensible framework for systematic trading research.
 
-> **🎉 Status Update (Feb 2, 2026)**: Phases 1-17 complete (85%)! Live trading engine operational with monitoring dashboard and comprehensive alert system.
+> **🎉 Status Update (Feb 3, 2026)**: Phases 1-18 complete (90%)! Centralized configuration system with secure Telegram alerts and multi-asset support (Futures, Options, Crypto, Forex).
 
 ## 🎯 Features
 
@@ -20,7 +21,9 @@
 - **Fast**: Vectorized operations and optional parallel processing
 - **Live Trading**: Real broker integration with paper & live trading modes
 - **Monitoring**: Real-time dashboard with performance tracking and risk metrics
-- **Alerts**: Multi-channel notifications (Console, Telegram, Email, SMS, Webhook)
+- **Alerts**: Multi-channel notifications with centralized Telegram bot (Console, Telegram, Email)
+- **Multi-Asset**: Support for Futures, Options, Crypto, and Forex beyond equities
+- **Centralized Config**: Secure environment-based configuration with `.env` support
 - **Well-Documented**: Detailed docstrings and usage examples
 
 ## 📦 Installation
