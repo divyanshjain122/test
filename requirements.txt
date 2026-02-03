@@ -1,13 +1,99 @@
-# Core dependencies for jsf-core
-numpy>=1.24.0,<2.0.0
-pandas>=2.0.0,<3.0.0
-pydantic>=2.0.0,<3.0.0
-scipy>=1.10.0,<2.0.0
-matplotlib>=3.7.0,<4.0.0
-seaborn>=0.12.0,<1.0.0
-plotly>=5.14.0,<6.0.0
-pyarrow>=12.0.0,<14.0.0
-typing-extensions>=4.5.0
+# =============================================================================
+# JBAC Strategy Foundry (JSF-Core) - Dependencies
+# =============================================================================
+# Production-ready quantitative trading framework
+# Version: 0.6.0-dev
+# =============================================================================
 
-# Optional: Telegram alerts (recommended for production)
-python-telegram-bot>=20.0,<21.0
+# -----------------------------------------------------------------------------
+# Core Scientific & Data Processing
+# -----------------------------------------------------------------------------
+numpy>=1.24.0,<2.0.0              # Numerical computing
+pandas>=2.0.0,<3.0.0              # Data manipulation and analysis
+scipy>=1.10.0,<2.0.0              # Scientific computing algorithms
+pyarrow>=12.0.0,<14.0.0           # Fast data serialization
+
+# -----------------------------------------------------------------------------
+# Type Safety & Validation
+# -----------------------------------------------------------------------------
+pydantic>=2.0.0,<3.0.0            # Data validation and settings
+typing-extensions>=4.5.0           # Extended type hints for older Python
+
+# -----------------------------------------------------------------------------
+# Visualization & Plotting
+# -----------------------------------------------------------------------------
+matplotlib>=3.7.0,<4.0.0          # Base plotting library
+seaborn>=0.12.0,<1.0.0            # Statistical data visualization
+plotly>=5.14.0,<6.0.0             # Interactive plots
+
+# -----------------------------------------------------------------------------
+# Progress & User Interface
+# -----------------------------------------------------------------------------
+tqdm>=4.65.0                       # Progress bars for optimization loops
+
+# -----------------------------------------------------------------------------
+# Monitoring Dashboard (Optional but Recommended)
+# -----------------------------------------------------------------------------
+streamlit>=1.28.0                  # Real-time monitoring dashboard
+
+# -----------------------------------------------------------------------------
+# Live Trading & Broker Integration (Optional)
+# -----------------------------------------------------------------------------
+# Uncomment the broker you plan to use:
+
+# Alpaca (commission-free stocks/crypto)
+alpaca-trade-api>=3.0.0           # Alpaca Trading API client
+
+# Interactive Brokers (stocks, options, futures, forex)
+# ib_insync>=0.9.86                # Interactive Brokers async API
+
+# Yahoo Finance (free market data)
+# yfinance>=0.2.28                 # Yahoo Finance data downloader
+
+# -----------------------------------------------------------------------------
+# Alert Systems (Optional but Recommended)
+# -----------------------------------------------------------------------------
+python-telegram-bot>=20.0,<21.0   # Telegram notifications for paper/live trading
+
+# -----------------------------------------------------------------------------
+# Development & Testing (Optional)
+# -----------------------------------------------------------------------------
+# Uncomment for development:
+# pytest>=7.4.0                    # Testing framework
+# pytest-cov>=4.1.0                # Code coverage reports
+# black>=23.7.0                    # Code formatter
+# ruff>=0.0.285                    # Fast linter
+# mypy>=1.5.0                      # Static type checker
+# pre-commit>=3.3.0                # Git hooks for code quality
+
+# =============================================================================
+# Installation Notes
+# =============================================================================
+#
+# QUICK START:
+#   pip install -r requirements.txt
+#
+# PAPER TRADING ONLY (minimal):
+#   pip install numpy pandas pydantic scipy matplotlib seaborn tqdm
+#
+# WITH TELEGRAM ALERTS:
+#   pip install -r requirements.txt
+#   # Already includes python-telegram-bot
+#
+# WITH DASHBOARD:
+#   pip install -r requirements.txt
+#   # Already includes streamlit
+#   # Run: streamlit run src/jsf/dashboard/app.py
+#
+# LIVE TRADING (Alpaca):
+#   pip install -r requirements.txt
+#   # Already includes alpaca-trade-api
+#   # Configure API keys in .env file
+#
+# DEVELOPMENT:
+#   Uncomment development dependencies above
+#   pip install -r requirements.txt
+#   pre-commit install
+#
+# =============================================================================
+
