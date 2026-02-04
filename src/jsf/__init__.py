@@ -92,6 +92,36 @@ from .dashboard import (
     calculate_sortino,
     calculate_var,
 )
+
+# ML Integration exports (Phase 19)
+from .ml import (
+    # Features
+    FeatureExtractor,
+    FeatureConfig,
+    create_feature_extractor,
+    FEATURE_GROUPS,
+    # Models
+    MLModel,
+    RandomForestModel,
+    XGBoostModel,
+    LightGBMModel,
+    EnsembleModel,
+    ModelConfig,
+    # Strategy
+    MLStrategy,
+    MLStrategyConfig,
+    # Validation
+    WalkForwardMLValidator,
+    MLValidationResult,
+    validate_ml_strategy,
+    # Preprocessing
+    prepare_ml_data,
+    create_target_variable,
+    split_train_test,
+    handle_missing_features,
+    MultiIndexConverter,
+)
+
 __all__ = [
     "__version__",
     "__author__",
@@ -154,4 +184,25 @@ __all__ = [
     "calculate_sharpe",
     "calculate_sortino",
     "calculate_var",
+    # ML Integration (Phase 19)
+    "FeatureExtractor",
+    "FeatureConfig",
+    "create_feature_extractor",
+    "FEATURE_GROUPS",
+    "MLModel",
+    "RandomForestModel",
+    "XGBoostModel",
+    "LightGBMModel",
+    "EnsembleModel",
+    "ModelConfig",
+    "MLStrategy",
+    "MLStrategyConfig",
+    "WalkForwardMLValidator",
+    "MLValidationResult",
+    "validate_ml_strategy",
+    "prepare_ml_data",
+    "create_target_variable",
+    "split_train_test",
+    "handle_missing_features",
+    "MultiIndexConverter",
 ]
