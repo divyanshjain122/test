@@ -429,24 +429,82 @@ class LightGBMModel(MLModel):
 class EnsembleModel(MLModel):
     """Weighted ensemble of multiple ML models.
     
-    Combines predictions from RandomForest, XGBoost, and LightGBM
-    using configurable weights. Weights can be updated based on
+    Combines predictions from RandomForest, XGBoost, LightGBM, and Neural Network
+    models using configurable weights. Weights can be updated based on
     out-of-sample performance.
     
+    Supports tree-based models (RF, XGBoost, LightGBM) and neural networks
+    (MLP, LSTM, GRU) for hybrid ensembles that capture different patterns.
+    
     Example:
+        >>> # Traditional ensemble
         >>> ensemble = EnsembleModel(
         ...     models=['random_forest', 'xgboost', 'lightgbm'],
         ...     weights={'random_forest': 0.3, 'xgboost': 0.4, 'lightgbm': 0.3}
         ... )
         >>> ensemble.fit(X_train, y_returns=y_train)
         >>> predictions = ensemble.predict(X_test)
+        >>> 
+        >>> # Hybrid ensemble with neural networks
+        >>> hybrid = EnsembleModel(
+        ...     models=['xgboost', 'mlp', 'lstm'],
+        ...     weights={'xgboost': 0.4, 'mlp': 0.3, 'lstm': 0.3}
+        ... )
     """
     
+    # Base model classes (always available)
     MODEL_CLASSES = {
         'random_forest': RandomForestModel,
         'xgboost': XGBoostModel,
         'lightgbm': LightGBMModel,
     }
+    
+    # Neural network models (loaded on demand)
+    _NEURAL_MODEL_CLASSES = None
+    
+    @classmethod
+    def _get_neural_models(cls) -> Dict[str, type]:
+        """Load neural network model classes."""
+        if cls._NEURAL_MODEL_CLASSES is None:
+            from .neural import MLPModel, LSTMModel, GRUModel, TransformerModel
+            cls._NEURAL_MODEL_CLASSES = {
+                'mlp': MLPModel,
+                'lstm': LSTMModel,
+                'gru': GRUModel,
+                'transformer': TransformerModel,
+            }
+            logger.info("Neural network models loaded successfully")
+        return cls._NEURAL_MODEL_CLASSES
+    
+    @classmethod
+    def get_available_models(cls) -> List[str]:
+        """Get list of all available model types."""
+        models = list(cls.MODEL_CLASSES.keys())
+        models.extend(cls._get_neural_models().keys())
+        return models
+    
+    @classmethod
+    def get_model_class(cls, name: str) -> type:
+        """Get model class by name.
+        
+        Args:
+            name: Model name (e.g., 'xgboost', 'mlp', 'lstm')
+            
+        Returns:
+            Model class
+            
+        Raises:
+            ValueError: If model name is not recognized
+        """
+        if name in cls.MODEL_CLASSES:
+            return cls.MODEL_CLASSES[name]
+        
+        neural_models = cls._get_neural_models()
+        if name in neural_models:
+            return neural_models[name]
+        
+        available = cls.get_available_models()
+        raise ValueError(f"Unknown model: {name}. Available: {available}")
     
     def __init__(
         self,
@@ -486,11 +544,35 @@ class EnsembleModel(MLModel):
         # Create model instances
         self._models: Dict[str, MLModel] = {}
         for name in self.model_names:
-            if name not in self.MODEL_CLASSES:
-                raise ValueError(f"Unknown model: {name}")
-            self._models[name] = self.MODEL_CLASSES[name](
+            # Use get_model_class to support both tree and neural models
+            model_class = self.get_model_class(name)
+            
+            # Check if this is a neural model by looking at the module
+            is_neural = 'neural' in model_class.__module__
+            
+            # Filter kwargs: neural models get their params, tree models get theirs
+            # Neural-specific params that tree models don't need
+            neural_params = {
+                'hidden_layers', 'dropout_rate', 'learning_rate', 'epochs',
+                'batch_size', 'optimizer', 'early_stopping_patience',
+                'reduce_lr_patience', 'validation_split', 'sequence_length',
+                'recurrent_units', 'recurrent_dropout', 'return_sequences',
+                'bidirectional', 'use_mixed_precision', 'l1_reg', 'l2_reg',
+                'batch_norm', 'output_activation'
+            }
+            
+            if is_neural:
+                filtered_kwargs = model_kwargs
+            else:
+                # Tree model - exclude neural-specific params
+                filtered_kwargs = {
+                    k: v for k, v in model_kwargs.items()
+                    if k not in neural_params
+                }
+            
+            self._models[name] = model_class(
                 prediction_type=prediction_type,
-                **model_kwargs
+                **filtered_kwargs
             )
         
         logger.info(f"EnsembleModel with {self.model_names}, weights={self.weights}")
