@@ -324,19 +324,22 @@ class FeatureExtractor:
         features["vol_realized_20d"] = returns.rolling(20).std().shift(1) * np.sqrt(252)
         features["vol_realized_60d"] = returns.rolling(60).std().shift(1) * np.sqrt(252)
         
-        # Range features
-        high = price_data.get_high_prices()
-        low = price_data.get_low_prices()
-        
-        features["daily_range"] = ((high - low) / close).shift(1)
-        features["avg_range_20d"] = features["daily_range"].rolling(20).mean()
+        # Range features - use get_field if available
+        try:
+            high = price_data.get_field("high")
+            low = price_data.get_field("low")
+            features["daily_range"] = ((high - low) / close).shift(1)
+            features["avg_range_20d"] = features["daily_range"].rolling(20).mean()
+        except (ValueError, KeyError):
+            # High/low not available
+            pass
         
         # Volume features if available
         try:
-            volume = price_data.get_volume()
+            volume = price_data.get_field("volume")
             vol_ma = volume.rolling(20).mean()
             features["volume_ratio"] = (volume / vol_ma).shift(1)
-        except Exception:
+        except (ValueError, KeyError):
             pass
         
         return features

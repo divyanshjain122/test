@@ -155,9 +155,11 @@ class MLStrategy(Strategy):
             )
         
         # Model and feature extractor
+        # Map strategy prediction types to model prediction types
+        model_pred_type = self._map_prediction_type(self.config.prediction_type)
         self.model = model or EnsembleModel(
             models=['random_forest', 'xgboost', 'lightgbm'],
-            prediction_type=self.config.prediction_type,
+            prediction_type=model_pred_type,
         )
         
         self.feature_extractor = feature_extractor or create_feature_extractor(
@@ -171,6 +173,20 @@ class MLStrategy(Strategy):
         self._train_metrics: Dict[str, float] = {}
         self._prediction_history: List[Dict] = []
         self._is_trained = False
+    
+    @staticmethod
+    def _map_prediction_type(strategy_type: str) -> str:
+        """Map strategy prediction type to model prediction type.
+        
+        Strategy uses: 'returns', 'direction', 'both'
+        Model uses: 'regression', 'classification', 'both'
+        """
+        mapping = {
+            'returns': 'regression',
+            'direction': 'classification',
+            'both': 'both',
+        }
+        return mapping.get(strategy_type, 'both')
     
     def generate_signals(
         self,
