@@ -29,7 +29,7 @@ print("="*60)
 print("\n[Step 1] Loading real data from Yahoo Finance...")
 
 from jsf.data import PriceData, load_data
-from jsf.data.sources.yahoo import YFINANCE_AVAILABLE
+from jsf.data.sources.yahoo import YahooFinanceLoader, YFINANCE_AVAILABLE
 
 # Use real stock data
 symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
@@ -39,18 +39,23 @@ end_date = '2024-12-31'
 use_real_data = False
 if YFINANCE_AVAILABLE:
     try:
-        price_data = load_data(
-            source='yahoo',
+        print(f"  Loading {symbols} from Yahoo Finance...")
+        loader = YahooFinanceLoader(
             symbols=symbols,
             start_date=start_date,
             end_date=end_date,
         )
+        df = loader.load()
+        # Convert DataFrame to PriceData
+        price_data = PriceData(df)
         print(f"  ✓ Loaded {len(price_data.symbols)} symbols from Yahoo Finance")
         print(f"  ✓ Date range: {price_data.dates[0].strftime('%Y-%m-%d')} to {price_data.dates[-1].strftime('%Y-%m-%d')}")
         print(f"  ✓ Total days: {len(price_data.dates)}")
         use_real_data = True
     except Exception as e:
         print(f"  ⚠ Yahoo Finance error: {e}")
+        import traceback
+        traceback.print_exc()
         use_real_data = False
 
 if not use_real_data:
