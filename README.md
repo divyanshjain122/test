@@ -3,13 +3,13 @@
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://img.shields.io/badge/tests-477%20passing-brightgreen.svg)](tests/)
-[![Progress](https://img.shields.io/badge/progress-18%2F20%20phases%20(90%25)-brightgreen.svg)](#development-roadmap)
+[![Tests](https://img.shields.io/badge/tests-509%20passing-brightgreen.svg)](tests/)
+[![Progress](https://img.shields.io/badge/progress-19%2F20%20phases%20(95%25)-brightgreen.svg)](#development-roadmap)
 [![Version](https://img.shields.io/badge/version-0.6.0--dev-blue.svg)](src/jsf/__init__.py)
 
 **JSF-Core** is a production-grade, open-source quantitative research engine for building, backtesting, and optimizing trading strategies. Built by JBAC EdTech, it provides a modular, type-safe, and extensible framework for systematic trading research.
 
-> **🎉 Status Update (Feb 3, 2026)**: Phases 1-18 complete (90%)! Centralized configuration system with secure Telegram alerts and multi-asset support (Futures, Options, Crypto, Forex).
+> **🎉 Status Update (Feb 4, 2026)**: Phases 1-19 complete (95%)! ML Integration added with feature extraction, ensemble models, and walk-forward validation.
 
 ## 🎯 Features
 
@@ -23,6 +23,7 @@
 - **Monitoring**: Real-time dashboard with performance tracking and risk metrics
 - **Alerts**: Multi-channel notifications with centralized Telegram bot (Console, Telegram, Email)
 - **Multi-Asset**: Support for Futures, Options, Crypto, and Forex beyond equities
+- **Machine Learning**: ML-based strategies with ensemble models and walk-forward validation
 - **Centralized Config**: Secure environment-based configuration with `.env` support
 - **Well-Documented**: Detailed docstrings and usage examples
 
@@ -126,6 +127,7 @@ print(f"Win Rate: {metrics['win_rate']:.2%}")
 - **`jsf.strategies`**: Strategy templates (momentum, mean-reversion, trend-following)
 - **`jsf.simulation`**: Backtesting engine with transaction costs and performance metrics
 - **`jsf.optimization`**: Parameter optimization (grid search, walk-forward)
+- **`jsf.ml`**: Machine learning integration (feature extraction, ensemble models, validation)
 - **`jsf.broker`**: Live trading broker integration (paper & live trading)
 - **`jsf.monitoring`**: Real-time monitoring dashboard with performance tracking
 - **`jsf.alerts`**: Multi-channel alert system (Console, Telegram, Email, SMS, Webhook)

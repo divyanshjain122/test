@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 19: Machine Learning Integration
+
+#### Added
+- **ML module** (`jsf.ml`):
+  - Complete machine learning integration for trading strategies
+  - Modular architecture with preprocessing, features, models, and validation
+
+- **Feature Extraction** (`jsf.ml.features`):
+  - `FeatureExtractor` - Extracts 20+ features from price data
+  - `FeatureConfig` - Configuration for feature extraction
+  - `FEATURE_GROUPS` - Predefined feature groups (momentum, volatility, trend, etc.)
+  - `create_feature_extractor` - Factory function for preset configurations
+  - Support for lag features (1, 5, 10 days)
+  - Cross-sectional normalization and ranking
+  - Automatic handling of MultiIndex data
+
+- **ML Model Wrappers** (`jsf.ml.models`):
+  - `MLModel` - Abstract base class for ML models
+  - `RandomForestModel` - Scikit-learn Random Forest wrapper
+  - `XGBoostModel` - XGBoost wrapper (optional dependency)
+  - `LightGBMModel` - LightGBM wrapper (optional dependency)
+  - `EnsembleModel` - Weighted ensemble with configurable voting
+  - `PredictionType` - Enum for regression/classification/both
+  - Feature importance extraction
+  - Model serialization (save/load)
+
+- **ML Strategy** (`jsf.ml.strategy`):
+  - `MLStrategy` - ML-based trading strategy
+  - `MLStrategyConfig` - Strategy configuration
+  - Walk-forward training with configurable retraining frequency
+  - Automatic drift monitoring
+  - Signal generation from predictions
+  - Long-only and top-N selection support
+
+- **Walk-Forward Validation** (`jsf.ml.validation`):
+  - `WalkForwardMLValidator` - Time-series cross-validation
+  - `MLValidationResult` - Validation results with metrics
+  - `validate_ml_strategy` - Convenience function
+  - Efficiency ratio for overfitting detection
+  - Train/test IC comparison
+
+- **Preprocessing Utilities** (`jsf.ml.preprocessing`):
+  - `MLDataset` - Container for ML-ready data
+  - `MultiIndexConverter` - Convert between wide/flat formats
+  - `create_target_variable` - Generate forward returns/direction targets
+  - `prepare_ml_data` - Prepare features and targets for training
+  - `split_train_test` - Time-aware train/test splitting
+  - `handle_missing_features` - NaN handling (ffill, mean, drop)
+
+#### Configuration
+- Default ensemble weights: RF 30%, XGBoost 40%, LightGBM 30%
+- Default retraining frequency: 63 days (quarterly)
+- Optional dependencies in `pyproject.toml[ml]`
+
+#### Examples
+- Created `ml_example.py` with 6 comprehensive examples:
+  - Example 1: Feature extraction
+  - Example 2: Model training and evaluation
+  - Example 3: Ensemble model configuration
+  - Example 4: ML strategy execution
+  - Example 5: Walk-forward validation
+  - Example 6: Backtesting ML strategies
+
+#### Testing
+- 33 new tests in `test_ml.py`
+- All ML tests passing
+- Total test count: 509 passed
+
+---
+
 ### Phase 11: Parameter Optimization
 
 #### Added
