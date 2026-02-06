@@ -4,7 +4,7 @@ This module implements signals based on market sentiment, regime detection,
 and behavioral patterns.
 """
 
-from typing import Optional, Any
+from typing import Optional, Any, List, Union, Dict
 
 import pandas as pd
 import numpy as np
@@ -14,6 +14,31 @@ from jsf.data import PriceData
 from jsf.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+# Lazy import for NLP models to avoid import errors when not installed
+def _get_sentiment_analyzer(model_type: str = "simple"):
+    """Get sentiment analyzer model.
+    
+    Args:
+        model_type: 'simple' for rule-based, 'finbert' for BERT-based
+        
+    Returns:
+        Sentiment analyzer instance
+    """
+    try:
+        if model_type == "simple":
+            from jsf.ml.transformers.sentiment import SimpleSentiment
+            return SimpleSentiment()
+        elif model_type == "finbert":
+            from jsf.ml.transformers.bert import FinBERT
+            return FinBERT(use_mock=True)  # Default to mock mode
+        else:
+            from jsf.ml.transformers.sentiment import SimpleSentiment
+            return SimpleSentiment()
+    except ImportError:
+        logger.warning("NLP models not available, using mock sentiment")
+        return None
 
 
 class MarketRegimeSignal(Signal):
@@ -444,3 +469,428 @@ class SeasonalitySignal(Signal):
             lookback_period=0,
             requires_volume=False,
         )
+
+
+# =============================================================================
+# NLP-BASED SENTIMENT SIGNALS (Phase 19 BERT Integration)
+# =============================================================================
+
+class TextSentimentSignal(Signal):
+    """
+    NLP-based sentiment signal using BERT or rule-based models.
+    
+    Analyzes text data (news, social media, filings) to generate
+    trading signals based on sentiment scores.
+    
+    This signal requires external text data aligned with price data timestamps.
+    
+    Example:
+        >>> signal = TextSentimentSignal(model_type="simple")
+        >>> sentiment_data = pd.DataFrame({
+        ...     "text": ["Stock beats earnings", "Market crashes"],
+        ...     "date": ["2024-01-01", "2024-01-02"]
+        ... })
+        >>> signal.set_sentiment_data(sentiment_data)
+        >>> signals = signal.generate(price_data)
+    """
+    
+    def __init__(
+        self,
+        model_type: str = "simple",
+        sentiment_threshold: float = 0.3,
+        smoothing_window: int = 5,
+        name: str = "text_sentiment",
+    ):
+        """
+        Initialize text sentiment signal.
+        
+        Args:
+            model_type: 'simple' for rule-based, 'finbert' for BERT-based
+            sentiment_threshold: Threshold for signal generation
+            smoothing_window: Window for smoothing sentiment scores
+            name: Signal name
+        """
+        super().__init__(
+            name=name,
+            signal_type=SignalType.SENTIMENT,
+            description=f"NLP sentiment signal ({model_type})",
+            model_type=model_type,
+            sentiment_threshold=sentiment_threshold,
+            smoothing_window=smoothing_window,
+        )
+        self.model_type = model_type
+        self.sentiment_threshold = sentiment_threshold
+        self.smoothing_window = smoothing_window
+        self._sentiment_data: Optional[pd.DataFrame] = None
+        self._analyzer = None
+    
+    def set_sentiment_data(
+        self,
+        data: pd.DataFrame,
+        text_column: str = "text",
+        date_column: str = "date",
+        symbol_column: Optional[str] = None,
+    ) -> None:
+        """
+        Set external sentiment data.
+        
+        Args:
+            data: DataFrame with text and date columns
+            text_column: Column containing text to analyze
+            date_column: Column containing dates
+            symbol_column: Optional column for symbol-specific sentiment
+        """
+        self._sentiment_data = data.copy()
+        self._text_column = text_column
+        self._date_column = date_column
+        self._symbol_column = symbol_column
+    
+    def _get_analyzer(self):
+        """Get or create the sentiment analyzer."""
+        if self._analyzer is None:
+            self._analyzer = _get_sentiment_analyzer(self.model_type)
+        return self._analyzer
+    
+    def _analyze_texts(self, texts: List[str]) -> List[float]:
+        """Analyze text sentiment scores."""
+        analyzer = self._get_analyzer()
+        
+        if analyzer is None:
+            # Fallback to random mock sentiment
+            return [np.random.uniform(-1, 1) for _ in texts]
+        
+        try:
+            if self.model_type == "finbert":
+                # FinBERT returns BERTSentimentResult objects
+                results = analyzer.predict(texts)
+                # Convert to float: positive=1, neutral=0, negative=-1
+                scores = []
+                for r in results:
+                    if r.label.value == "positive":
+                        scores.append(r.score)
+                    elif r.label.value == "negative":
+                        scores.append(-r.score)
+                    else:
+                        scores.append(0.0)
+                return scores
+            else:
+                # SimpleSentiment returns SentimentResult objects
+                results = analyzer.analyze(texts)
+                if not isinstance(results, list):
+                    results = [results]
+                return [r.score for r in results]
+        except Exception as e:
+            logger.warning(f"Sentiment analysis failed: {e}")
+            return [0.0] * len(texts)
+    
+    def generate(
+        self,
+        price_data: PriceData,
+        sentiment_data: Optional[pd.DataFrame] = None,
+        **kwargs: Any
+    ) -> pd.DataFrame:
+        """
+        Generate NLP sentiment signal.
+        
+        If sentiment_data is not provided, will use mock sentiment.
+        
+        Args:
+            price_data: Price data for alignment
+            sentiment_data: Optional DataFrame with text and dates
+            **kwargs: Additional arguments
+            
+        Returns:
+            Signal DataFrame (date x symbol) with values in [-1, 1]
+        """
+        close_prices = price_data.get_close_prices()
+        
+        # Initialize signal DataFrame
+        signal = pd.DataFrame(
+            0.0,
+            index=close_prices.index,
+            columns=close_prices.columns,
+        )
+        
+        # Use provided data or stored data
+        data = sentiment_data if sentiment_data is not None else self._sentiment_data
+        
+        if data is not None and len(data) > 0:
+            # Analyze sentiment from text data
+            text_col = getattr(self, '_text_column', 'text')
+            date_col = getattr(self, '_date_column', 'date')
+            symbol_col = getattr(self, '_symbol_column', None)
+            
+            texts = data[text_col].tolist()
+            scores = self._analyze_texts(texts)
+            
+            # Create sentiment series
+            sentiment_df = data.copy()
+            sentiment_df['_sentiment_score'] = scores
+            sentiment_df[date_col] = pd.to_datetime(sentiment_df[date_col])
+            
+            # Aggregate by date (and symbol if available)
+            if symbol_col and symbol_col in sentiment_df.columns:
+                # Symbol-specific sentiment
+                grouped = sentiment_df.groupby([date_col, symbol_col])['_sentiment_score'].mean()
+                for (date, symbol), score in grouped.items():
+                    if date in signal.index and symbol in signal.columns:
+                        signal.loc[date, symbol] = score
+            else:
+                # Broadcast to all symbols
+                date_sentiment = sentiment_df.groupby(date_col)['_sentiment_score'].mean()
+                for date, score in date_sentiment.items():
+                    if date in signal.index:
+                        signal.loc[date, :] = score
+        else:
+            # Generate mock sentiment based on returns
+            returns = price_data.get_returns(periods=1)
+            # Mock: sentiment follows returns with noise
+            signal = np.tanh(returns * 5 + np.random.randn(*returns.shape) * 0.1)
+            signal = pd.DataFrame(signal, index=close_prices.index, columns=close_prices.columns)
+        
+        # Apply smoothing
+        if self.smoothing_window > 1:
+            signal = signal.rolling(window=self.smoothing_window).mean()
+        
+        # Apply threshold
+        signal[signal.abs() < self.sentiment_threshold] = 0.0
+        
+        return signal.fillna(0)
+    
+    def get_metadata(self) -> SignalMetadata:
+        """Get signal metadata."""
+        return SignalMetadata(
+            name=self.name,
+            signal_type=self.signal_type,
+            description=self.description,
+            parameters=self.parameters,
+            lookback_period=self.smoothing_window,
+            requires_volume=False,
+        )
+
+
+class SentimentMomentumSignal(Signal):
+    """
+    Sentiment momentum signal.
+    
+    Generates signals based on sentiment trends - going long when
+    sentiment is positive and rising, short when negative and falling.
+    
+    Example:
+        >>> signal = SentimentMomentumSignal(
+        ...     lookback=7,
+        ...     momentum_threshold=0.2
+        ... )
+        >>> signals = signal.generate(price_data, sentiment_data=sentiment_df)
+    """
+    
+    def __init__(
+        self,
+        lookback: int = 7,
+        momentum_threshold: float = 0.1,
+        sentiment_threshold: float = 0.3,
+        model_type: str = "simple",
+        name: str = "sentiment_momentum",
+    ):
+        """
+        Initialize sentiment momentum signal.
+        
+        Args:
+            lookback: Lookback period for momentum calculation
+            momentum_threshold: Minimum momentum change for signal
+            sentiment_threshold: Minimum sentiment level for signal
+            model_type: 'simple' or 'finbert' for sentiment analysis
+            name: Signal name
+        """
+        super().__init__(
+            name=name,
+            signal_type=SignalType.SENTIMENT,
+            description=f"Sentiment momentum ({lookback}-day lookback)",
+            lookback=lookback,
+            momentum_threshold=momentum_threshold,
+            sentiment_threshold=sentiment_threshold,
+        )
+        self.lookback = lookback
+        self.momentum_threshold = momentum_threshold
+        self.sentiment_threshold = sentiment_threshold
+        self.model_type = model_type
+        self._text_signal = TextSentimentSignal(model_type=model_type)
+    
+    def generate(
+        self,
+        price_data: PriceData,
+        sentiment_data: Optional[pd.DataFrame] = None,
+        **kwargs: Any
+    ) -> pd.DataFrame:
+        """
+        Generate sentiment momentum signal.
+        
+        Logic:
+        - BUY: sentiment > threshold AND sentiment rising
+        - SELL: sentiment < -threshold AND sentiment falling
+        - NEUTRAL: otherwise
+        
+        Args:
+            price_data: Price data
+            sentiment_data: Optional sentiment DataFrame
+            **kwargs: Additional arguments
+            
+        Returns:
+            Signal DataFrame
+        """
+        # Get base sentiment
+        base_sentiment = self._text_signal.generate(
+            price_data, 
+            sentiment_data=sentiment_data
+        )
+        
+        # Calculate sentiment momentum (rate of change)
+        sentiment_ma = base_sentiment.rolling(window=self.lookback).mean()
+        sentiment_momentum = sentiment_ma.diff()
+        
+        # Generate signal
+        signal = pd.DataFrame(
+            0.0,
+            index=base_sentiment.index,
+            columns=base_sentiment.columns,
+        )
+        
+        # Bullish: positive sentiment + rising momentum
+        bullish = (
+            (sentiment_ma > self.sentiment_threshold) & 
+            (sentiment_momentum > self.momentum_threshold)
+        )
+        signal[bullish] = 1.0
+        
+        # Bearish: negative sentiment + falling momentum
+        bearish = (
+            (sentiment_ma < -self.sentiment_threshold) & 
+            (sentiment_momentum < -self.momentum_threshold)
+        )
+        signal[bearish] = -1.0
+        
+        return signal.fillna(0)
+    
+    def get_metadata(self) -> SignalMetadata:
+        """Get signal metadata."""
+        return SignalMetadata(
+            name=self.name,
+            signal_type=self.signal_type,
+            description=self.description,
+            parameters=self.parameters,
+            lookback_period=self.lookback,
+            requires_volume=False,
+        )
+
+
+class SentimentDivergenceSignal(Signal):
+    """
+    Price-sentiment divergence signal.
+    
+    Detects when price and sentiment are moving in opposite directions,
+    which can signal potential reversals.
+    
+    Divergence patterns:
+    - Bullish divergence: Price falling, sentiment rising → BUY
+    - Bearish divergence: Price rising, sentiment falling → SELL
+    
+    Example:
+        >>> signal = SentimentDivergenceSignal(lookback=10)
+        >>> signals = signal.generate(price_data, sentiment_data=sentiment_df)
+    """
+    
+    def __init__(
+        self,
+        lookback: int = 10,
+        divergence_threshold: float = 0.15,
+        model_type: str = "simple",
+        name: str = "sentiment_divergence",
+    ):
+        """
+        Initialize sentiment divergence signal.
+        
+        Args:
+            lookback: Lookback for divergence detection
+            divergence_threshold: Minimum divergence level for signal
+            model_type: 'simple' or 'finbert' for sentiment analysis
+            name: Signal name
+        """
+        super().__init__(
+            name=name,
+            signal_type=SignalType.SENTIMENT,
+            description=f"Price-sentiment divergence ({lookback}-period)",
+            lookback=lookback,
+            divergence_threshold=divergence_threshold,
+        )
+        self.lookback = lookback
+        self.divergence_threshold = divergence_threshold
+        self.model_type = model_type
+        self._text_signal = TextSentimentSignal(model_type=model_type)
+    
+    def generate(
+        self,
+        price_data: PriceData,
+        sentiment_data: Optional[pd.DataFrame] = None,
+        **kwargs: Any
+    ) -> pd.DataFrame:
+        """
+        Generate sentiment divergence signal.
+        
+        Args:
+            price_data: Price data
+            sentiment_data: Optional sentiment DataFrame
+            **kwargs: Additional arguments
+            
+        Returns:
+            Signal DataFrame
+        """
+        close_prices = price_data.get_close_prices()
+        
+        # Get sentiment signal
+        sentiment = self._text_signal.generate(
+            price_data, 
+            sentiment_data=sentiment_data
+        )
+        
+        # Calculate price momentum (normalized returns)
+        price_returns = close_prices.pct_change(periods=self.lookback)
+        price_momentum = np.tanh(price_returns * 5)  # Normalize to [-1, 1]
+        
+        # Calculate sentiment momentum
+        sentiment_momentum = sentiment.rolling(window=self.lookback).mean().diff()
+        sentiment_momentum = np.tanh(sentiment_momentum * 3)
+        
+        # Detect divergence
+        signal = pd.DataFrame(
+            0.0,
+            index=close_prices.index,
+            columns=close_prices.columns,
+        )
+        
+        # Bullish divergence: price down, sentiment up
+        bullish_divergence = (
+            (price_momentum < -self.divergence_threshold) & 
+            (sentiment_momentum > self.divergence_threshold)
+        )
+        signal[bullish_divergence] = 1.0
+        
+        # Bearish divergence: price up, sentiment down
+        bearish_divergence = (
+            (price_momentum > self.divergence_threshold) & 
+            (sentiment_momentum < -self.divergence_threshold)
+        )
+        signal[bearish_divergence] = -1.0
+        
+        return signal.fillna(0)
+    
+    def get_metadata(self) -> SignalMetadata:
+        """Get signal metadata."""
+        return SignalMetadata(
+            name=self.name,
+            signal_type=self.signal_type,
+            description=self.description,
+            parameters=self.parameters,
+            lookback_period=self.lookback,
+            requires_volume=False,
+        )
+

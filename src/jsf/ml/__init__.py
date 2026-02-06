@@ -155,6 +155,21 @@ from .rl_agent import (
     create_trading_agent,
 )
 
+# NLP Transformers (Phase 19)
+from .transformers import (
+    FinBERT,
+    CustomBERT,
+    BERTFeatureExtractor,
+    BERTConfig,
+    create_finbert,
+    SimpleSentiment,
+    FinBERTSentiment,
+    SentimentResult,
+    SentimentLabel,
+    SentimentAnalyzer,
+    TextEmbedder,
+)
+
 __all__ = [
     # Feature extraction
     "FeatureExtractor",
@@ -222,6 +237,18 @@ __all__ = [
     "RegisteredModel",
     "ModelVersion",
     "ModelStatus",
+    # NLP Transformers (Phase 19)
+    "FinBERT",
+    "CustomBERT",
+    "BERTFeatureExtractor",
+    "BERTConfig",
+    "create_finbert",
+    "SimpleSentiment",
+    "FinBERTSentiment",
+    "SentimentResult",
+    "SentimentLabel",
+    "SentimentAnalyzer",
+    "TextEmbedder",
 ]
 
 

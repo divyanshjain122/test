@@ -50,6 +50,10 @@ from jsf.signals.sentiment import (
     NewHighLowSignal,
     VolumeShockSignal,
     SeasonalitySignal,
+    # NLP-based signals (Phase 19)
+    TextSentimentSignal,
+    SentimentMomentumSignal,
+    SentimentDivergenceSignal,
 )
 
 # Advanced composites
@@ -111,6 +115,10 @@ __all__ = [
     "NewHighLowSignal",
     "VolumeShockSignal",
     "SeasonalitySignal",
+    # NLP-based signals (Phase 19)
+    "TextSentimentSignal",
+    "SentimentMomentumSignal",
+    "SentimentDivergenceSignal",
     # Advanced Composites
     "RotationSignal",
     "MultiTimeframeSignal",
