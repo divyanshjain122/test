@@ -217,6 +217,145 @@ class TestFeatureExtractor:
 
 
 # =============================================================================
+# TEST: TEXT FEATURE EXTRACTION
+# =============================================================================
+
+class TestTextFeatureExtractor:
+    """Test text-based feature extraction."""
+    
+    @pytest.fixture
+    def sample_text_df(self):
+        """Generate sample text DataFrame for testing."""
+        return pd.DataFrame({
+            'date': pd.to_datetime([
+                '2023-01-01', '2023-01-01', '2023-01-02', 
+                '2023-01-02', '2023-01-03',
+            ]),
+            'symbol': ['AAPL', 'GOOGL', 'AAPL', 'GOOGL', 'AAPL'],
+            'text': [
+                "Apple reports strong quarterly earnings, beating analyst expectations",
+                "Google announces major AI breakthrough",
+                "Market volatility increases amid economic concerns",
+                "Alphabet stock rises on cloud revenue growth",
+                "iPhone sales beat expectations",
+            ],
+        })
+    
+    @pytest.fixture
+    def market_text_df(self):
+        """Generate market-level text DataFrame (no symbol)."""
+        return pd.DataFrame({
+            'date': pd.to_datetime([
+                '2023-01-01', '2023-01-02', '2023-01-03',
+            ]),
+            'headline': [
+                "Markets rally on Federal Reserve optimism",
+                "Economic uncertainty weighs on stocks",
+                "Tech sector leads market gains",
+            ],
+        })
+    
+    def test_extract_text_features_basic(self, sample_text_df):
+        """Test basic text feature extraction."""
+        extractor = FeatureExtractor(
+            feature_groups=['momentum'],
+            lag_periods=[1],
+        )
+        
+        features = extractor.extract_text_features(sample_text_df, text_column='text')
+        
+        assert isinstance(features, pd.DataFrame)
+        assert features.shape[0] > 0
+        assert 'text_sentiment_score' in features.columns
+        assert 'text_sentiment_confidence' in features.columns
+    
+    def test_extract_text_features_sentiment_range(self, sample_text_df):
+        """Test that sentiment scores are in valid range."""
+        extractor = FeatureExtractor(
+            feature_groups=['momentum'],
+            lag_periods=[1],
+        )
+        
+        features = extractor.extract_text_features(sample_text_df, text_column='text')
+        
+        # Sentiment should be between -1 and 1
+        assert features['text_sentiment_score'].min() >= -1.0
+        assert features['text_sentiment_score'].max() <= 1.0
+        # Confidence should be between 0 and 1
+        assert features['text_sentiment_confidence'].min() >= 0.0
+        assert features['text_sentiment_confidence'].max() <= 1.0
+    
+    def test_extract_text_features_market_level(self, market_text_df):
+        """Test text feature extraction without symbol (market-level)."""
+        extractor = FeatureExtractor(
+            feature_groups=['momentum'],
+            lag_periods=[1],
+        )
+        
+        features = extractor.extract_text_features(
+            market_text_df, 
+            text_column='headline',
+            symbol_column=None  # No symbol column
+        )
+        
+        assert 'text_sentiment_score' in features.columns
+        # Index should be single level (date only)
+        assert features.index.name == 'date' or 'date' in str(features.index.names)
+    
+    def test_merge_text_features(self, sample_price_data, sample_text_df):
+        """Test merging price and text features."""
+        extractor = FeatureExtractor(
+            feature_groups=['momentum'],
+            lag_periods=[1],
+        )
+        
+        # Extract price features
+        price_features = extractor.extract(sample_price_data)
+        
+        # Extract text features
+        text_features = extractor.extract_text_features(sample_text_df, text_column='text')
+        
+        # Merge should work (inner join by default)
+        merged = extractor.merge_text_features(price_features, text_features, how='inner')
+        
+        assert isinstance(merged, pd.DataFrame)
+        # Merged should have both price and text feature columns
+        price_cols = [c for c in merged.columns if 'momentum' in c.lower()]
+        text_cols = [c for c in merged.columns if 'sentiment' in c.lower()]
+        assert len(price_cols) > 0
+        assert len(text_cols) > 0
+    
+    def test_text_sentiment_feature_group_exists(self):
+        """Test that text_sentiment feature group is defined."""
+        assert 'text_sentiment' in FEATURE_GROUPS
+        assert 'requires' in FEATURE_GROUPS['text_sentiment']
+        assert FEATURE_GROUPS['text_sentiment']['requires'] == 'text_data'
+    
+    def test_extract_text_features_aggregation(self):
+        """Test that multiple texts per date/symbol are aggregated."""
+        # Multiple texts for same date/symbol
+        text_df = pd.DataFrame({
+            'date': pd.to_datetime(['2023-01-01', '2023-01-01', '2023-01-01']),
+            'symbol': ['AAPL', 'AAPL', 'AAPL'],
+            'text': [
+                "Very positive news!",
+                "Slightly negative report",
+                "Neutral statement from company",
+            ],
+        })
+        
+        extractor = FeatureExtractor(
+            feature_groups=['momentum'],
+            lag_periods=[1],
+        )
+        
+        features = extractor.extract_text_features(text_df, text_column='text')
+        
+        # Should aggregate to single row for AAPL on 2023-01-01
+        assert len(features) == 1
+
+
+# =============================================================================
 # TEST: PREPROCESSING
 # =============================================================================
 
