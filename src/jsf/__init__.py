@@ -7,11 +7,29 @@ and optimizing trading strategies.
 Version: 0.6.0-dev
 Author: JBAC EdTech
 License: MIT
+
+⚠️ EDUCATIONAL PURPOSE ONLY ⚠️
+==============================
+
+This software is designed for LEARNING and RESEARCH purposes only.
+
+IMPORTANT NOTICES:
+- NOT FINANCIAL ADVICE: Nothing in this software constitutes investment advice.
+- NOT FOR REAL TRADING: This is not intended for trading with real money.
+- PAST PERFORMANCE: Backtested results do NOT guarantee future results.
+- SUBSTANTIAL RISK: Trading involves substantial risk of financial loss.
+- NO WARRANTY: Provided "AS IS" without warranty. Use at your own risk.
+
+By importing this module, you acknowledge that you understand and accept
+these risks. The authors and JBAC EdTech are NOT liable for any losses.
+
+For full disclaimer, see: https://github.com/JaiAnshSB26/JBAC-Strategy-Foundry#disclaimer
 """
 
 __version__ = "0.6.0-dev"
 __author__ = "JBAC EdTech"
 __license__ = "MIT"
+__disclaimer__ = "EDUCATIONAL PURPOSE ONLY - NOT FOR REAL TRADING"
 
 # Configuration exports
 from .config import (

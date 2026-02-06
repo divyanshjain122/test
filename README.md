@@ -7,6 +7,8 @@
 [![Progress](https://img.shields.io/badge/progress-19%2F20%20phases%20(95%25)-brightgreen.svg)](#development-roadmap)
 [![Version](https://img.shields.io/badge/version-0.6.0--dev-blue.svg)](src/jsf/__init__.py)
 
+> ⚠️ **EDUCATIONAL PURPOSE ONLY**: This software is designed for **learning and research purposes only**. It is NOT intended for real trading with real money. Past performance in backtests does NOT guarantee future results. Trading involves substantial risk of loss. The authors and contributors are NOT liable for any financial losses. See [DISCLAIMER](#disclaimer) for full details.
+
 **JSF-Core** is a production-grade, open-source quantitative research engine for building, backtesting, and optimizing trading strategies. Built by JBAC EdTech, it provides a modular, type-safe, and extensible framework for systematic trading research.
 
 > **🎉 Status Update (Feb 4, 2026)**: Phases 1-19 complete (95%)! ML Integration added with feature extraction, ensemble models, and walk-forward validation.
@@ -286,6 +288,28 @@ pre-commit install
 make check
 ```
 
+## ⚠️ Disclaimer
+
+**EDUCATIONAL PURPOSE ONLY**
+
+This software is provided for **educational and research purposes only**. It is designed to help students, researchers, and developers learn about quantitative trading concepts, backtesting methodologies, and algorithmic strategy development.
+
+**IMPORTANT NOTICES:**
+
+1. **NOT FINANCIAL ADVICE**: Nothing in this software or documentation constitutes financial, investment, tax, or legal advice. Always consult with qualified professionals before making investment decisions.
+
+2. **NO REAL TRADING**: This software is NOT intended for trading with real money. While it includes broker integration capabilities for educational demonstrations, using it for live trading is at your own risk.
+
+3. **PAST PERFORMANCE**: Backtested results do NOT guarantee future performance. Simulated trading programs are designed with the benefit of hindsight and do not account for real-world market conditions, liquidity, or execution issues.
+
+4. **SUBSTANTIAL RISK**: Trading financial instruments involves substantial risk of loss. You could lose some or all of your invested capital. Only trade with money you can afford to lose.
+
+5. **NO WARRANTY**: This software is provided "AS IS" without warranty of any kind, express or implied. The authors and contributors disclaim all liability for any losses or damages.
+
+6. **YOUR RESPONSIBILITY**: You are solely responsible for any trading decisions and their outcomes. The authors and JBAC EdTech are NOT responsible for any financial losses.
+
+By using this software, you acknowledge that you understand and accept these risks.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -303,6 +327,6 @@ GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
 
 ---
 
-**Status**: 🚧 Active Development (v0.5.0-dev)  
-**Phase**: 7/20 - Portfolio Construction Complete  
-**Next**: Phase 8-9 - Strategy Templates
+**Status**: 🚧 Active Development (v0.6.0-dev)  
+**Phase**: 19/20 - ML Integration Complete  
+**Next**: Phase 20 - Documentation & Deployment
