@@ -167,6 +167,10 @@ class NeuralConfig(ModelConfig):
     
     # GPU/Performance
     use_mixed_precision: bool = False  # Enable for faster GPU training
+    
+    # Checkpointing (for long training runs)
+    checkpoint_dir: Optional[str] = None  # Directory to save checkpoints
+    checkpoint_frequency: int = 5  # Save every N epochs
 
 
 class NeuralModel(MLModel):
@@ -321,8 +325,16 @@ class NeuralModel(MLModel):
         opt_class = optimizer_map.get(self.config.optimizer.lower(), tf.keras.optimizers.Adam)
         return opt_class(learning_rate=self.config.learning_rate)
     
-    def _get_callbacks(self, validation_data: bool = True) -> List[Any]:
-        """Get training callbacks."""
+    def _get_callbacks(self, validation_data: bool = True, model_name: str = "model") -> List[Any]:
+        """Get training callbacks including optional checkpointing.
+        
+        Args:
+            validation_data: Whether validation data is available
+            model_name: Name for checkpoint files (e.g., 'regressor', 'classifier')
+            
+        Returns:
+            List of Keras callbacks
+        """
         tf = self.tf
         callbacks = []
         
@@ -344,6 +356,29 @@ class NeuralModel(MLModel):
                 min_lr=1e-7,
                 verbose=0
             ))
+        
+        # Model checkpointing for long training runs
+        if self.config.checkpoint_dir is not None:
+            checkpoint_path = Path(self.config.checkpoint_dir) / f"{model_name}_epoch_{{epoch:03d}}.keras"
+            checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            callbacks.append(tf.keras.callbacks.ModelCheckpoint(
+                filepath=str(checkpoint_path),
+                save_freq='epoch',
+                save_best_only=False,
+                verbose=0
+            ))
+            
+            # Also save the best model
+            best_path = Path(self.config.checkpoint_dir) / f"{model_name}_best.keras"
+            callbacks.append(tf.keras.callbacks.ModelCheckpoint(
+                filepath=str(best_path),
+                monitor='val_loss' if validation_data else 'loss',
+                save_best_only=True,
+                verbose=0
+            ))
+            
+            logger.info(f"Checkpointing enabled: {self.config.checkpoint_dir}")
         
         return callbacks
     
@@ -447,7 +482,8 @@ class NeuralModel(MLModel):
             validation_data is not None or 
             self.config.validation_split > 0
         )
-        callbacks = self._get_callbacks(validation_data=use_validation)
+        regressor_callbacks = self._get_callbacks(validation_data=use_validation, model_name="regressor")
+        classifier_callbacks = self._get_callbacks(validation_data=use_validation, model_name="classifier")
         
         # Fit regressor
         if self.prediction_type in [PredictionType.REGRESSION, PredictionType.BOTH]:
@@ -472,7 +508,7 @@ class NeuralModel(MLModel):
             fit_kwargs = {
                 'epochs': self.config.epochs,
                 'batch_size': self.config.batch_size,
-                'callbacks': callbacks,
+                'callbacks': regressor_callbacks,
                 'verbose': 0,
             }
             
@@ -518,7 +554,7 @@ class NeuralModel(MLModel):
             fit_kwargs = {
                 'epochs': self.config.epochs,
                 'batch_size': self.config.batch_size,
-                'callbacks': callbacks,
+                'callbacks': classifier_callbacks,
                 'verbose': 0,
             }
             
