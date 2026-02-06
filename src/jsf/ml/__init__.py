@@ -110,6 +110,15 @@ from .export import (
     verify_model_checksum,
 )
 
+# Model Registry
+from .registry import (
+    ModelRegistry,
+    ExperimentTracker,
+    RegisteredModel,
+    ModelVersion,
+    ModelStatus,
+)
+
 # Neural Networks (TensorFlow)
 from .neural import (
     NeuralModel,
@@ -207,6 +216,12 @@ __all__ = [
     "create_exporter",
     "compute_model_checksum",
     "verify_model_checksum",
+    # Model Registry
+    "ModelRegistry",
+    "ExperimentTracker",
+    "RegisteredModel",
+    "ModelVersion",
+    "ModelStatus",
 ]
 
 

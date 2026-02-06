@@ -1089,6 +1089,317 @@ class TestCreateExporter:
 
 
 # =============================================================================
+# TEST: MODEL REGISTRY
+# =============================================================================
+
+class TestModelVersion:
+    """Tests for ModelVersion dataclass."""
+    
+    def test_version_creation(self):
+        """Test creating a model version."""
+        from jsf.ml.registry import ModelVersion, ModelStatus
+        
+        version = ModelVersion(
+            version="1.0.0",
+            metrics={"accuracy": 0.85, "f1": 0.82},
+            status=ModelStatus.DEVELOPMENT,
+        )
+        
+        assert version.version == "1.0.0"
+        assert version.metrics["accuracy"] == 0.85
+        assert version.status == ModelStatus.DEVELOPMENT
+    
+    def test_version_to_dict(self):
+        """Test converting version to dictionary."""
+        from jsf.ml.registry import ModelVersion
+        
+        version = ModelVersion(
+            version="2.0.0",
+            description="Improved model",
+            tags=["production", "v2"],
+        )
+        
+        d = version.to_dict()
+        
+        assert d["version"] == "2.0.0"
+        assert d["description"] == "Improved model"
+        assert "production" in d["tags"]
+    
+    def test_version_from_dict(self):
+        """Test creating version from dictionary."""
+        from jsf.ml.registry import ModelVersion, ModelStatus
+        
+        data = {
+            "version": "1.5.0",
+            "metrics": {"mse": 0.05},
+            "status": "staging",
+        }
+        
+        version = ModelVersion.from_dict(data)
+        
+        assert version.version == "1.5.0"
+        assert version.metrics["mse"] == 0.05
+        assert version.status == ModelStatus.STAGING
+
+
+class TestRegisteredModel:
+    """Tests for RegisteredModel dataclass."""
+    
+    def test_model_creation(self):
+        """Test creating a registered model."""
+        from jsf.ml.registry import RegisteredModel
+        
+        model = RegisteredModel(
+            name="price_predictor",
+            description="Predicts next-day prices",
+        )
+        
+        assert model.name == "price_predictor"
+        assert len(model.versions) == 0
+    
+    def test_get_version(self):
+        """Test getting a specific version."""
+        from jsf.ml.registry import RegisteredModel, ModelVersion
+        
+        model = RegisteredModel(name="test_model")
+        model.versions["1.0.0"] = ModelVersion(version="1.0.0")
+        model.versions["2.0.0"] = ModelVersion(version="2.0.0")
+        model.latest_version = "2.0.0"
+        
+        # Get specific version
+        v1 = model.get_version("1.0.0")
+        assert v1.version == "1.0.0"
+        
+        # Get latest
+        latest = model.get_version("latest")
+        assert latest.version == "2.0.0"
+    
+    def test_list_versions(self):
+        """Test listing versions."""
+        from jsf.ml.registry import RegisteredModel, ModelVersion
+        
+        model = RegisteredModel(name="test")
+        model.versions["1.0.0"] = ModelVersion(version="1.0.0")
+        model.versions["1.1.0"] = ModelVersion(version="1.1.0")
+        
+        versions = model.list_versions()
+        
+        assert "1.0.0" in versions
+        assert "1.1.0" in versions
+
+
+class TestModelRegistry:
+    """Tests for ModelRegistry class."""
+    
+    def test_registry_creation(self, tmp_path):
+        """Test creating a registry."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        assert len(registry.list_models()) == 0
+    
+    def test_register_model(self, tmp_path):
+        """Test registering a model."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        # Create a simple model object
+        model = {"type": "mock", "params": {"n_estimators": 100}}
+        
+        version = registry.register(
+            model=model,
+            name="test_model",
+            version="1.0.0",
+            metrics={"accuracy": 0.9},
+            description="Test model",
+        )
+        
+        assert version.version == "1.0.0"
+        assert version.metrics["accuracy"] == 0.9
+        assert "test_model" in registry.list_models()
+    
+    def test_load_model(self, tmp_path):
+        """Test loading a registered model."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        original_model = {"type": "mock", "value": 42}
+        registry.register(model=original_model, name="loadable", version="1.0.0")
+        
+        loaded = registry.load("loadable", version="1.0.0")
+        
+        assert loaded["type"] == "mock"
+        assert loaded["value"] == 42
+    
+    def test_load_latest(self, tmp_path):
+        """Test loading latest version."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        registry.register(model={"v": 1}, name="versioned", version="1.0.0")
+        registry.register(model={"v": 2}, name="versioned", version="2.0.0")
+        
+        latest = registry.load("versioned", version="latest")
+        
+        assert latest["v"] == 2
+    
+    def test_list_versions(self, tmp_path):
+        """Test listing model versions."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        registry.register(model={}, name="multi", version="1.0.0")
+        registry.register(model={}, name="multi", version="1.1.0")
+        registry.register(model={}, name="multi", version="2.0.0")
+        
+        versions = registry.list_versions("multi")
+        
+        assert len(versions) == 3
+        assert "1.0.0" in versions
+        assert "2.0.0" in versions
+    
+    def test_compare_versions(self, tmp_path):
+        """Test comparing model versions."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        registry.register(
+            model={}, name="comparable", version="1.0.0",
+            metrics={"accuracy": 0.8}
+        )
+        registry.register(
+            model={}, name="comparable", version="2.0.0",
+            metrics={"accuracy": 0.9}
+        )
+        
+        comparison = registry.compare_versions(
+            "comparable", ["1.0.0", "2.0.0"]
+        )
+        
+        assert comparison["1.0.0"]["metrics"]["accuracy"] == 0.8
+        assert comparison["2.0.0"]["metrics"]["accuracy"] == 0.9
+    
+    def test_set_production_version(self, tmp_path):
+        """Test setting production version."""
+        from jsf.ml.registry import ModelRegistry, ModelStatus
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        registry.register(model={}, name="prod_test", version="1.0.0")
+        registry.register(model={}, name="prod_test", version="2.0.0")
+        
+        registry.set_production_version("prod_test", "2.0.0")
+        
+        model_info = registry.get_model_info("prod_test")
+        assert model_info.production_version == "2.0.0"
+        
+        version_info = registry.get_version_info("prod_test", "2.0.0")
+        assert version_info.status == ModelStatus.PRODUCTION
+    
+    def test_delete_version(self, tmp_path):
+        """Test deleting a version."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry = ModelRegistry(tmp_path / "registry")
+        
+        registry.register(model={}, name="deletable", version="1.0.0")
+        registry.register(model={}, name="deletable", version="2.0.0")
+        
+        result = registry.delete_version("deletable", "1.0.0")
+        
+        assert result is True
+        assert "1.0.0" not in registry.list_versions("deletable")
+        assert "2.0.0" in registry.list_versions("deletable")
+    
+    def test_registry_persistence(self, tmp_path):
+        """Test that registry persists across instances."""
+        from jsf.ml.registry import ModelRegistry
+        
+        registry_path = tmp_path / "persistent"
+        
+        # First instance
+        registry1 = ModelRegistry(registry_path)
+        registry1.register(model={"test": 1}, name="persist_test", version="1.0.0")
+        
+        # Second instance
+        registry2 = ModelRegistry(registry_path)
+        
+        assert "persist_test" in registry2.list_models()
+        loaded = registry2.load("persist_test")
+        assert loaded["test"] == 1
+
+
+class TestExperimentTracker:
+    """Tests for ExperimentTracker class."""
+    
+    def test_tracker_creation(self, tmp_path):
+        """Test creating an experiment tracker."""
+        from jsf.ml.registry import ExperimentTracker
+        
+        tracker = ExperimentTracker(tmp_path / "experiments")
+        
+        assert len(tracker.list_runs()) == 0
+    
+    def test_start_and_end_run(self, tmp_path):
+        """Test starting and ending a run."""
+        from jsf.ml.registry import ExperimentTracker
+        
+        tracker = ExperimentTracker(tmp_path / "experiments")
+        
+        tracker.start_run("test_experiment")
+        tracker.log_params({"learning_rate": 0.01})
+        tracker.log_metrics({"accuracy": 0.85})
+        tracker.end_run()
+        
+        runs = tracker.list_runs()
+        assert len(runs) == 1
+        assert runs[0]["name"] == "test_experiment"
+        assert runs[0]["params"]["learning_rate"] == 0.01
+        assert runs[0]["metrics"]["accuracy"] == 0.85
+    
+    def test_context_manager(self, tmp_path):
+        """Test using tracker as context manager."""
+        from jsf.ml.registry import ExperimentTracker
+        
+        tracker = ExperimentTracker(tmp_path / "experiments")
+        
+        with tracker.start_run("context_test"):
+            tracker.log_params({"param": "value"})
+            tracker.log_metrics({"metric": 1.0})
+        
+        runs = tracker.list_runs()
+        assert len(runs) == 1
+        assert runs[0]["status"] == "completed"
+    
+    def test_get_best_run(self, tmp_path):
+        """Test finding best run by metric."""
+        from jsf.ml.registry import ExperimentTracker
+        
+        tracker = ExperimentTracker(tmp_path / "experiments")
+        
+        # Create multiple runs
+        with tracker.start_run("optimization"):
+            tracker.log_metrics({"score": 0.7})
+        
+        with tracker.start_run("optimization"):
+            tracker.log_metrics({"score": 0.9})
+        
+        with tracker.start_run("optimization"):
+            tracker.log_metrics({"score": 0.8})
+        
+        best = tracker.get_best_run("optimization", "score", maximize=True)
+        
+        assert best is not None
+        assert best["metrics"]["score"] == 0.9
+
+
+# =============================================================================
 # RUN TESTS
 # =============================================================================
 
