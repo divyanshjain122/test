@@ -596,3 +596,195 @@ class TestAnalyzeAttentionFunction:
         assert "stats" in result
         assert "key_pairs" in result
         assert "financial" not in result
+
+
+# =============================================================================
+# TEST: BERT MODELS
+# =============================================================================
+
+class TestBERTConfig:
+    """Tests for BERTConfig dataclass."""
+    
+    def test_default_config(self):
+        """Test default BERT configuration."""
+        from jsf.ml.transformers.bert import BERTConfig
+        
+        config = BERTConfig()
+        
+        assert config.model_name == "ProsusAI/finbert"
+        assert config.max_length == 512
+        assert config.batch_size == 8
+        assert config.device == "auto"
+
+
+class TestFinBERT:
+    """Tests for FinBERT model."""
+    
+    def test_finbert_creation_mock(self):
+        """Test creating FinBERT in mock mode."""
+        from jsf.ml.transformers.bert import FinBERT
+        
+        model = FinBERT(use_mock=True)
+        
+        assert model.use_mock is True
+        assert model.model is None
+    
+    def test_predict_one_mock(self):
+        """Test single prediction with mock."""
+        from jsf.ml.transformers.bert import FinBERT, SentimentLabel
+        
+        model = FinBERT(use_mock=True)
+        
+        result = model.predict_one("Revenue increased significantly")
+        
+        assert result.text == "Revenue increased significantly"
+        assert isinstance(result.label, SentimentLabel)
+        assert 0 <= result.score <= 1
+        assert "positive" in result.probabilities
+        assert "negative" in result.probabilities
+        assert "neutral" in result.probabilities
+    
+    def test_predict_batch_mock(self):
+        """Test batch prediction with mock."""
+        from jsf.ml.transformers.bert import FinBERT
+        
+        model = FinBERT(use_mock=True)
+        
+        texts = [
+            "Company beats earnings expectations",
+            "Stock crashes amid scandal",
+            "Quarterly results as expected"
+        ]
+        
+        results = model.predict(texts)
+        
+        assert len(results) == 3
+        assert all(hasattr(r, 'label') for r in results)
+        assert all(hasattr(r, 'score') for r in results)
+    
+    def test_get_embeddings_mock(self):
+        """Test getting embeddings with mock."""
+        from jsf.ml.transformers.bert import FinBERT
+        
+        model = FinBERT(use_mock=True)
+        
+        texts = ["Text 1", "Text 2", "Text 3"]
+        embeddings = model.get_embeddings(texts)
+        
+        assert embeddings.shape == (3, 768)
+        assert embeddings.dtype == np.float32
+
+
+class TestCustomBERT:
+    """Tests for CustomBERT model."""
+    
+    def test_custom_bert_creation_mock(self):
+        """Test creating CustomBERT in mock mode."""
+        from jsf.ml.transformers.bert import CustomBERT
+        
+        model = CustomBERT(num_labels=3, use_mock=True)
+        
+        assert model.num_labels == 3
+        assert model.use_mock is True
+    
+    def test_train_mock(self):
+        """Test training with mock."""
+        from jsf.ml.transformers.bert import CustomBERT
+        
+        model = CustomBERT(num_labels=2, use_mock=True)
+        
+        texts = ["text 1", "text 2", "text 3"]
+        labels = [0, 1, 0]
+        
+        history = model.train(texts, labels, epochs=2)
+        
+        assert "train_loss" in history
+        assert "val_loss" in history
+        assert len(history["train_loss"]) >= 2  # Mock returns sample data
+    
+    def test_predict_mock(self):
+        """Test prediction with mock."""
+        from jsf.ml.transformers.bert import CustomBERT
+        
+        model = CustomBERT(num_labels=3, use_mock=True)
+        
+        texts = ["predict this", "and this"]
+        predictions = model.predict(texts, return_probabilities=False)
+        
+        assert len(predictions) == 2
+        assert all(isinstance(p, (int, np.integer)) for p in predictions)
+    
+    def test_predict_with_probabilities_mock(self):
+        """Test prediction with probabilities."""
+        from jsf.ml.transformers.bert import CustomBERT
+        
+        model = CustomBERT(num_labels=3, use_mock=True)
+        
+        texts = ["text"]
+        results = model.predict(texts, return_probabilities=True)
+        
+        assert len(results) == 1
+        label, probs = results[0]
+        assert isinstance(label, (int, np.integer))
+        assert len(probs) == 3
+        assert np.isclose(probs.sum(), 1.0)
+
+
+class TestBERTFeatureExtractor:
+    """Tests for BERTFeatureExtractor."""
+    
+    def test_extractor_creation(self):
+        """Test creating feature extractor."""
+        from jsf.ml.transformers.bert import BERTFeatureExtractor
+        
+        extractor = BERTFeatureExtractor(use_mock=True)
+        
+        assert extractor.pooling == "cls"
+    
+    def test_extract_features(self):
+        """Test extracting features."""
+        from jsf.ml.transformers.bert import BERTFeatureExtractor
+        
+        extractor = BERTFeatureExtractor(use_mock=True)
+        
+        texts = ["financial news 1", "financial news 2"]
+        features = extractor.extract(texts)
+        
+        assert features.shape[0] == 2
+        assert features.shape[1] > 0
+        assert features.dtype == np.float32
+    
+    def test_fit_transform(self):
+        """Test fit_transform method."""
+        from jsf.ml.transformers.bert import BERTFeatureExtractor
+        
+        extractor = BERTFeatureExtractor(use_mock=True)
+        
+        texts = ["text 1", "text 2", "text 3"]
+        features = extractor.fit_transform(texts)
+        
+        assert features.shape[0] == 3
+    
+    def test_fit_transform_with_pca(self):
+        """Test dimensionality reduction."""
+        from jsf.ml.transformers.bert import BERTFeatureExtractor
+        
+        extractor = BERTFeatureExtractor(use_mock=True)
+        
+        texts = ["text"] * 50  # Need enough samples for PCA
+        features = extractor.fit_transform(texts, reduce_dim=50)
+        
+        assert features.shape == (50, 50)
+
+
+class TestCreateFinBERT:
+    """Test the create_finbert convenience function."""
+    
+    def test_create_finbert(self):
+        """Test creating FinBERT with convenience function."""
+        from jsf.ml.transformers.bert import create_finbert
+        
+        model = create_finbert(use_mock=True, device="cpu")
+        
+        assert model is not None
+        assert model.use_mock is True

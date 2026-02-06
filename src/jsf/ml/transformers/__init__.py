@@ -231,6 +231,16 @@ from .sentiment import (
     SentimentLabel,
 )
 
+# Import BERT models
+from .bert import (
+    FinBERT,
+    CustomBERT,
+    BERTFeatureExtractor,
+    BERTConfig,
+    BERTSentimentResult,
+    create_finbert,
+)
+
 
 # Export placeholder classes
 __all__ = [
@@ -249,4 +259,11 @@ __all__ = [
     "FinBERTSentiment",
     "SentimentResult",
     "SentimentLabel",
+    # BERT models
+    "FinBERT",
+    "CustomBERT",
+    "BERTFeatureExtractor",
+    "BERTConfig",
+    "BERTSentimentResult",
+    "create_finbert",
 ]
