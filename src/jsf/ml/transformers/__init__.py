@@ -214,9 +214,39 @@ class TextEmbedder:
         return np.array(embeddings)
 
 
+# Import attention visualization utilities
+from .attention import (
+    AttentionHead,
+    AttentionPattern,
+    AttentionAnalyzer,
+    FinancialAttentionInterpreter,
+    analyze_attention,
+)
+
+# Import sentiment analysis
+from .sentiment import (
+    SimpleSentiment,
+    FinBERTSentiment,
+    SentimentResult,
+    SentimentLabel,
+)
+
+
 # Export placeholder classes
 __all__ = [
+    # Base classes
     "SentimentAnalyzer",
     "TextEmbedder",
     "get_backend",
+    # Attention visualization
+    "AttentionHead",
+    "AttentionPattern",
+    "AttentionAnalyzer",
+    "FinancialAttentionInterpreter",
+    "analyze_attention",
+    # Sentiment analysis
+    "SimpleSentiment",
+    "FinBERTSentiment",
+    "SentimentResult",
+    "SentimentLabel",
 ]
