@@ -109,6 +109,8 @@ from .neural import (
     GRUModel,
     TransformerModel,
     SequenceModel,
+    configure_gpu_memory,
+    get_gpu_info,
 )
 
 # Monte Carlo Simulation
@@ -156,6 +158,8 @@ __all__ = [
     "GRUModel",
     "TransformerModel",
     "SequenceModel",
+    "configure_gpu_memory",
+    "get_gpu_info",
     # Monte Carlo Simulation
     "MonteCarloSimulator",
     "PortfolioMonteCarloSimulator",

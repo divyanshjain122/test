@@ -57,6 +57,83 @@ def _check_tensorflow():
         )
 
 
+def configure_gpu_memory(memory_limit_mb: Optional[int] = None, allow_growth: bool = True):
+    """Configure GPU memory settings for TensorFlow.
+    
+    Call this BEFORE creating any models to avoid OOM errors.
+    
+    Args:
+        memory_limit_mb: Optional memory limit in MB per GPU. If None, uses growth.
+        allow_growth: If True, allocate memory as needed (recommended).
+        
+    Example:
+        >>> from jsf.ml.neural import configure_gpu_memory
+        >>> configure_gpu_memory(allow_growth=True)  # Recommended
+        >>> # Or limit to 4GB:
+        >>> configure_gpu_memory(memory_limit_mb=4096)
+        
+    Note:
+        This is for EDUCATIONAL PURPOSES. In production, carefully tune
+        memory settings based on your hardware and model requirements.
+    """
+    tf = _check_tensorflow()
+    
+    gpus = tf.config.list_physical_devices('GPU')
+    if not gpus:
+        logger.info("No GPU detected. Using CPU.")
+        return
+    
+    try:
+        for gpu in gpus:
+            if memory_limit_mb is not None:
+                # Set hard memory limit
+                tf.config.set_logical_device_configuration(
+                    gpu,
+                    [tf.config.LogicalDeviceConfiguration(memory_limit=memory_limit_mb)]
+                )
+                logger.info(f"GPU memory limited to {memory_limit_mb}MB: {gpu}")
+            elif allow_growth:
+                # Allow dynamic memory allocation
+                tf.config.experimental.set_memory_growth(gpu, True)
+                logger.info(f"GPU memory growth enabled: {gpu}")
+    except RuntimeError as e:
+        # GPU configuration must be done before initialization
+        logger.warning(f"GPU configuration failed (must be set before model creation): {e}")
+
+
+def get_gpu_info() -> Dict[str, Any]:
+    """Get information about available GPUs.
+    
+    Returns:
+        Dict with GPU information for debugging/logging.
+        
+    Example:
+        >>> info = get_gpu_info()
+        >>> print(f"GPUs available: {info['n_gpus']}")
+    """
+    tf = _check_tensorflow()
+    
+    gpus = tf.config.list_physical_devices('GPU')
+    
+    info = {
+        'n_gpus': len(gpus),
+        'gpus': [gpu.name for gpu in gpus],
+        'cuda_available': len(gpus) > 0,
+        'tensorflow_version': tf.__version__,
+    }
+    
+    # Try to get memory info
+    if gpus:
+        try:
+            for i, gpu in enumerate(gpus):
+                # This requires GPU to be initialized
+                info[f'gpu_{i}_memory'] = 'Available (check nvidia-smi for details)'
+        except Exception:
+            pass
+    
+    return info
+
+
 @dataclass
 class NeuralConfig(ModelConfig):
     """Configuration for Neural Network models."""
