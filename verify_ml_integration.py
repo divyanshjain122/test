@@ -165,6 +165,7 @@ try:
         epochs=5,
         batch_size=32,
         verbose=0,
+        prediction_type='regression',  # Only test regression for speed
     )
     train_size = min(500, len(X) - 100)
     mlp.fit(X.iloc[:train_size], y_returns=y_ret.iloc[:train_size])

@@ -157,6 +157,7 @@ class NeuralConfig(ModelConfig):
     early_stopping_patience: int = 10
     reduce_lr_patience: int = 5
     validation_split: float = 0.2
+    verbose: int = 0  # Training verbosity (0=silent, 1=progress bar, 2=one line per epoch)
     
     # For sequence models (LSTM/GRU)
     sequence_length: int = 20
@@ -509,7 +510,7 @@ class NeuralModel(MLModel):
                 'epochs': self.config.epochs,
                 'batch_size': self.config.batch_size,
                 'callbacks': regressor_callbacks,
-                'verbose': 0,
+                'verbose': self.config.verbose,
             }
             
             if sample_weight is not None:
@@ -555,7 +556,7 @@ class NeuralModel(MLModel):
                 'epochs': self.config.epochs,
                 'batch_size': self.config.batch_size,
                 'callbacks': classifier_callbacks,
-                'verbose': 0,
+                'verbose': self.config.verbose,
             }
             
             if sample_weight is not None:
