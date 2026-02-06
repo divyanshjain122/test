@@ -104,11 +104,13 @@ class TestFeatureGroups:
         assert 'trend' in FEATURE_GROUPS
     
     def test_feature_groups_have_signals(self):
-        """Test that each group has signals defined."""
+        """Test that each group has signals defined or requires external data."""
         for group_name, group_def in FEATURE_GROUPS.items():
             assert 'signals' in group_def
             assert 'description' in group_def
-            assert len(group_def['signals']) > 0
+            # Groups with 'requires' flag get data from external sources (e.g., text)
+            if 'requires' not in group_def:
+                assert len(group_def['signals']) > 0, f"Group '{group_name}' has no signals"
 
 
 # =============================================================================

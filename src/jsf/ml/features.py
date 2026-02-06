@@ -116,6 +116,11 @@ FEATURE_GROUPS = {
         ],
         "description": "Market regime detection",
     },
+    "text_sentiment": {
+        "signals": [],  # Text features handled separately
+        "description": "NLP-based sentiment from financial text (news, social media)",
+        "requires": "text_data",  # Flag that this needs text input
+    },
 }
 
 
@@ -417,6 +422,123 @@ class FeatureExtractor:
         ).sort_values(ascending=False)
         
         return importances.head(top_n)
+    
+    def extract_text_features(
+        self,
+        text_data: pd.DataFrame,
+        text_column: str = "text",
+        date_column: str = "date",
+        symbol_column: Optional[str] = "symbol",
+        model: str = "simple",
+    ) -> pd.DataFrame:
+        """Extract sentiment features from text data.
+        
+        Integrates with jsf.ml.transformers.sentiment module to convert
+        financial text (news, earnings calls, social media) into numerical
+        features suitable for ML models.
+        
+        ⚠️ EDUCATIONAL PURPOSE ONLY ⚠️
+        Sentiment analysis is ONE factor among many. It should NOT be used
+        as a standalone trading signal.
+        
+        Args:
+            text_data: DataFrame with text, date, and optional symbol columns
+            text_column: Name of column containing text
+            date_column: Name of column containing dates
+            symbol_column: Name of column containing symbols (None for market-level)
+            model: Sentiment model ('simple' or 'finbert')
+            
+        Returns:
+            DataFrame with sentiment features indexed by (date, symbol) or date
+            
+        Example:
+            >>> # News data
+            >>> news_df = pd.DataFrame({
+            ...     'date': ['2024-01-01', '2024-01-02'],
+            ...     'symbol': ['AAPL', 'AAPL'],
+            ...     'headline': ['Apple beats earnings', 'iPhone sales decline'],
+            ... })
+            >>> 
+            >>> extractor = FeatureExtractor(feature_groups=['momentum', 'text_sentiment'])
+            >>> text_features = extractor.extract_text_features(
+            ...     news_df, text_column='headline', model='simple'
+            ... )
+        """
+        try:
+            from jsf.ml.transformers.sentiment import SimpleSentiment, FinBERTSentiment
+        except ImportError:
+            raise ImportError(
+                "Text features require jsf.ml.transformers module. "
+                "This should be available in your installation."
+            )
+        
+        # Select model
+        if model == "simple":
+            analyzer = SimpleSentiment()
+        elif model == "finbert":
+            analyzer = FinBERTSentiment()
+        else:
+            raise ValueError(f"Unknown model: {model}. Use 'simple' or 'finbert'.")
+        
+        # Analyze sentiment
+        texts = text_data[text_column].tolist()
+        results = analyzer.analyze(texts)
+        
+        # Build features DataFrame
+        features = {
+            'text_sentiment_score': [r.score for r in results],
+            'text_sentiment_confidence': [r.confidence for r in results],
+            'text_sentiment_positive': [1 if r.label.value == 'positive' else 0 for r in results],
+            'text_sentiment_negative': [1 if r.label.value == 'negative' else 0 for r in results],
+        }
+        
+        features_df = pd.DataFrame(features)
+        features_df[date_column] = pd.to_datetime(text_data[date_column])
+        
+        if symbol_column and symbol_column in text_data.columns:
+            features_df[symbol_column] = text_data[symbol_column]
+            # Set MultiIndex
+            features_df = features_df.set_index([date_column, symbol_column])
+        else:
+            features_df = features_df.set_index(date_column)
+        
+        # Aggregate if multiple texts per date/symbol
+        features_df = features_df.groupby(level=features_df.index.names).mean()
+        
+        logger.info(f"Extracted text features: {features_df.shape[0]} rows, {features_df.shape[1]} features")
+        
+        return features_df
+    
+    def merge_text_features(
+        self,
+        price_features: pd.DataFrame,
+        text_features: pd.DataFrame,
+        how: str = "left",
+    ) -> pd.DataFrame:
+        """Merge text features with price-based features.
+        
+        Args:
+            price_features: Features from extract() method
+            text_features: Features from extract_text_features() method
+            how: Merge method ('left', 'inner', 'outer')
+            
+        Returns:
+            Combined DataFrame with all features
+        """
+        # Align indices
+        merged = price_features.join(text_features, how=how)
+        
+        # Fill missing text features with neutral sentiment
+        text_cols = [c for c in merged.columns if c.startswith('text_sentiment')]
+        for col in text_cols:
+            if 'score' in col:
+                merged[col] = merged[col].fillna(0.0)
+            elif 'confidence' in col:
+                merged[col] = merged[col].fillna(0.5)
+            else:
+                merged[col] = merged[col].fillna(0)
+        
+        return merged
 
 
 def create_feature_extractor(
