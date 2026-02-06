@@ -423,14 +423,18 @@ class TradingEnvironment:
         return obs, reward, self._done, info
     
     def _calculate_reward(self, portfolio_return: float) -> float:
-        """Calculate reward based on configured reward type."""
-        reward_type = self.config.transaction_cost  # Use parent config
+        """Calculate reward based on configured reward type.
         
-        # Simple return
+        Note: TradingEnvironment uses EnvironmentConfig which doesn't have reward_type.
+        The reward_type is configured in PPOConfig and passed during agent training.
+        For simplicity, we use scaled returns here. The PPOAgent can wrap this
+        with more sophisticated reward shaping.
+        """
+        # Simple return-based reward
         reward = portfolio_return
         
-        # Scale reward
-        reward *= 100  # Scale up for better learning
+        # Scale reward for better gradient signal
+        reward *= 100
         
         return reward
     

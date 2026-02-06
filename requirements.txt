@@ -32,6 +32,20 @@ plotly>=5.14.0,<6.0.0             # Interactive plots
 tqdm>=4.65.0                       # Progress bars for optimization loops
 
 # -----------------------------------------------------------------------------
+# Machine Learning (Phase 19)
+# -----------------------------------------------------------------------------
+joblib>=1.3.0                      # Model serialization
+scikit-learn>=1.3.0                # ML algorithms & preprocessing
+
+# Tree-based models (high performance)
+xgboost>=2.0.0                     # Gradient boosting
+lightgbm>=4.0.0                    # Fast gradient boosting
+
+# Deep Learning (optional - large install)
+# tensorflow>=2.13.0               # Neural networks (MLP, LSTM, GRU, Transformer)
+# Note: Uncomment tensorflow if using neural.py or rl_agent.py
+
+# -----------------------------------------------------------------------------
 # Monitoring Dashboard (Optional but Recommended)
 # -----------------------------------------------------------------------------
 streamlit>=1.28.0                  # Real-time monitoring dashboard

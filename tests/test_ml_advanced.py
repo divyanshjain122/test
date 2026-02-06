@@ -12,7 +12,19 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import warnings
-import tensorflow as tf
+
+# Conditional TensorFlow import - skip neural tests if not installed
+try:
+    import tensorflow as tf
+    HAS_TENSORFLOW = True
+except ImportError:
+    tf = None
+    HAS_TENSORFLOW = False
+
+requires_tensorflow = pytest.mark.skipif(
+    not HAS_TENSORFLOW,
+    reason="TensorFlow not installed"
+)
 
 # =============================================================================
 # TEST DATA FIXTURES
@@ -78,6 +90,7 @@ def sample_returns(sample_prices):
 # TEST: NEURAL NETWORK MODELS
 # =============================================================================
 
+@requires_tensorflow
 class TestNeuralNetworks:
     """Tests for neural network models."""
     
@@ -535,6 +548,7 @@ class TestMonteCarlo:
 # TEST: REINFORCEMENT LEARNING
 # =============================================================================
 
+@requires_tensorflow
 class TestReinforcementLearning:
     """Tests for reinforcement learning agents."""
     
@@ -772,6 +786,7 @@ class TestReinforcementLearning:
 # TEST: HYBRID ENSEMBLE
 # =============================================================================
 
+@requires_tensorflow
 class TestHybridEnsemble:
     """Tests for hybrid ensemble with tree and neural models."""
     
