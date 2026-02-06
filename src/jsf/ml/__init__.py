@@ -100,6 +100,16 @@ from .preprocessing import (
     MultiIndexConverter,
 )
 
+# ONNX Export Utilities
+from .export import (
+    ONNXExporter,
+    MockONNXExporter,
+    ModelMetadata,
+    create_exporter,
+    compute_model_checksum,
+    verify_model_checksum,
+)
+
 # Neural Networks (TensorFlow)
 from .neural import (
     NeuralModel,
@@ -190,6 +200,13 @@ __all__ = [
     "split_train_test",
     "handle_missing_features",
     "MultiIndexConverter",
+    # ONNX Export
+    "ONNXExporter",
+    "MockONNXExporter",
+    "ModelMetadata",
+    "create_exporter",
+    "compute_model_checksum",
+    "verify_model_checksum",
 ]
 
 

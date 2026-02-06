@@ -876,6 +876,219 @@ class TestMLIntegration:
 
 
 # =============================================================================
+# TEST: ONNX EXPORT UTILITIES
+# =============================================================================
+
+class TestModelMetadata:
+    """Tests for ModelMetadata class."""
+    
+    def test_metadata_creation(self):
+        """Test creating model metadata."""
+        from jsf.ml.export import ModelMetadata
+        
+        metadata = ModelMetadata(
+            model_name="TestModel",
+            model_type="RandomForest",
+            input_shape=(1, 50),
+            output_shape=(1, 1),
+            feature_names=["feature_1", "feature_2"],
+        )
+        
+        assert metadata.model_name == "TestModel"
+        assert metadata.model_type == "RandomForest"
+        assert metadata.input_shape == (1, 50)
+        assert len(metadata.feature_names) == 2
+    
+    def test_metadata_to_dict(self):
+        """Test converting metadata to dictionary."""
+        from jsf.ml.export import ModelMetadata
+        
+        metadata = ModelMetadata(
+            model_name="TestModel",
+            model_type="XGBoost",
+            input_shape=(1, 10),
+        )
+        
+        d = metadata.to_dict()
+        
+        assert d["model_name"] == "TestModel"
+        assert d["model_type"] == "XGBoost"
+        assert d["input_shape"] == [1, 10]
+        assert "export_timestamp" in d
+    
+    def test_metadata_from_dict(self):
+        """Test creating metadata from dictionary."""
+        from jsf.ml.export import ModelMetadata
+        
+        data = {
+            "model_name": "FromDict",
+            "model_type": "LightGBM",
+            "input_shape": [1, 20],
+            "output_shape": [1, 3],
+            "framework": "sklearn",
+        }
+        
+        metadata = ModelMetadata.from_dict(data)
+        
+        assert metadata.model_name == "FromDict"
+        assert metadata.model_type == "LightGBM"
+        assert metadata.input_shape == (1, 20)
+        assert metadata.output_shape == (1, 3)
+    
+    def test_metadata_save_load(self, tmp_path):
+        """Test saving and loading metadata."""
+        from jsf.ml.export import ModelMetadata
+        
+        metadata = ModelMetadata(
+            model_name="SaveLoadTest",
+            model_type="MLP",
+            input_shape=(32, 100),
+            feature_names=["a", "b", "c"],
+            description="Test model",
+        )
+        
+        # Save
+        save_path = tmp_path / "metadata.json"
+        metadata.save(save_path)
+        
+        assert save_path.exists()
+        
+        # Load
+        loaded = ModelMetadata.load(save_path)
+        
+        assert loaded.model_name == "SaveLoadTest"
+        assert loaded.model_type == "MLP"
+        assert loaded.input_shape == (32, 100)
+        assert loaded.feature_names == ["a", "b", "c"]
+
+
+class TestMockONNXExporter:
+    """Tests for MockONNXExporter (no real ONNX dependency)."""
+    
+    def test_mock_export(self, tmp_path):
+        """Test mock ONNX export."""
+        from jsf.ml.export import MockONNXExporter
+        
+        exporter = MockONNXExporter()
+        
+        output_path = tmp_path / "model.onnx"
+        metadata = exporter.mock_export(
+            model_name="MockModel",
+            model_type="RandomForest",
+            input_shape=(1, 50),
+            output_path=output_path,
+            feature_names=["f1", "f2", "f3"],
+        )
+        
+        assert output_path.exists()
+        assert metadata.model_name == "MockModel"
+        assert metadata.input_shape == (1, 50)
+        
+        # Check metadata file was also created
+        metadata_path = tmp_path / "model.json"
+        assert metadata_path.exists()
+    
+    def test_mock_inference(self):
+        """Test mock ONNX inference."""
+        from jsf.ml.export import MockONNXExporter, ModelMetadata
+        
+        exporter = MockONNXExporter()
+        
+        metadata = ModelMetadata(
+            model_name="InferenceTest",
+            model_type="LSTM",
+            input_shape=(1, 20),
+            output_shape=(1, 1),
+        )
+        
+        input_data = np.random.randn(10, 20).astype(np.float32)
+        predictions = exporter.mock_inference(metadata, input_data)
+        
+        assert predictions.shape[0] == 10
+        assert predictions.dtype == np.float32
+    
+    def test_mock_inference_deterministic(self):
+        """Test that mock inference is deterministic for same input."""
+        from jsf.ml.export import MockONNXExporter, ModelMetadata
+        
+        exporter = MockONNXExporter()
+        
+        metadata = ModelMetadata(
+            model_name="DeterministicTest",
+            model_type="MLP",
+            input_shape=(1, 10),
+            output_shape=(1, 1),
+        )
+        
+        input_data = np.array([[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]])
+        
+        pred1 = exporter.mock_inference(metadata, input_data)
+        pred2 = exporter.mock_inference(metadata, input_data)
+        
+        np.testing.assert_array_equal(pred1, pred2)
+
+
+class TestChecksumUtilities:
+    """Tests for model checksum utilities."""
+    
+    def test_compute_checksum(self, tmp_path):
+        """Test computing file checksum."""
+        from jsf.ml.export import compute_model_checksum
+        
+        # Create test file
+        test_file = tmp_path / "test_model.bin"
+        test_file.write_bytes(b"test model content")
+        
+        checksum = compute_model_checksum(test_file)
+        
+        assert isinstance(checksum, str)
+        assert len(checksum) == 64  # SHA256 hex digest
+    
+    def test_verify_checksum_valid(self, tmp_path):
+        """Test verifying valid checksum."""
+        from jsf.ml.export import compute_model_checksum, verify_model_checksum
+        
+        test_file = tmp_path / "valid_model.bin"
+        test_file.write_bytes(b"valid content")
+        
+        checksum = compute_model_checksum(test_file)
+        
+        assert verify_model_checksum(test_file, checksum) is True
+    
+    def test_verify_checksum_invalid(self, tmp_path):
+        """Test verifying invalid checksum."""
+        from jsf.ml.export import verify_model_checksum
+        
+        test_file = tmp_path / "invalid_model.bin"
+        test_file.write_bytes(b"some content")
+        
+        wrong_checksum = "0" * 64
+        
+        assert verify_model_checksum(test_file, wrong_checksum) is False
+
+
+class TestCreateExporter:
+    """Tests for create_exporter factory function."""
+    
+    def test_create_mock_exporter(self):
+        """Test creating mock exporter."""
+        from jsf.ml.export import create_exporter, MockONNXExporter
+        
+        exporter = create_exporter(mock=True)
+        
+        assert isinstance(exporter, MockONNXExporter)
+    
+    def test_create_real_exporter(self):
+        """Test creating real exporter (may fail if ONNX not installed)."""
+        from jsf.ml.export import create_exporter, ONNXExporter
+        
+        # This should return ONNXExporter, but won't fail if ONNX not installed
+        exporter = create_exporter(mock=False)
+        
+        assert isinstance(exporter, ONNXExporter)
+
+
+# =============================================================================
 # RUN TESTS
 # =============================================================================
 
