@@ -4,7 +4,7 @@ JSF-Core: JBAC Strategy Foundry
 A production-grade quantitative research engine for building, backtesting,
 and optimizing trading strategies.
 
-Version: 0.6.0-dev
+Version: 0.7.0-dev
 Author: JBAC EdTech
 License: MIT
 
