@@ -32,7 +32,8 @@ def _get_sentiment_analyzer(model_type: str = "simple"):
             return SimpleSentiment()
         elif model_type == "finbert":
             from jsf.ml.transformers.bert import FinBERT
-            return FinBERT(use_mock=True)  # Default to mock mode
+            # Use real model by default (can override with use_mock=True if needed)
+            return FinBERT(use_mock=False)
         else:
             from jsf.ml.transformers.sentiment import SimpleSentiment
             return SimpleSentiment()
