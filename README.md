@@ -3,9 +3,9 @@
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://img.shields.io/badge/tests-509%20passing-brightgreen.svg)](tests/)
-[![Progress](https://img.shields.io/badge/progress-19%2F20%20phases%20(95%25)-brightgreen.svg)](#development-roadmap)
-[![Version](https://img.shields.io/badge/version-0.6.0--dev-blue.svg)](src/jsf/__init__.py)
+[![Tests](https://img.shields.io/badge/tests-635%20passing-brightgreen.svg)](tests/)
+[![Progress](https://img.shields.io/badge/progress-Phase%2019%20Complete-brightgreen.svg)](#development-roadmap)
+[![Version](https://img.shields.io/badge/version-0.7.0--dev-blue.svg)](src/jsf/__init__.py)
 
 > ⚠️ **EDUCATIONAL PURPOSE ONLY**: This software is designed for **learning and research purposes only**. It is NOT intended for real trading with real money. Past performance in backtests does NOT guarantee future results. Trading involves substantial risk of loss. The authors and contributors are NOT liable for any financial losses. See [DISCLAIMER](#disclaimer) for full details.
 
@@ -327,6 +327,6 @@ GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
 
 ---
 
-**Status**: 🚧 Active Development (v0.6.0-dev)  
-**Phase**: 19/20 - ML Integration Complete  
-**Next**: Phase 20 - Documentation & Deployment
+**Status**: 🚧 Active Development (v0.7.0-dev)  
+**Phase**: 19/20 - ML Integration & NLP Sentiment Complete  
+**Next**: Phase 20 - PyPI Publication & Documentation

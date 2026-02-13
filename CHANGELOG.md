@@ -5,7 +5,69 @@ All notable changes to JSF-Core will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.7.0-dev] - 2026-02-13
+
+### Phase 19: NLP & Sentiment Analysis (Final)
+
+This release completes Phase 19 with advanced NLP-based sentiment signals using BERT models.
+
+#### Added - NLP Sentiment Signals
+- **`TextSentimentSignal`** (`jsf.signals.sentiment`):
+  - NLP-based sentiment analysis using BERT or rule-based models
+  - Support for external text data (news, social media, SEC filings)
+  - Configurable sentiment thresholds and smoothing windows
+  - Mock fallback for testing without transformers library
+  - Lazy imports to avoid dependency errors
+
+- **`SentimentMomentumSignal`** (`jsf.signals.sentiment`):
+  - Combines sentiment scores with momentum analysis
+  - BUY signal: sentiment > threshold AND rising momentum
+  - SELL signal: sentiment < -threshold AND falling momentum
+  - 5-day default smoothing with configurable lookback
+
+- **`SentimentDivergenceSignal`** (`jsf.signals.sentiment`):
+  - Detects price-sentiment divergence for reversal signals
+  - Bullish divergence: price falling, sentiment rising → BUY
+  - Bearish divergence: price rising, sentiment falling → SELL
+  - Normalized momentum calculations for robust signals
+
+- **BERT Integration Enhancements**:
+  - Lazy loading of NLP models (`_get_sentiment_analyzer`)
+  - Graceful degradation when transformers not installed
+  - Support for both FinBERT and SimpleSentiment backends
+  - Automatic sentiment score normalization
+
+#### Added - Demos & Examples
+- Refactored examples into `demos/` folder for better organization
+- Added real-time news source integrations
+- Created synthetic data testing for FinBERT
+- ML integration examples for sentiment-based trading
+
+#### Testing
+- **24 new tests** in `test_sentiment_signals.py`
+- All sentiment signal tests passing
+- Mock sentiment data generation for testing
+- **Total test count: 635 passed** (up from 509)
+
+#### Documentation
+- Added `SENTIMENT_INVESTING.md` roadmap for future enhancements
+- Documented multi-source sentiment aggregation architecture
+- Phase 20 preparation: PyPI publication guidelines
+
+#### Technical Improvements
+- Version bumped to `0.7.0-dev` across all files
+- Fixed version inconsistency between `__version__` and `pyproject.toml`
+- Updated README badges (tests: 509 → 635, progress: Phase 19 complete)
+- Created `MANIFEST.in` for PyPI distribution
+
+#### Contributors
+- Core ML implementation: Jai Ansh Bindra
+- NLP sentiment signals: Anubhav
+- BERT integration: Jai Ansh Bindra & Anubhav
+
+---
+
+## [0.6.0-dev] - 2026-02-04
 
 ### Phase 19: Machine Learning Integration
 

@@ -26,7 +26,7 @@ these risks. The authors and JBAC EdTech are NOT liable for any losses.
 For full disclaimer, see: https://github.com/JaiAnshSB26/JBAC-Strategy-Foundry#disclaimer
 """
 
-__version__ = "0.6.0-dev"
+__version__ = "0.7.0-dev"
 __author__ = "JBAC EdTech"
 __license__ = "MIT"
 __disclaimer__ = "EDUCATIONAL PURPOSE ONLY - NOT FOR REAL TRADING"
