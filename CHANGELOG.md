@@ -577,9 +577,9 @@ This is the initial development version establishing the project foundation.
 
 ## Roadmap
 
-- ~~**Phase 1**: Foundation & Project Structure~~ ✅ Complete
-- ~~**Phase 2**: Core Configuration System~~ ✅ Complete
-- ~~**Phase 3**: Data Loading Infrastructure~~ ✅ Complete
+- ~~**Phase 1**: Foundation & Project Structure~~ [Complete]
+- ~~**Phase 2**: Core Configuration System~~ [Complete]
+- ~~**Phase 3**: Data Loading Infrastructure~~ [Complete]
 - **Phase 4-6**: Signal Framework
 - **Phase 7-9**: Strategy Templates
 - **Phase 10-11**: Backtesting Engine

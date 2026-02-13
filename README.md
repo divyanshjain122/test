@@ -11,9 +11,9 @@
 
 **JSF-Core** is a production-grade, open-source quantitative research engine for building, backtesting, and optimizing trading strategies. Built by JBAC EdTech, it provides a modular, type-safe, and extensible framework for systematic trading research.
 
-> **🎉 Status Update (Feb 4, 2026)**: Phases 1-19 complete (95%)! ML Integration added with feature extraction, ensemble models, and walk-forward validation.
+> **Status Update (Feb 4, 2026)**: Phases 1-19 complete (95%)! ML Integration added with feature extraction, ensemble models, and walk-forward validation.
 
-## 🎯 Features
+## Features
 
 - **Modular Architecture**: Clean separation between data, signals, strategies, simulation, and evaluation
 - **Type-Safe**: Full Pydantic validation and Python type hints throughout
@@ -29,7 +29,7 @@
 - **Centralized Config**: Secure environment-based configuration with `.env` support
 - **Well-Documented**: Detailed docstrings and usage examples
 
-## 📦 Installation
+## Installation
 
 ### From Source (Development)
 
@@ -118,7 +118,7 @@ print(f"Win Rate: {metrics['win_rate']:.2%}")
 - Detailed performance metrics
 - Transaction cost analysis
 
-## 📖 Documentation
+## Documentation
 
 ### Core Modules
 
@@ -175,7 +175,7 @@ make lint
 make format
 ```
 
-## 🛠 Development
+## Development
 
 ### Project Structure
 
@@ -198,15 +198,15 @@ jsf-core/
 
 ### Development Roadmap
 
-**Phase 1**: Foundation & Project Structure ✅  
-**Phase 2**: Core Configuration System ✅  
-**Phase 3**: Data Loading Infrastructure ✅  
-**Phase 4-6**: Signal Framework ✅  
-**Phase 7**: Portfolio Construction ✅  
-**Phase 8**: Strategy Templates ✅  
-**Phase 9**: Backtesting & Simulation Engine ✅  
-**Phase 10**: Visualization & Reporting ✅  
-**Phase 11**: Parameter Optimization ✅  
+**Phase 1**: Foundation & Project Structure [Complete]  
+**Phase 2**: Core Configuration System [Complete]  
+**Phase 3**: Data Loading Infrastructure [Complete]  
+**Phase 4-6**: Signal Framework [Complete]  
+**Phase 7**: Portfolio Construction [Complete]  
+**Phase 8**: Strategy Templates [Complete]  
+**Phase 9**: Backtesting & Simulation Engine [Complete]  
+**Phase 10**: Visualization & Reporting [Complete]  
+**Phase 11**: Parameter Optimization [Complete]  
 **Phase 12**: Walk-Forward Analysis (Next)  
 **Phase 13**: Real Data Integration  
 **Phase 14**: Advanced Strategies  
@@ -219,7 +219,7 @@ jsf-core/
 
 ### Current Status (Phase 11 Complete)
 
-✅ **Production-Ready Quantitative Trading System**:
+**Production-Ready Quantitative Trading System**:
 - Data loading (synthetic + real data support)
 - Signal generation (10+ signal types)
 - Portfolio construction (24 components)
@@ -247,7 +247,7 @@ jsf-core/
 4. Phases 15-17: Risk management, multi-asset support, high-level API
 5. Phases 18-20: CLI tool, documentation, PyPI release
 
-## 📋 Handoff Documentation
+## Handoff Documentation
 
 **For Anubhav (Co-Developer)**:
 
@@ -267,11 +267,11 @@ pytest tests/test_integration_phases_7_11.py --override-ini="addopts=" -v
 ```
 
 **Development Status**:
-- ✅ Phases 1-11: Complete & Tested (55%)
-- ⏳ Phases 12-20: Ready for development (45%)
-- 🎯 Next: Phase 12 (Walk-Forward Analysis)  
+- Phases 1-11: Complete & Tested (55%)
+- Phases 12-20: Ready for development (45%)
+- Next: Phase 12 (Walk-Forward Analysis)  
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -310,23 +310,23 @@ This software is provided for **educational and research purposes only**. It is 
 
 By using this software, you acknowledge that you understand and accept these risks.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with modern Python best practices
 - Inspired by leading quantitative research frameworks
 - Powered by NumPy, Pandas, and Pydantic
 
-## 📧 Contact
+## Contact
 
 **JBAC EdTech**  
 GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
 
 ---
 
-**Status**: 🚧 Active Development (v0.7.0-dev)  
+**Status**: Active Development (v0.7.0-dev)  
 **Phase**: 19/20 - ML Integration & NLP Sentiment Complete  
 **Next**: Phase 20 - PyPI Publication & Documentation
