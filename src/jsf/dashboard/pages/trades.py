@@ -10,7 +10,10 @@ import plotly.graph_objects as go
 from typing import Optional, Any, List
 from datetime import datetime, timedelta
 
-from ..models import DashboardState, TradeRecord
+try:
+    from ..models import DashboardState, TradeRecord
+except ImportError:
+    from jsf.dashboard.models import DashboardState, TradeRecord
 
 
 def render_trades(state: DashboardState, collector: Optional[Any] = None):

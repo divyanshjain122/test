@@ -12,12 +12,20 @@ from plotly.subplots import make_subplots
 from typing import Optional, Any
 from datetime import datetime, timedelta
 
-from ..models import DashboardState, PerformanceMetrics
-from ..metrics import (
-    MetricsCalculator,
-    calculate_returns,
-    calculate_drawdown,
-)
+try:
+    from ..models import DashboardState, PerformanceMetrics
+    from ..metrics import (
+        MetricsCalculator,
+        calculate_returns,
+        calculate_drawdown,
+    )
+except ImportError:
+    from jsf.dashboard.models import DashboardState, PerformanceMetrics
+    from jsf.dashboard.metrics import (
+        MetricsCalculator,
+        calculate_returns,
+        calculate_drawdown,
+    )
 
 
 def render_pnl(state: DashboardState, collector: Optional[Any] = None):

@@ -11,16 +11,28 @@ import plotly.graph_objects as go
 from typing import Optional, Any
 from datetime import datetime
 
-from ..models import DashboardState, RiskMetrics
-from ..metrics import (
-    MetricsCalculator,
-    calculate_returns,
-    calculate_drawdown,
-    calculate_var,
-    calculate_volatility,
-    calculate_sharpe,
-    calculate_sortino,
-)
+try:
+    from ..models import DashboardState, RiskMetrics
+    from ..metrics import (
+        MetricsCalculator,
+        calculate_returns,
+        calculate_drawdown,
+        calculate_var,
+        calculate_volatility,
+        calculate_sharpe,
+        calculate_sortino,
+    )
+except ImportError:
+    from jsf.dashboard.models import DashboardState, RiskMetrics
+    from jsf.dashboard.metrics import (
+        MetricsCalculator,
+        calculate_returns,
+        calculate_drawdown,
+        calculate_var,
+        calculate_volatility,
+        calculate_sharpe,
+        calculate_sortino,
+    )
 
 
 def render_risk(state: DashboardState, collector: Optional[Any] = None):

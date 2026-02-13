@@ -16,13 +16,23 @@ try:
 except ImportError:
     STREAMLIT_AVAILABLE = False
 
-from .models import (
-    DashboardState,
-    DashboardConfig,
-    DashboardPage,
-    RefreshRate,
-)
-from .collectors import DataCollector, MockDataCollector
+# Use absolute imports for standalone execution
+try:
+    from .models import (
+        DashboardState,
+        DashboardConfig,
+        DashboardPage,
+        RefreshRate,
+    )
+    from .collectors import DataCollector, MockDataCollector
+except ImportError:
+    from jsf.dashboard.models import (
+        DashboardState,
+        DashboardConfig,
+        DashboardPage,
+        RefreshRate,
+    )
+    from jsf.dashboard.collectors import DataCollector, MockDataCollector
 
 
 def init_session_state():

@@ -9,7 +9,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from typing import Optional
 
-from ..models import DashboardState, PositionSnapshot
+try:
+    from ..models import DashboardState, PositionSnapshot
+except ImportError:
+    from jsf.dashboard.models import DashboardState, PositionSnapshot
 
 
 def render_portfolio(state: DashboardState):
