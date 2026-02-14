@@ -331,36 +331,36 @@ def render_overview_page():
 def render_portfolio_page():
     """Render detailed portfolio page."""
     try:
-        from .pages.portfolio import render_portfolio
+        from .components.portfolio import render_portfolio
     except ImportError:
-        from jsf.dashboard.pages.portfolio import render_portfolio
+        from jsf.dashboard.components.portfolio import render_portfolio
     render_portfolio(st.session_state.dashboard_state)
 
 
 def render_pnl_page():
     """Render P&L tracking page."""
     try:
-        from .pages.pnl import render_pnl
+        from .components.pnl import render_pnl
     except ImportError:
-        from jsf.dashboard.pages.pnl import render_pnl
+        from jsf.dashboard.components.pnl import render_pnl
     render_pnl(st.session_state.dashboard_state, st.session_state.collector)
 
 
 def render_trades_page():
     """Render trades history page."""
     try:
-        from .pages.trades import render_trades
+        from .components.trades import render_trades
     except ImportError:
-        from jsf.dashboard.pages.trades import render_trades
+        from jsf.dashboard.components.trades import render_trades
     render_trades(st.session_state.dashboard_state, st.session_state.collector)
 
 
 def render_risk_page():
     """Render risk metrics page."""
     try:
-        from .pages.risk import render_risk
+        from .components.risk import render_risk
     except ImportError:
-        from jsf.dashboard.pages.risk import render_risk
+        from jsf.dashboard.components.risk import render_risk
     render_risk(st.session_state.dashboard_state, st.session_state.collector)
 
 

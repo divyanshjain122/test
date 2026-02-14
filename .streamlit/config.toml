@@ -1,0 +1,14 @@
+[server]
+# Disable auto page discovery to prevent duplicate navigation
+enableStaticServing = false
+
+[client]
+# Improve dashboard performance
+toolbarMode = "minimal"
+
+[runner]
+# Faster re-runs
+fastReruns = true
+
+# IMPORTANT: This prevents Streamlit from auto-discovering pages/ folder
+# The dashboard uses custom navigation instead
