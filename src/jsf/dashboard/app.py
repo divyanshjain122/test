@@ -330,25 +330,37 @@ def render_overview_page():
 
 def render_portfolio_page():
     """Render detailed portfolio page."""
-    from .pages.portfolio import render_portfolio
+    try:
+        from .pages.portfolio import render_portfolio
+    except ImportError:
+        from jsf.dashboard.pages.portfolio import render_portfolio
     render_portfolio(st.session_state.dashboard_state)
 
 
 def render_pnl_page():
     """Render P&L tracking page."""
-    from .pages.pnl import render_pnl
+    try:
+        from .pages.pnl import render_pnl
+    except ImportError:
+        from jsf.dashboard.pages.pnl import render_pnl
     render_pnl(st.session_state.dashboard_state, st.session_state.collector)
 
 
 def render_trades_page():
     """Render trades history page."""
-    from .pages.trades import render_trades
+    try:
+        from .pages.trades import render_trades
+    except ImportError:
+        from jsf.dashboard.pages.trades import render_trades
     render_trades(st.session_state.dashboard_state, st.session_state.collector)
 
 
 def render_risk_page():
     """Render risk metrics page."""
-    from .pages.risk import render_risk
+    try:
+        from .pages.risk import render_risk
+    except ImportError:
+        from jsf.dashboard.pages.risk import render_risk
     render_risk(st.session_state.dashboard_state, st.session_state.collector)
 
 
