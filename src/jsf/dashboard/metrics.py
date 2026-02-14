@@ -692,8 +692,8 @@ class MetricsCalculator:
         if equity.empty:
             return pd.DataFrame()
         
-        # Resample to month-end
-        monthly = equity.resample('M').last()
+        # Resample to month-end (use 'ME' instead of deprecated 'M')
+        monthly = equity.resample('ME').last()
         monthly_returns = monthly.pct_change() * 100
         
         # Create year-month matrix
@@ -703,7 +703,15 @@ class MetricsCalculator:
         
         # Pivot
         pivot = df.pivot(index='year', columns='month', values='return')
-        pivot.columns = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        
+        # Rename columns to month names (only for months that exist in data)
+        month_names = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
+                      7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
+        pivot.columns = [month_names.get(col, str(col)) for col in pivot.columns]
+        
+        # Reindex to include all months (fill missing with NaN)
+        all_months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        pivot = pivot.reindex(columns=all_months)
         
         return pivot
