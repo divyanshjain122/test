@@ -1,332 +1,460 @@
 # JSF-Core: JBAC Strategy Foundry
 
+[![PyPI version](https://img.shields.io/pypi/v/jsf-core.svg)](https://pypi.org/project/jsf-core/)
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Tests](https://img.shields.io/badge/tests-635%20passing-brightgreen.svg)](tests/)
-[![Progress](https://img.shields.io/badge/progress-Phase%2019%20Complete-brightgreen.svg)](#development-roadmap)
-[![Version](https://img.shields.io/badge/version-0.7.0--dev-blue.svg)](src/jsf/__init__.py)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-> ⚠️ **EDUCATIONAL PURPOSE ONLY**: This software is designed for **learning and research purposes only**. It is NOT intended for real trading with real money. Past performance in backtests does NOT guarantee future results. Trading involves substantial risk of loss. The authors and contributors are NOT liable for any financial losses. See [DISCLAIMER](#disclaimer) for full details.
+> ⚠️ **EDUCATIONAL PURPOSE ONLY** — This software is for **learning and research only**. It is NOT intended for trading with real money. See [Disclaimer](#disclaimer).
 
-**JSF-Core** is a production-grade, open-source quantitative research engine for building, backtesting, and optimizing trading strategies. Built by JBAC EdTech, it provides a modular, type-safe, and extensible framework for systematic trading research.
+**JSF-Core** is a production-grade, open-source quantitative research engine for building, backtesting, and optimizing algorithmic trading strategies. It ships with a real-time Streamlit monitoring dashboard, FinBERT-powered sentiment analysis, live paper trading via Alpaca, and multi-channel alert support.
 
-> **Status Update (Feb 4, 2026)**: Phases 1-19 complete (95%)! ML Integration added with feature extraction, ensemble models, and walk-forward validation.
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Quick Start](#quick-start)
+- [Running the Dashboard](#running-the-dashboard)
+- [Live Paper Trading](#live-paper-trading)
+- [Sentiment Analysis (NLP)](#sentiment-analysis-nlp)
+- [Module Reference](#module-reference)
+- [Project Structure](#project-structure)
+- [Development](#development)
+- [Disclaimer](#disclaimer)
+
+---
 
 ## Features
 
-- **Modular Architecture**: Clean separation between data, signals, strategies, simulation, and evaluation
-- **Type-Safe**: Full Pydantic validation and Python type hints throughout
-- **Extensible**: Easy to add custom signals, strategies, and evaluation metrics
-- **Production-Ready**: Comprehensive logging, error handling, and testing
-- **Reproducible**: Deterministic backtests with seed control
-- **Fast**: Vectorized operations and optional parallel processing
-- **Live Trading**: Real broker integration with paper & live trading modes
-- **Monitoring**: Real-time dashboard with performance tracking and risk metrics
-- **Alerts**: Multi-channel notifications with centralized Telegram bot (Console, Telegram, Email)
-- **Multi-Asset**: Support for Futures, Options, Crypto, and Forex beyond equities
-- **Machine Learning**: ML-based strategies with ensemble models and walk-forward validation
-- **Centralized Config**: Secure environment-based configuration with `.env` support
-- **Well-Documented**: Detailed docstrings and usage examples
+| Category | What's Included |
+|---|---|
+| **Backtesting** | Transaction costs, slippage, position tracking, multi-symbol |
+| **Signals** | 10+ signal types: Momentum, Mean-Reversion, Volatility, Sentiment |
+| **Portfolio** | 24 components: Equal weight, Risk Parity, Kelly, Min-Variance |
+| **Strategies** | Pre-built Momentum, Mean-Reversion, Trend-Following templates |
+| **ML** | XGBoost, LightGBM, Neural Networks, walk-forward validation |
+| **NLP** | FinBERT sentiment signals (positive/negative/neutral on news) |
+| **Dashboard** | Real-time Streamlit UI: P&L, Portfolio, Trades, Risk pages |
+| **Alerts** | Telegram, Console, Email notifications |
+| **Live Trading** | Alpaca paper/live trading integration |
+| **Metrics** | 20+ metrics: Sharpe, Sortino, Calmar, VaR, CVaR, Win Rate |
+
+---
 
 ## Installation
 
-### From Source (Development)
+### Step 1 — Create a Virtual Environment
 
 ```bash
-# Clone the repository
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### Step 2 — Install from PyPI
+
+```bash
+# Core backtesting engine only (lightest install)
+pip install jsf-core
+
+# + NLP / FinBERT sentiment analysis
+pip install jsf-core[ml]
+
+# + Streamlit monitoring dashboard
+pip install jsf-core[dashboard]
+
+# + Alpaca live/paper trading
+pip install jsf-core[trading]
+
+# + Telegram & alert system
+pip install jsf-core[alerts]
+
+# Everything at once (recommended for full feature set)
+pip install jsf-core[ml,dashboard,trading,alerts]
+```
+
+### Install from Source (development)
+
+```bash
 git clone https://github.com/JaiAnshSB26/JBAC-Strategy-Foundry.git
 cd JBAC-Strategy-Foundry
-
-# Install in development mode
+python -m venv venv
+venv\Scripts\activate       # Windows — use "source venv/bin/activate" on Mac/Linux
 pip install -e ".[dev]"
-
-# Install pre-commit hooks
 pre-commit install
 ```
 
-### From PyPI (Coming Soon)
+---
+
+## Configuration
+
+JSF-Core supports two configuration methods — use whichever fits your workflow. Both can be used together (YAML for settings, `.env` for secrets).
+
+### Option A — `.env` file (API keys and secrets)
 
 ```bash
-pip install jsf-core
+cp .env.example .env    # Mac/Linux
+copy .env.example .env  # Windows
 ```
 
-## 🚀 Quick Start
+Then edit `.env`:
 
-### Setup Telegram Alerts (Optional, 2 minutes)
+```env
+# Alpaca paper trading — get free keys at https://alpaca.markets
+ALPACA_API_KEY=PKxxxxxxxxxxxxxxxxxx
+ALPACA_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ALPACA_BASE_URL=https://paper-api.alpaca.markets
 
-Get real-time paper trading alerts on your phone:
+# News / market data — get free key at https://www.alphavantage.co
+ALPHA_VANTAGE_API_KEY=your_key_here
+
+# Telegram alerts — create a bot via @BotFather on Telegram
+TELEGRAM_BOT_TOKEN=1234567890:ABCdef...
+TELEGRAM_CHAT_IDS=your_chat_id
+
+# App settings
+APP_ENV=development
+LOG_LEVEL=INFO
+ENABLE_TELEGRAM_ALERTS=true
+```
+
+> `.env` is in `.gitignore` — your secrets never touch git.
+
+### Option B — `config.yml` (backtesting and dashboard settings)
 
 ```bash
-# Interactive setup wizard
-python -m jsf.cli.setup_telegram
-
-# Or follow the guide
-# See: docs/QUICKSTART_TELEGRAM.md
+cp config.example.yml config.yml    # Mac/Linux
+copy config.example.yml config.yml  # Windows
 ```
 
-### Your First Strategy
+Then edit `config.yml`:
+
+```yaml
+environment: development
+
+backtest:
+  initial_capital: 100000
+  transaction_cost: 0.001     # 10 basis points per trade
+  slippage: 0.0005            # 5 basis points
+  benchmark: "SPY"
+  risk_free_rate: 0.05
+
+broker:
+  provider: alpaca
+  mode: paper                 # paper | live
+  alpaca:
+    api_key: ""               # or set ALPACA_API_KEY in .env
+    secret_key: ""
+    base_url: https://paper-api.alpaca.markets
+
+dashboard:
+  symbols: [AAPL, GOOGL, MSFT, AMZN, NVDA]
+  initial_capital: 100000
+  history_days: 90
+  refresh_interval: 30        # seconds (0 = disabled)
+
+alerts:
+  channels:
+    telegram:
+      enabled: true
+      bot_token: ""           # or set TELEGRAM_BOT_TOKEN in .env
+    console: true
+```
+
+See [`config.example.yml`](config.example.yml) for all available options including ML, email alerts, and IB.
+
+### Getting API Keys (all free)
+
+| Service | Purpose | Sign up |
+|---|---|---|
+| **Alpaca** | Paper/live trading + market data | [alpaca.markets](https://alpaca.markets) |
+| **Alpha Vantage** | Historical market data (25 req/day) | [alphavantage.co](https://www.alphavantage.co/support/#api-key) |
+| **Telegram Bot** | Trade alerts on your phone | [@BotFather](https://t.me/BotFather) on Telegram |
+
+---
+
+## Quick Start
+
+### Backtesting a Strategy
 
 ```python
-from jsf.data import load_data
+from jsf.data import SyntheticDataLoader
 from jsf.strategies import MomentumStrategy
 from jsf.simulation import BacktestEngine, BacktestConfig
 
-# Load data
-data = load_data(
-    source='synthetic',
-    symbols=['AAPL', 'GOOGL', 'MSFT', 'AMZN'],
-    start_date='2020-01-01',
-    end_date='2023-12-31'
+# Load data (no API key needed — uses synthetic data)
+loader = SyntheticDataLoader(
+    symbols=["AAPL", "GOOGL", "MSFT", "AMZN"],
+    start_date="2020-01-01",
+    end_date="2023-12-31",
 )
+data = loader.load()
 
 # Create strategy
-strategy = MomentumStrategy(
-    name="momentum_60d",
-    lookback=60,
-    long_only=True
-)
+strategy = MomentumStrategy(name="momentum_60d", lookback=60, long_only=True)
 
-# Configure backtest
+# Configure and run backtest
 config = BacktestConfig(
-    initial_capital=100000,
-    transaction_cost=0.001,  # 10 bps
-    slippage=0.0005,  # 5 bps
+    initial_capital=100_000,
+    transaction_cost=0.001,
+    slippage=0.0005,
 )
-
-# Run backtest
 engine = BacktestEngine(config)
 result = engine.run_strategy(strategy, data)
 
-# Display results
-print(f"Total Return: {result.total_return:.2%}")
-print(f"Sharpe Ratio: {result.sharpe_ratio:.2f}")
-print(f"Max Drawdown: {result.max_drawdown:.2%}")
-print(f"Total Trades: {len(result.trades)}")
-
-# Full metrics
-from jsf.simulation import calculate_all_metrics
-metrics = calculate_all_metrics(result.returns)
-print(f"\nCAGR: {metrics['cagr']:.2%}")
-print(f"Sortino Ratio: {metrics['sortino_ratio']:.2f}")
-print(f"Win Rate: {metrics['win_rate']:.2%}")
+print(f"Total Return : {result.total_return:.2%}")
+print(f"Sharpe Ratio : {result.sharpe_ratio:.2f}")
+print(f"Max Drawdown : {result.max_drawdown:.2%}")
+print(f"Win Rate     : {result.win_rate:.2%}")
 ```
 
-**See `examples/complete_backtest_example.py` for comprehensive examples including:**
-- Basic backtesting
-- Multi-strategy comparison
-- Detailed performance metrics
-- Transaction cost analysis
+### Backtesting with Real Data (Alpaca)
 
-## Documentation
+```python
+from jsf.data import AlpacaDataLoader
 
-### Core Modules
+loader = AlpacaDataLoader(
+    symbols=["AAPL", "MSFT"],
+    start_date="2023-01-01",
+    end_date="2023-12-31",
+    # Reads ALPACA_API_KEY and ALPACA_SECRET_KEY from .env automatically
+)
+data = loader.load()
+```
 
-- **`jsf.config`**: Configuration schemas and validation
-- **`jsf.data`**: Data loading and preprocessing (synthetic & real data)
-- **`jsf.signals`**: Signal generation (momentum, mean-reversion, trend, volatility, etc.)
-- **`jsf.portfolio`**: Portfolio construction (position sizing, optimization, rebalancing)
-- **`jsf.strategies`**: Strategy templates (momentum, mean-reversion, trend-following)
-- **`jsf.simulation`**: Backtesting engine with transaction costs and performance metrics
-- **`jsf.optimization`**: Parameter optimization (grid search, walk-forward)
-- **`jsf.ml`**: Machine learning integration (feature extraction, ensemble models, validation)
-- **`jsf.broker`**: Live trading broker integration (paper & live trading)
-- **`jsf.monitoring`**: Real-time monitoring dashboard with performance tracking
-- **`jsf.alerts`**: Multi-channel alert system (Console, Telegram, Email, SMS, Webhook)
+### Custom Signal
 
-### Available Components
+```python
+from jsf.signals import BaseSignal, SignalResult
+import pandas as pd
 
-**Signals** (10+ types):
-- Momentum, Mean Reversion, Trend Following
-- Volatility, Volume, Moving Average Cross
-- Breakout, Support/Resistance, Seasonality
+class MyMomentumSignal(BaseSignal):
+    def generate(self, data: pd.DataFrame) -> SignalResult:
+        score = data["close"].pct_change(20).iloc[-1]
+        return SignalResult(
+            value=score,
+            direction="long" if score > 0 else "short",
+        )
+```
 
-**Portfolio Construction** (24 components):
-- Position Sizing: Equal weight, signal-weighted, volatility-scaled, risk parity, Kelly
-- Optimization: Min variance, max Sharpe, mean-variance, risk parity, max diversification
-- Rebalancing: Periodic, threshold-based, signal-triggered, volatility-adjusted, cost-aware
-- Constraints: Long-only, leverage, position limits, sector, turnover, exposure
-
-**Strategies** (3 templates):
-- Momentum Strategy (trend following)
-- Mean Reversion Strategy (counter-trend)
-- Trend Following Strategy (MA cross + trend strength)
-
-**Performance Metrics** (20+ metrics):
-- Returns: Total, CAGR, mean daily
-- Risk: Volatility, downside deviation, max drawdown, VaR, CVaR
-- Risk-adjusted: Sharpe, Sortino, Calmar
-- Trading: Win rate, profit factor, avg win/loss
-- Distribution: Skewness, kurtosis
-
-## 🧪 Testing
+### Running from Examples
 
 ```bash
-# Run all tests
-make test
-
-# Run fast tests (no coverage)
-make test-fast
-
-# Run linting
-make lint
-
-# Format code
-make format
+# With venv activated:
+python examples/quickstart.py                   # Simple backtest
+python examples/complete_backtest_example.py    # Full metrics + charts
+python examples/ml_example.py                   # ML strategy
+python examples/paper_trading_alerts.py         # Live paper trading
 ```
+
+---
+
+## Running the Dashboard
+
+The Streamlit dashboard provides a live monitoring UI with P&L, positions, trades, and risk analytics.
+
+### Launch
+
+```bash
+# Activate venv first, then:
+
+# Windows
+python -m streamlit run src\jsf\dashboard\app.py
+
+# macOS / Linux
+python -m streamlit run src/jsf/dashboard/app.py
+```
+
+Opens at **http://localhost:8501**
+
+### Demo Mode (no API keys needed)
+
+Click **"Start Demo Mode"** in the sidebar. This instantly generates:
+- 90 days of historical mock equity data
+- 40 mock trades across AAPL, GOOGL, MSFT, AMZN, NVDA
+- Full metrics: Sharpe, drawdown, VaR, win rate, monthly heatmap
+
+### Dashboard Pages
+
+| Page | What it shows |
+|---|---|
+| **Overview** | Current positions table, allocation pie chart |
+| **P&L** | Equity curve, drawdown, daily returns, monthly heatmap, date range filters |
+| **Trades** | Full trade history, buy/sell breakdown, filters by symbol/date, CSV export |
+| **Risk** | VaR, CVaR, volatility, Calmar ratio, exposure analysis |
+| **Settings** | Connection status, version info, auto-refresh interval |
+
+### Connect to Your Alpaca Account
+
+Go to **Settings** in the dashboard sidebar and enter your Alpaca API key and secret. The dashboard will display your actual paper trading portfolio and update in real time.
+
+---
+
+## Live Paper Trading
+
+```bash
+# With venv activated:
+python examples/paper_trading_alerts.py
+```
+
+This connects to Alpaca paper trading, generates signals, places orders automatically, and sends Telegram alerts for every trade.
+
+**Set up Telegram in 2 minutes:**
+
+```bash
+python -m jsf.cli.setup_telegram
+```
+
+This wizard guides you through creating a Telegram bot and saves the credentials to `.env`.
+
+---
+
+## Sentiment Analysis (NLP)
+
+Requires `pip install jsf-core[ml]`. Downloads the FinBERT model (~400 MB on first run, then cached).
+
+### Single prediction
+
+```python
+from jsf.ml.transformers.bert import FinBERT
+
+model = FinBERT()
+
+result = model.predict_one("Apple reports record earnings, beating analyst estimates by 20%.")
+print(result.label.value)      # 'positive'
+print(f"{result.score:.0%}")   # e.g. 96%
+print(result.probabilities)    # {'positive': 0.96, 'negative': 0.01, 'neutral': 0.03}
+```
+
+### Batch prediction
+
+```python
+headlines = [
+    "Revenue grew 25% year over year",
+    "Company faces bankruptcy and mass layoffs",
+    "Quarterly report was released on schedule",
+]
+for text, r in zip(headlines, model.predict(headlines)):
+    print(f"{r.label.value:8s}  {r.score:.0%}  {text}")
+
+# positive   94%  Revenue grew 25% year over year
+# negative   97%  Company faces bankruptcy and mass layoffs
+# neutral    81%  Quarterly report was released on schedule
+```
+
+### Sentiment signal in strategy
+
+```python
+from jsf.signals.sentiment import SentimentMomentumSignal
+
+signal = SentimentMomentumSignal(
+    name="finbert_momentum",
+    model_type="finbert",       # "simple" for lightweight rule-based version
+    lookback=7,
+    sentiment_threshold=0.3,
+    momentum_threshold=0.1,
+)
+# BUY  when sentiment > threshold AND price momentum rising
+# SELL when sentiment < -threshold AND price momentum falling
+```
+
+---
+
+## Module Reference
+
+```
+jsf/
+├── config/         Configuration schemas and YAML/env loaders
+├── data/           Data loaders: Synthetic, Alpaca, YFinance, AlphaVantage
+├── signals/        Signal generators: Momentum, MeanReversion, Volatility, Sentiment
+├── portfolio/      Position sizing, optimization, rebalancing, risk constraints
+├── strategies/     Ready-made strategies: Momentum, MeanReversion, TrendFollowing
+├── simulation/     BacktestEngine with transaction costs, slippage, tracking
+├── optimization/   Grid search and walk-forward parameter optimization
+├── evaluation/     Performance metrics (20+ metrics)
+├── ml/             XGBoost, LightGBM, Neural Networks, FinBERT NLP
+├── broker/         Alpaca and Interactive Brokers live trading
+├── dashboard/      Streamlit real-time monitoring dashboard
+├── alerts/         Telegram, Console, Email alert system
+├── cli/            Command-line tools (setup_telegram, etc.)
+└── utils/          Shared utilities and helpers
+```
+
+---
+
+## Project Structure
+
+```
+JBAC-Strategy-Foundry/
+├── src/jsf/                    Main package source
+├── tests/                      Test suite (635 tests)
+├── examples/                   Runnable example scripts
+│   ├── quickstart.py
+│   ├── complete_backtest_example.py
+│   ├── ml_example.py
+│   └── paper_trading_alerts.py
+├── demos/                      Feature demo scripts
+│   ├── demo_real_sentiment.py
+│   ├── demo_ml_pipeline.py
+│   └── demo_realtime_news.py
+├── docs/                       Extended documentation
+├── config.example.yml          Config template  →  copy to config.yml
+├── .env.example                API key template →  copy to .env
+├── pyproject.toml              Package metadata and dependencies
+├── requirements.txt            Full dependency list with comments
+└── Makefile                    Dev shortcuts: test, lint, format, build
+```
+
+---
 
 ## Development
 
-### Project Structure
-
-```
-jsf-core/
-├── src/jsf/              # Main package
-│   ├── config/           # Configuration schemas
-│   ├── data/             # Data loading & preprocessing
-│   ├── signals/          # Signal generation
-│   ├── strategies/       # Strategy templates
-│   ├── simulation/       # Backtest engine
-│   ├── optimization/     # Parameter optimization
-│   ├── evaluation/       # Performance metrics
-│   ├── reporting/        # Report generation
-│   └── utils/            # Utilities
-├── tests/                # Test suite
-├── docs/                 # Documentation
-└── examples/             # Usage examples
-```
-
-### Development Roadmap
-
-**Phase 1**: Foundation & Project Structure [Complete]  
-**Phase 2**: Core Configuration System [Complete]  
-**Phase 3**: Data Loading Infrastructure [Complete]  
-**Phase 4-6**: Signal Framework [Complete]  
-**Phase 7**: Portfolio Construction [Complete]  
-**Phase 8**: Strategy Templates [Complete]  
-**Phase 9**: Backtesting & Simulation Engine [Complete]  
-**Phase 10**: Visualization & Reporting [Complete]  
-**Phase 11**: Parameter Optimization [Complete]  
-**Phase 12**: Walk-Forward Analysis (Next)  
-**Phase 13**: Real Data Integration  
-**Phase 14**: Advanced Strategies  
-**Phase 15**: Risk Management Enhancements  
-**Phase 16**: Multi-Asset Support  
-**Phase 17**: High-Level API  
-**Phase 18**: CLI Tool  
-**Phase 19**: SDK Documentation  
-**Phase 20**: Release Preparation  
-
-### Current Status (Phase 11 Complete)
-
-**Production-Ready Quantitative Trading System**:
-- Data loading (synthetic + real data support)
-- Signal generation (10+ signal types)
-- Portfolio construction (24 components)
-- Strategy templates (3 pre-built strategies)
-- Backtesting engine (transaction costs, slippage, tracking)
-- Performance metrics (20+ metrics)
-- Professional visualizations (6 plot types)
-- Parameter optimization (grid search)
-
-**Latest Achievements**:
-- **Validation Complete**: 18/18 integration tests passing (100% success rate)
-- **Phases 7-11**: All functionality tested and validated
-- **Optimization**: Grid search finding optimal parameters (tested 95.65% return, 2.00 Sharpe)
-- **End-to-End**: Complete workflow validated from data → signals → portfolio → backtest → metrics → plots
-
-**Real Results from Optimization**:
-- Momentum 120d optimized: 95.65% return, 2.00 Sharpe, -8.12% max drawdown
-- Parameter search: Tested 6 combinations, found best in 2.5 seconds
-- Multi-metric optimization: Different metrics favor different parameters
-
-**Next Steps** (Phases 12-20):
-1. Phase 12: Walk-forward analysis for out-of-sample testing
-2. Phase 13: Real market data integration (Yahoo Finance, Alpha Vantage)
-3. Phase 14: Advanced strategy templates (ML, multi-signal)
-4. Phases 15-17: Risk management, multi-asset support, high-level API
-5. Phases 18-20: CLI tool, documentation, PyPI release
-
-## Handoff Documentation
-
-**For Anubhav (Co-Developer)**:
-
-This project is ready for collaborative development! All foundational components (Phases 1-11) are complete, tested, and documented.
-
-**Key Documents**:
-- [**HANDOFF_STATUS.md**](HANDOFF_STATUS.md) - Current status, test results, and immediate next steps
-- [**HANDOFF_DOCUMENTATION.md**](HANDOFF_DOCUMENTATION.md) - Complete technical guide (500+ lines)
-- [**Test Suite**](tests/test_integration_phases_7_11.py) - 18 integration tests (all passing)
-
-**Quick Validation**:
 ```bash
-# Run all integration tests
-pytest tests/test_integration_phases_7_11.py --override-ini="addopts=" -v
-
-# Expected: 18 passed in ~30 seconds
+make test        # Run all 635 tests with coverage report
+make test-fast   # Run tests without coverage
+make lint        # ruff + mypy
+make format      # black formatter
+make check       # lint + test (run before committing)
+make build       # Build wheel + sdist into dist/
+make clean       # Remove build artifacts
 ```
 
-**Development Status**:
-- Phases 1-11: Complete & Tested (55%)
-- Phases 12-20: Ready for development (45%)
-- Next: Phase 12 (Walk-Forward Analysis)  
+---
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-```bash
-# Install with dev dependencies
-pip install -e ".[dev]"
-
-# Install pre-commit hooks
-pre-commit install
-
-# Run checks before committing
-make check
-```
-
-## ⚠️ Disclaimer
+## Disclaimer
 
 **EDUCATIONAL PURPOSE ONLY**
 
 This software is provided for **educational and research purposes only**. It is designed to help students, researchers, and developers learn about quantitative trading concepts, backtesting methodologies, and algorithmic strategy development.
 
-**IMPORTANT NOTICES:**
+1. **NOT FINANCIAL ADVICE** — Nothing here constitutes investment, tax, or legal advice.
+2. **NO REAL TRADING** — This software is not intended for use with real money.
+3. **PAST PERFORMANCE** — Backtested results do not guarantee future returns.
+4. **SUBSTANTIAL RISK** — Trading involves substantial risk of total capital loss.
+5. **NO WARRANTY** — Provided "AS IS" with no liability for any losses or damages.
 
-1. **NOT FINANCIAL ADVICE**: Nothing in this software or documentation constitutes financial, investment, tax, or legal advice. Always consult with qualified professionals before making investment decisions.
-
-2. **NO REAL TRADING**: This software is NOT intended for trading with real money. While it includes broker integration capabilities for educational demonstrations, using it for live trading is at your own risk.
-
-3. **PAST PERFORMANCE**: Backtested results do NOT guarantee future performance. Simulated trading programs are designed with the benefit of hindsight and do not account for real-world market conditions, liquidity, or execution issues.
-
-4. **SUBSTANTIAL RISK**: Trading financial instruments involves substantial risk of loss. You could lose some or all of your invested capital. Only trade with money you can afford to lose.
-
-5. **NO WARRANTY**: This software is provided "AS IS" without warranty of any kind, express or implied. The authors and contributors disclaim all liability for any losses or damages.
-
-6. **YOUR RESPONSIBILITY**: You are solely responsible for any trading decisions and their outcomes. The authors and JBAC EdTech are NOT responsible for any financial losses.
-
-By using this software, you acknowledge that you understand and accept these risks.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with modern Python best practices
-- Inspired by leading quantitative research frameworks
-- Powered by NumPy, Pandas, and Pydantic
-
-## Contact
-
-**JBAC EdTech**  
-GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
+By using this software you accept full responsibility for any outcomes.
 
 ---
 
-**Status**: Active Development (v0.7.0-dev)  
-**Phase**: 19/20 - ML Integration & NLP Sentiment Complete  
-**Next**: Phase 20 - PyPI Publication & Documentation
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+## Contact
+
+**JBAC EdTech** · GitHub: [@JaiAnshSB26](https://github.com/JaiAnshSB26)
+
+**PyPI**: [pypi.org/project/jsf-core](https://pypi.org/project/jsf-core/)
