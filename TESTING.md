@@ -6,19 +6,26 @@ This guide explains how to test the JSF-Core Streamlit dashboard with real or mo
 
 The dashboard includes a mock data collector that generates synthetic trading data.
 
-### 1. Start the Dashboard
+### 1. Activate the Virtual Environment
 
 ```powershell
 # Make sure you're in the project root
-cd C:\Users\Jai Ansh Bindra\JBAC-Strategy-Foundry
+cd "C:\Users\Jai Ansh Bindra\JBAC-Strategy-Foundry"
 
-# Run with Python 3.11
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m streamlit run src\jsf\dashboard\app.py
+# Activate the venv (do this once per terminal session)
+.\venv\Scripts\Activate.ps1
 ```
 
-The dashboard will launch at **http://localhost:8503** (or next available port)
+### 2. Start the Dashboard
 
-### 2. Navigate the Dashboard
+```powershell
+# Run the Streamlit dashboard
+python -m streamlit run src\jsf\dashboard\app.py
+```
+
+The dashboard will launch at **http://localhost:8501** (or next available port)
+
+### 3. Navigate the Dashboard
 
 The dashboard has several pages:
 - **P&L**: Equity curve, returns, and performance metrics
@@ -54,12 +61,12 @@ Free paper trading account with real market data.
 
 3. **Install Alpaca SDK** (if not already installed):
    ```powershell
-   & "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m pip install alpaca-trade-api
+   pip install alpaca-trade-api
    ```
 
 4. **Test Connection**:
    ```powershell
-   & "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -c "from alpaca_trade_api import REST; import os; api = REST(os.getenv('ALPACA_API_KEY'), os.getenv('ALPACA_SECRET_KEY'), 'https://paper-api.alpaca.markets'); print('Connected:', api.get_account().status)"
+   python -c "from alpaca_trade_api import REST; import os; api = REST(os.getenv('ALPACA_API_KEY'), os.getenv('ALPACA_SECRET_KEY'), 'https://paper-api.alpaca.markets'); print('Connected:', api.get_account().status)"
    ```
 
 ### Option 2: Yahoo Finance (Free, No Registration)
@@ -70,12 +77,12 @@ Uses historical data only (no live trading).
 
 1. **Install yfinance**:
    ```powershell
-   & "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m pip install yfinance
+   pip install yfinance
    ```
 
 2. **Run a Demo**:
    ```powershell
-   & "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" demos\demo_complete.py
+   python demos\demo_complete.py
    ```
 
 ### Option 3: Alpha Vantage API
@@ -112,53 +119,56 @@ Free tier: 25 API calls per day.
 
 4. **Test Alerts**:
    ```powershell
-   & "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" examples\alerts_example.py
+   python examples\alerts_example.py
    ```
 
 ## Running Example Strategies
 
 ### Basic Backtest (No API Keys)
 ```powershell
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" examples\quickstart.py
+python examples\quickstart.py
 ```
 
 ### Complete Backtest with Metrics
 ```powershell
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" examples\complete_backtest_example.py
+python examples\complete_backtest_example.py
 ```
 
 ### ML Strategy Example
 ```powershell
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" examples\ml_example.py
+python examples\ml_example.py
 ```
 
 ### Paper Trading (requires Alpaca keys)
 ```powershell
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" examples\paper_trading_alerts.py
+python examples\paper_trading_alerts.py
 ```
 
 ## Troubleshooting
 
 ### Dashboard won't start
 ```powershell
+# Make sure venv is activated first
+.\venv\Scripts\Activate.ps1
+
 # Check if streamlit is installed
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m pip list | Select-String streamlit
+pip list | Select-String streamlit
 
 # Reinstall if needed
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m pip install streamlit plotly
+pip install streamlit plotly
 ```
 
 ### Import errors
 ```powershell
 # Install JSF in editable mode
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m pip install -e . --no-deps
+pip install -e . --no-deps
 ```
 
 ### Port already in use
 ```powershell
 # Streamlit will automatically try next available port
 # Or specify a port manually:
-& "C:/Users/Jai Ansh Bindra/AppData/Local/Programs/Python/Python311/python.exe" -m streamlit run src\jsf\dashboard\app.py --server.port=8504
+python -m streamlit run src\jsf\dashboard\app.py --server.port=8504
 ```
 
 ## Security Reminders

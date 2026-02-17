@@ -57,7 +57,6 @@ def setup_page_config():
     """Configure Streamlit page settings."""
     st.set_page_config(
         page_title="JSF Trading Dashboard",
-        page_icon="📈",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -122,15 +121,15 @@ def apply_custom_css():
 def render_sidebar():
     """Render the sidebar navigation and controls."""
     with st.sidebar:
-        st.title("📈 JSF Dashboard")
+        st.title("JSF Dashboard")
         st.markdown("---")
         
         # Connection status
         state = st.session_state.dashboard_state
         if state.is_connected:
-            st.markdown("🟢 **Connected**")
+            st.markdown("**Status:** Connected")
         else:
-            st.markdown("🔴 **Disconnected**")
+            st.markdown("**Status:** Disconnected")
         
         if state.last_update:
             st.caption(f"Last update: {state.last_update.strftime('%H:%M:%S')}")
@@ -141,12 +140,12 @@ def render_sidebar():
         st.subheader("Navigation")
         
         pages = {
-            "📊 Overview": DashboardPage.OVERVIEW,
-            "💼 Portfolio": DashboardPage.PORTFOLIO,
-            "💰 P&L": DashboardPage.PNL,
-            "📋 Trades": DashboardPage.TRADES,
-            "⚠️ Risk": DashboardPage.RISK,
-            "⚙️ Settings": DashboardPage.SETTINGS,
+            "Overview": DashboardPage.OVERVIEW,
+            "Portfolio": DashboardPage.PORTFOLIO,
+            "P&L": DashboardPage.PNL,
+            "Trades": DashboardPage.TRADES,
+            "Risk": DashboardPage.RISK,
+            "Settings": DashboardPage.SETTINGS,
         }
         
         selected = st.radio(
@@ -164,7 +163,7 @@ def render_sidebar():
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Refresh", use_container_width=True):
+            if st.button("Refresh", use_container_width=True):
                 refresh_data()
         
         with col2:
@@ -226,7 +225,7 @@ def refresh_data():
 
 def render_overview_page():
     """Render the overview/home page."""
-    st.title("📊 Portfolio Overview")
+    st.title("Portfolio Overview")
     
     state = st.session_state.dashboard_state
     snapshot = state.current_snapshot
@@ -234,7 +233,7 @@ def render_overview_page():
     if snapshot is None:
         st.warning("No data available. Connect to a broker or use demo mode.")
         
-        if st.button("🎮 Start Demo Mode"):
+        if st.button("Start Demo Mode"):
             start_demo_mode()
             st.rerun()
         return
@@ -295,12 +294,12 @@ def render_overview_page():
                         'P&L': '${:+,.2f}',
                         'P&L %': '{:+.2f}%',
                         'Weight %': '{:.1f}%',
-                    }).applymap(
+                    }).map(
                         lambda x: 'color: green' if isinstance(x, (int, float)) and x > 0 
                         else ('color: red' if isinstance(x, (int, float)) and x < 0 else ''),
                         subset=['P&L', 'P&L %']
                     ),
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
         else:
@@ -325,7 +324,7 @@ def render_overview_page():
                 height=300,
                 margin=dict(l=20, r=20, t=20, b=20),
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
 
 def render_portfolio_page():
@@ -366,7 +365,7 @@ def render_risk_page():
 
 def render_settings_page():
     """Render settings page."""
-    st.title("⚙️ Settings")
+    st.title("Settings")
     
     config = st.session_state.config
     
@@ -419,13 +418,13 @@ def render_settings_page():
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🎮 Start Demo Mode", use_container_width=True):
+        if st.button("Start Demo Mode", use_container_width=True):
             start_demo_mode()
             st.success("Demo mode started!")
             st.rerun()
     
     with col2:
-        if st.button("🔌 Disconnect", use_container_width=True):
+        if st.button("Disconnect", use_container_width=True):
             disconnect()
             st.info("Disconnected")
             st.rerun()
@@ -434,7 +433,7 @@ def render_settings_page():
     
     st.subheader("About")
     st.markdown("""
-    **JSF Trading Dashboard** v0.5.0
+    **JSF Trading Dashboard** v0.7.0-dev
     
     Part of the JBAC Strategy Foundry framework.
     
@@ -447,14 +446,25 @@ def start_demo_mode():
     st.session_state.collector = MockDataCollector(
         initial_capital=100000.0,
         symbols=["AAPL", "GOOGL", "MSFT", "AMZN", "NVDA"],
+        history_days=90,
     )
     
-    # Collect initial snapshot
+    # Collect initial snapshot (adds to history)
     snapshot = st.session_state.collector.collect_snapshot()
     st.session_state.dashboard_state.current_snapshot = snapshot
     st.session_state.dashboard_state.is_connected = True
     st.session_state.dashboard_state.last_update = datetime.now()
     st.session_state.dashboard_state.initial_capital = 100000.0
+    
+    # Populate equity history in state from collector history
+    st.session_state.dashboard_state.equity_history = [
+        (s.timestamp, s.equity) for s in st.session_state.collector.history.snapshots
+    ]
+    
+    # Populate trade history in state from collector
+    st.session_state.dashboard_state.trade_history = list(
+        st.session_state.collector.trade_history
+    )
 
 
 def disconnect():
@@ -510,9 +520,11 @@ def main():
         now = datetime.now()
         elapsed = (now - st.session_state.last_refresh).total_seconds()
         
-        if elapsed >= config.refresh_rate.value:
+        if elapsed >= config.refresh_rate.value and config.refresh_rate.value > 0:
             refresh_data()
             st.session_state.last_refresh = now
+            time.sleep(0.1)
+            st.rerun()
     
     # Render current page
     state = st.session_state.dashboard_state

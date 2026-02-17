@@ -35,7 +35,7 @@ def render_pnl(state: DashboardState, collector: Optional[Any] = None):
         state: Current dashboard state
         collector: DataCollector instance
     """
-    st.title("💰 Profit & Loss")
+    st.title("Profit & Loss")
     
     snapshot = state.current_snapshot
     
@@ -54,6 +54,60 @@ def render_pnl(state: DashboardState, collector: Optional[Any] = None):
     if equity_series.empty or len(equity_series) < 2:
         st.info("Insufficient historical data for charts. Data will accumulate over time.")
         return
+    
+    # Date range filter
+    st.subheader("Date Range")
+    filter_col1, filter_col2, filter_col3 = st.columns([1, 1, 2])
+    
+    with filter_col1:
+        min_date = equity_series.index.min().date()
+        max_date = equity_series.index.max().date()
+        start_date = st.date_input(
+            "Start Date",
+            value=min_date,
+            min_value=min_date,
+            max_value=max_date,
+        )
+    
+    with filter_col2:
+        end_date = st.date_input(
+            "End Date",
+            value=max_date,
+            min_value=min_date,
+            max_value=max_date,
+        )
+    
+    with filter_col3:
+        quick_range = st.selectbox(
+            "Quick Select",
+            ["Custom", "Last 7 Days", "Last 30 Days", "Last 90 Days", "Year to Date", "All Time"],
+            index=5,
+        )
+        if quick_range == "Last 7 Days":
+            start_date = (datetime.now() - timedelta(days=7)).date()
+        elif quick_range == "Last 30 Days":
+            start_date = (datetime.now() - timedelta(days=30)).date()
+        elif quick_range == "Last 90 Days":
+            start_date = (datetime.now() - timedelta(days=90)).date()
+        elif quick_range == "Year to Date":
+            start_date = datetime(datetime.now().year, 1, 1).date()
+        elif quick_range == "All Time":
+            start_date = min_date
+    
+    # Validate date range
+    if start_date > end_date:
+        st.error("Start date must be before end date.")
+        return
+    
+    # Filter equity series by date range
+    mask = (equity_series.index.date >= start_date) & (equity_series.index.date <= end_date)
+    equity_series = equity_series[mask]
+    
+    if equity_series.empty or len(equity_series) < 2:
+        st.warning("No data available for the selected date range.")
+        return
+    
+    st.markdown("---")
     
     # Equity curve and drawdown
     col1, col2 = st.columns([2, 1])
@@ -229,7 +283,7 @@ def render_equity_curve(equity: pd.Series, initial_capital: float):
         ),
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_performance_metrics(equity: pd.Series, initial_capital: float):
@@ -298,7 +352,7 @@ def render_returns_histogram(equity: pd.Series):
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Stats below
     st.caption(
@@ -345,7 +399,7 @@ def render_daily_pnl(equity: pd.Series):
         yaxis_title='P&L ($)',
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Summary stats
     wins = (daily_pnl > 0).sum()
@@ -394,7 +448,7 @@ def render_cumulative_returns(equity: pd.Series):
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_drawdown_chart(equity: pd.Series):
@@ -437,7 +491,7 @@ def render_drawdown_chart(equity: pd.Series):
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     st.caption(f"Max Drawdown: {max_dd:.2f}% | Current Drawdown: {current_dd:.2f}%")
 
@@ -479,7 +533,7 @@ def render_monthly_returns(equity: pd.Series):
         yaxis_title='Year',
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Yearly totals
     if not monthly.empty:

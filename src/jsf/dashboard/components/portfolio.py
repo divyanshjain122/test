@@ -21,7 +21,7 @@ def render_portfolio(state: DashboardState):
     Args:
         state: Current dashboard state
     """
-    st.title("💼 Portfolio Details")
+    st.title("Portfolio Details")
     
     snapshot = state.current_snapshot
     
@@ -143,9 +143,9 @@ def render_positions_table(positions: list):
         'P&L %': '{:+.2f}%',
         'Weight': '{:.1f}%',
         'Quantity': '{:,.0f}',
-    }).applymap(color_pnl, subset=['P&L', 'P&L %'])
+    }).map(color_pnl, subset=['P&L', 'P&L %'])
     
-    st.dataframe(styled_df, use_container_width=True, hide_index=True)
+    st.dataframe(styled_df, width="stretch", hide_index=True)
     
     # Summary row
     total_value = sum(p.market_value for p in positions)
@@ -197,7 +197,7 @@ def render_allocation_chart(snapshot):
         margin=dict(l=20, r=20, t=20, b=50),
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_weights_bar_chart(positions: list):
@@ -234,7 +234,7 @@ def render_weights_bar_chart(positions: list):
         coloraxis_showscale=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_pnl_bar_chart(positions: list):
@@ -275,7 +275,7 @@ def render_pnl_bar_chart(positions: list):
     # Add zero line
     fig.add_hline(y=0, line_dash="dash", line_color="gray")
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_position_details(positions: list):
@@ -289,7 +289,7 @@ def render_position_details(positions: list):
         return
     
     for pos in positions:
-        with st.expander(f"📊 {pos.symbol} - {pos.side.upper()}"):
+        with st.expander(f"{pos.symbol} - {pos.side.upper()}"):
             col1, col2, col3 = st.columns(3)
             
             with col1:
@@ -338,4 +338,4 @@ def render_position_details(positions: list):
                 legend=dict(orientation="h", yanchor="bottom", y=1.02),
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")

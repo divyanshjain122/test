@@ -42,7 +42,7 @@ def render_risk(state: DashboardState, collector: Optional[Any] = None):
         state: Current dashboard state
         collector: DataCollector instance
     """
-    st.title("⚠️ Risk Analysis")
+    st.title("Risk Analysis")
     
     snapshot = state.current_snapshot
     
@@ -201,7 +201,7 @@ def render_drawdown_section(equity: pd.Series):
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Drawdown stats
     col1, col2, col3 = st.columns(3)
@@ -247,7 +247,7 @@ def render_var_section(equity: pd.Series):
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # VaR interpretation
     current_equity = equity.iloc[-1]
@@ -274,7 +274,10 @@ def render_risk_adjusted_metrics(equity: pd.Series, risk_metrics: Optional[RiskM
     if risk_metrics:
         calmar = risk_metrics.calmar_ratio
     else:
-        from ..metrics import calculate_calmar
+        try:
+            from ..metrics import calculate_calmar
+        except ImportError:
+            from jsf.dashboard.metrics import calculate_calmar
         _, max_dd, _ = calculate_drawdown(equity)
         calmar = calculate_calmar(returns, max_dd) if max_dd > 0 else 0
     
@@ -314,7 +317,7 @@ def render_risk_adjusted_metrics(equity: pd.Series, risk_metrics: Optional[RiskM
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Interpretation
     st.caption(
@@ -371,7 +374,7 @@ def render_volatility_section(equity: pd.Series):
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Volatility stats
     col1, col2, col3 = st.columns(3)
@@ -412,7 +415,7 @@ def render_exposure_section(snapshot, risk_metrics: Optional[RiskMetrics]):
             title='Cash vs Invested',
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     
     with col2:
         # Position concentration
@@ -440,7 +443,7 @@ def render_exposure_section(snapshot, risk_metrics: Optional[RiskMetrics]):
                 showlegend=True,
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         else:
             st.info("No positions to analyze")
     
@@ -507,7 +510,7 @@ def render_position_risk(snapshot):
         yaxis_title='Unrealized P&L (%)',
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Risk table
     st.subheader("Position Risk Table")
@@ -522,4 +525,4 @@ def render_position_risk(snapshot):
         cmap='RdYlGn_r',
     )
     
-    st.dataframe(styled_df, use_container_width=True, hide_index=True)
+    st.dataframe(styled_df, width="stretch", hide_index=True)

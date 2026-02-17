@@ -391,19 +391,22 @@ class MockDataCollector(DataCollector):
     """Data collector with mock data for testing/demo.
     
     Generates realistic-looking data without requiring
-    a real broker connection.
+    a real broker connection. Pre-generates historical data
+    on initialization so charts display immediately.
     """
     
     def __init__(
         self,
         initial_capital: float = 100000.0,
         symbols: List[str] = None,
+        history_days: int = 90,
     ):
         """Initialize mock collector.
         
         Args:
             initial_capital: Starting capital
             symbols: List of symbols to simulate
+            history_days: Number of days of historical data to generate
         """
         self.initial_capital = initial_capital
         self.symbols = symbols or ["AAPL", "GOOGL", "MSFT", "AMZN"]
@@ -423,6 +426,15 @@ class MockDataCollector(DataCollector):
         self._positions = self._generate_mock_positions()
         self._day_start_equity = initial_capital
         self._last_day = datetime.now().date()
+        
+        # Set retention long enough to hold all historical data
+        self.history = SnapshotHistory(
+            retention_hours=max(24, (history_days + 1) * 24),
+        )
+        
+        # Pre-generate historical data so charts work immediately
+        self._generate_historical_data(history_days)
+        self._generate_mock_trades()
     
     def _generate_mock_positions(self) -> List[PositionSnapshot]:
         """Generate mock positions."""
@@ -510,3 +522,96 @@ class MockDataCollector(DataCollector):
             self._fire_callbacks("on_snapshot", snapshot)
             
             return snapshot
+
+    def _generate_historical_data(self, days: int):
+        """Generate historical equity snapshots for charts.
+        
+        Creates a realistic random-walk equity curve going back
+        N trading days so that all charts have data on first load.
+        
+        Args:
+            days: Number of trading days to simulate
+        """
+        import random
+        import uuid
+        
+        now = datetime.now()
+        equity = self.initial_capital
+        
+        for day_offset in range(days, 0, -1):
+            ts = now - timedelta(days=day_offset)
+            # Skip weekends
+            if ts.weekday() >= 5:
+                continue
+            
+            # Random daily return: mean +0.03%, std 1.2%
+            daily_return = random.gauss(0.0003, 0.012)
+            equity *= (1 + daily_return)
+            
+            # Build a lightweight snapshot for the history
+            cash = equity * random.uniform(0.25, 0.35)
+            pv = equity - cash
+            total_pnl = equity - self.initial_capital
+            total_ret = (total_pnl / self.initial_capital) * 100
+            
+            snapshot = PortfolioSnapshot(
+                timestamp=ts,
+                cash=cash,
+                portfolio_value=pv,
+                equity=equity,
+                positions=[],
+                num_positions=len(self.symbols),
+                daily_pnl=equity * daily_return,
+                daily_return=daily_return * 100,
+                total_pnl=total_pnl,
+                total_return=total_ret,
+            )
+            self.history.add(snapshot)
+        
+        # Set current equity to match end of history
+        self._equity = equity
+        self._cash = equity * 0.3
+        self._positions = self._generate_mock_positions()
+
+    def _generate_mock_trades(self):
+        """Generate a realistic set of mock trades for the trade history."""
+        import random
+        import uuid
+        
+        now = datetime.now()
+        sides = ["buy", "sell"]
+        
+        for i in range(40):
+            day_offset = random.randint(0, 60)
+            hour = random.randint(9, 15)
+            minute = random.randint(0, 59)
+            ts = now - timedelta(days=day_offset, hours=random.randint(0, 5), minutes=minute)
+            ts = ts.replace(hour=hour, minute=minute)
+            # Skip weekends
+            if ts.weekday() >= 5:
+                ts -= timedelta(days=ts.weekday() - 4)
+            
+            symbol = random.choice(self.symbols)
+            side = random.choice(sides)
+            price = random.uniform(100, 500)
+            quantity = random.randint(5, 100)
+            value = price * quantity
+            commission = round(value * 0.001, 2)
+            pnl = round(random.gauss(0, value * 0.02), 2) if side == "sell" else None
+            
+            record = TradeRecord(
+                trade_id=str(uuid.uuid4())[:8],
+                order_id=str(uuid.uuid4())[:8],
+                timestamp=ts,
+                symbol=symbol,
+                side=side,
+                quantity=quantity,
+                price=round(price, 2),
+                value=round(value, 2),
+                commission=commission,
+                pnl=pnl,
+            )
+            self.trade_history.append(record)
+        
+        # Sort by timestamp
+        self.trade_history.sort(key=lambda t: t.timestamp)

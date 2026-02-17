@@ -23,7 +23,7 @@ def render_trades(state: DashboardState, collector: Optional[Any] = None):
         state: Current dashboard state
         collector: DataCollector instance
     """
-    st.title("📋 Trade History")
+    st.title("Trade History")
     
     # Get trade history
     trades = get_trade_history(state, collector)
@@ -275,14 +275,14 @@ def render_trade_table(trades: List[TradeRecord]):
         'Commission': '${:.2f}',
         'P&L': lambda x: f'${x:+,.2f}' if x is not None and not pd.isna(x) else '-',
         'Quantity': '{:,.0f}',
-    }).applymap(style_side, subset=['Side']).applymap(style_pnl, subset=['P&L'])
+    }).map(style_side, subset=['Side']).map(style_pnl, subset=['P&L'])
     
-    st.dataframe(styled_df, use_container_width=True, hide_index=True, height=400)
+    st.dataframe(styled_df, width="stretch", hide_index=True, height=400)
     
     # Download button
     csv = df.to_csv(index=False)
     st.download_button(
-        label="📥 Download CSV",
+        label="Download CSV",
         data=csv,
         file_name=f"trades_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         mime="text/csv",
@@ -322,7 +322,7 @@ def render_trades_by_symbol(trades: List[TradeRecord]):
         showlegend=True,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_trades_over_time(trades: List[TradeRecord]):
@@ -380,7 +380,7 @@ def render_trades_over_time(trades: List[TradeRecord]):
     fig.update_yaxes(title_text="Trade Count", secondary_y=False)
     fig.update_yaxes(title_text="Cumulative Value ($)", secondary_y=True)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_trade_value_distribution(trades: List[TradeRecord]):
@@ -419,7 +419,7 @@ def render_trade_value_distribution(trades: List[TradeRecord]):
         yaxis_title='Frequency',
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_buy_sell_analysis(trades: List[TradeRecord]):
@@ -461,7 +461,7 @@ def render_buy_sell_analysis(trades: List[TradeRecord]):
         showlegend=False,
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Value comparison
     st.caption(
