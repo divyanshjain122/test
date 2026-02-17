@@ -5,6 +5,42 @@ All notable changes to JSF-Core will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-02-18
+
+### Dashboard Overhaul & Release
+
+#### Fixed - Dashboard
+- MockDataCollector now generates 90 days of historical equity + 40 mock trades on startup
+- SnapshotHistory retention expanded to accommodate full historical data
+- P&L page: full date range filter (Start Date, End Date, Quick Select: 7/30/90 days, YTD, All Time)
+- Removed all emojis from UI (titles, sidebar, buttons, expanders)
+- Fixed deprecated `Styler.applymap` → `Styler.map` (pandas 2.x)
+- Fixed deprecated `use_container_width=True` → `width="stretch"` (Streamlit 1.54)
+- Fixed `calculate_calmar` import fallback in `risk.py`
+- Fixed auto-refresh to call `st.rerun()` correctly
+- Fixed SyntaxError in `app.py` (mismatched parenthesis in style chain)
+- Enhanced `start_demo_mode()` to populate `equity_history` and `trade_history` in state
+- Dashboard version now reads from `jsf.__version__` dynamically
+
+#### Changed - Dependencies
+- Moved `tensorflow`, `torch`, `transformers` from hard dependencies to optional `[ml]` extra
+- Added `streamlit`, `python-dotenv` as optional `[dashboard]` extra
+- Added `alpaca-trade-api` as optional `[trading]` extra
+- Added `python-telegram-bot` as optional `[alerts]` extra
+- Added `tqdm`, `joblib` to core dependencies
+- Updated minimum PyTorch version to 2.6.0 (required by transformers 5.x, CVE-2025-32434)
+
+#### Installation
+```bash
+pip install jsf-core                        # Core backtesting engine
+pip install jsf-core[ml]                    # + NLP/sentiment (tensorflow, torch, transformers)
+pip install jsf-core[dashboard]             # + Streamlit monitoring dashboard
+pip install jsf-core[trading]               # + Alpaca live trading
+pip install jsf-core[ml,dashboard,trading]  # Everything
+```
+
+---
+
 ## [0.7.0-dev] - 2026-02-13
 
 ### Phase 19: NLP & Sentiment Analysis (Final)

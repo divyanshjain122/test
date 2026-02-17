@@ -2,7 +2,7 @@
 # JBAC Strategy Foundry (JSF-Core) - Dependencies
 # =============================================================================
 # Production-ready quantitative trading framework
-# Version: 0.7.0-dev
+# Version: 0.7.0
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ lightgbm>=4.0.0                    # Fast gradient boosting
 # Deep Learning & NLP
 tensorflow>=2.13.0                 # Neural networks (MLP, LSTM, GRU, Transformer)
 transformers>=4.30.0               # HuggingFace transformers (BERT, FinBERT for sentiment)
-torch>=2.0.0                       # PyTorch (required by some transformers models)
+torch>=2.6.0                       # PyTorch (required by transformers; install CPU build: pip install torch --index-url https://download.pytorch.org/whl/cpu)
 
 # -----------------------------------------------------------------------------
 # Monitoring Dashboard (Optional but Recommended)

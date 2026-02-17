@@ -432,8 +432,12 @@ def render_settings_page():
     st.markdown("---")
     
     st.subheader("About")
-    st.markdown("""
-    **JSF Trading Dashboard** v0.7.0-dev
+    try:
+        from jsf import __version__ as jsf_version
+    except ImportError:
+        jsf_version = "0.7.0"
+    st.markdown(f"""
+    **JSF Trading Dashboard** v{jsf_version}
     
     Part of the JBAC Strategy Foundry framework.
     
