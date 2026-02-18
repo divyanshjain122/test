@@ -145,6 +145,7 @@ def render_sidebar():
             "P&L": DashboardPage.PNL,
             "Trades": DashboardPage.TRADES,
             "Risk": DashboardPage.RISK,
+            "Backtest": DashboardPage.BACKTEST,
             "Settings": DashboardPage.SETTINGS,
         }
         
@@ -363,6 +364,15 @@ def render_risk_page():
     render_risk(st.session_state.dashboard_state, st.session_state.collector)
 
 
+def render_backtest_page():
+    """Render the interactive strategy backtesting page."""
+    try:
+        from .components.backtest import render_backtest
+    except ImportError:
+        from jsf.dashboard.components.backtest import render_backtest
+    render_backtest()
+
+
 def render_settings_page():
     """Render settings page."""
     st.title("Settings")
@@ -435,7 +445,7 @@ def render_settings_page():
     try:
         from jsf import __version__ as jsf_version
     except ImportError:
-        jsf_version = "0.7.0"
+        jsf_version = "0.7.1"
     st.markdown(f"""
     **JSF Trading Dashboard** v{jsf_version}
     
@@ -544,6 +554,8 @@ def main():
         render_trades_page()
     elif page == DashboardPage.RISK:
         render_risk_page()
+    elif page == DashboardPage.BACKTEST:
+        render_backtest_page()
     elif page == DashboardPage.SETTINGS:
         render_settings_page()
 

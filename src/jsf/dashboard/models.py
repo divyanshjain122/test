@@ -17,6 +17,7 @@ class DashboardPage(Enum):
     PNL = "pnl"
     TRADES = "trades"
     RISK = "risk"
+    BACKTEST = "backtest"
     SETTINGS = "settings"
 
 
