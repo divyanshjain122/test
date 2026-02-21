@@ -62,26 +62,26 @@ source venv/bin/activate
 ### Step 2 — Install from PyPI
 
 ```bash
-# Core backtesting engine only (lightest install)
+# Full install — backtesting + dashboard + live trading + alerts (recommended)
 pip install jsf-core
 
-# + NLP / FinBERT sentiment analysis
+# + FinBERT NLP sentiment analysis and neural network strategies
+# (adds PyTorch ~800 MB, TensorFlow ~500 MB, FinBERT ~400 MB)
 pip install jsf-core[ml]
 
-# + Streamlit monitoring dashboard
-pip install jsf-core[dashboard]
-
-# + Alpaca live/paper trading
-pip install jsf-core[trading]
-
-# + Telegram & alert system
-pip install jsf-core[alerts]
-
-# Everything at once (recommended for full feature set)
-pip install jsf-core[ml,dashboard,trading,alerts]
+# Minimal install — backtesting engine only, no dashboard / trading / alerts
+# Use this on CI servers or resource-constrained environments
+pip install jsf-core[lite]
 ```
 
-### Install from Source (development)
+After install, verify with:
+
+```bash
+jsf version
+# jsf-core version 0.7.3
+```
+
+### Install from Source (contributors)
 
 ```bash
 git clone https://github.com/JaiAnshSB26/JBAC-Strategy-Foundry.git
@@ -339,7 +339,7 @@ This wizard guides you through creating a Telegram bot and saves the credentials
 
 ## Sentiment Analysis (NLP)
 
-Requires `pip install jsf-core[ml]`. Downloads the FinBERT model (~400 MB on first run, then cached).
+Requires `pip install jsf-core[ml]` — adds PyTorch, TensorFlow, and the HuggingFace Transformers library. The FinBERT model downloads ~400 MB on first run, then caches locally.
 
 ### Single prediction
 

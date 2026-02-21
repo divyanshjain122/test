@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jsf-core"
-version = "0.7.2"
+version = "0.7.3"
 description = "JBAC Strategy Foundry - A production-grade quantitative research engine"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -38,6 +38,7 @@ classifiers = [
 ]
 
 dependencies = [
+    # --- Core math / data ---
     "numpy>=1.24.0,<2.0.0",
     "pandas>=2.0.0,<3.0.0",
     "pydantic>=2.0.0,<3.0.0",
@@ -48,34 +49,52 @@ dependencies = [
     "pyarrow>=12.0.0",
     "typing-extensions>=4.5.0",
     "tqdm>=4.65.0",
+    # --- ML baseline (lightweight) ---
     "scikit-learn>=1.3.0",
     "xgboost>=1.7.0",
     "lightgbm>=4.0.0",
     "joblib>=1.3.0",
+    # --- Dashboard ---
+    "streamlit>=1.28.0",
+    "python-dotenv>=1.0.0",
+    # --- Live trading ---
+    "alpaca-trade-api>=3.0.0",
+    # --- Alerts ---
+    "python-telegram-bot>=20.0,<21.0",
+    # --- Optimisation ---
+    "optuna>=3.2.0",
 ]
 
 [project.optional-dependencies]
+# Heavy ML / NLP models (PyTorch ~800 MB, TensorFlow ~500 MB, FinBERT ~400 MB)
+# Install when you need FinBERT sentiment analysis or neural network strategies.
 ml = [
     "tensorflow>=2.13.0",
     "torch>=2.6.0",
     "transformers>=4.30.0",
 ]
 
-dashboard = [
-    "streamlit>=1.28.0",
-    "python-dotenv>=1.0.0",
+# Minimal install — backtesting engine only, no dashboard / trading / alerts.
+# Use this on CI servers or resource-constrained environments.
+lite = [
+    "numpy>=1.24.0,<2.0.0",
+    "pandas>=2.0.0,<3.0.0",
+    "pydantic>=2.0.0,<3.0.0",
+    "scipy>=1.10.0,<2.0.0",
+    "plotly>=5.14.0,<6.0.0",
+    "typing-extensions>=4.5.0",
+    "tqdm>=4.65.0",
+    "scikit-learn>=1.3.0",
+    "xgboost>=1.7.0",
+    "lightgbm>=4.0.0",
+    "joblib>=1.3.0",
 ]
 
-trading = [
-    "alpaca-trade-api>=3.0.0",
-]
-
-alerts = [
-    "python-telegram-bot>=20.0,<21.0",
-]
-
-optimization = [
-    "optuna>=3.2.0",
+# Everything including heavy ML/NLP models
+all = [
+    "tensorflow>=2.13.0",
+    "torch>=2.6.0",
+    "transformers>=4.30.0",
 ]
 
 dev = [
@@ -89,10 +108,6 @@ dev = [
     "pre-commit>=3.3.0",
     "ipython>=8.14.0",
     "jupyter>=1.0.0",
-]
-
-all = [
-    "jsf-core[ml,dashboard,trading,alerts,optimization]",
 ]
 
 [project.urls]
