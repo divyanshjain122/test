@@ -576,7 +576,7 @@ def try_auto_connect() -> bool:
         return False
 
 
-
+def start_demo_mode():
     """Start demo mode with mock data."""
     st.session_state.collector = MockDataCollector(
         initial_capital=100000.0,
