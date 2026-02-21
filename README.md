@@ -78,7 +78,7 @@ After install, verify with:
 
 ```bash
 jsf version
-# jsf-core version 0.7.4
+# jsf-core version 0.7.5
 ```
 
 ### Install from Source (contributors)

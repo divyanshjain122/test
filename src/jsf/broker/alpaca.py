@@ -124,14 +124,22 @@ class AlpacaBroker(Broker):
         require_alpaca()
         super().__init__(name=name, **kwargs)
         
-        # API credentials
-        self.api_key = api_key or os.getenv("APCA_API_KEY_ID")
-        self.api_secret = api_secret or os.getenv("APCA_API_SECRET_KEY")
+        # API credentials — support both naming conventions
+        self.api_key = (
+            api_key
+            or os.getenv("ALPACA_API_KEY")       # jsf-core .env convention
+            or os.getenv("APCA_API_KEY_ID")       # alpaca SDK convention
+        )
+        self.api_secret = (
+            api_secret
+            or os.getenv("ALPACA_SECRET_KEY")     # jsf-core .env convention
+            or os.getenv("APCA_API_SECRET_KEY")   # alpaca SDK convention
+        )
         
         if not self.api_key or not self.api_secret:
             raise ValueError(
                 "Alpaca API credentials required. "
-                "Set api_key/api_secret or APCA_API_KEY_ID/APCA_API_SECRET_KEY env vars."
+                "Set api_key/api_secret or ALPACA_API_KEY/ALPACA_SECRET_KEY env vars."
             )
         
         # API endpoint

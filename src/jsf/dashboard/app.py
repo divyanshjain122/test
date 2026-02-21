@@ -424,18 +424,85 @@ def render_settings_page():
     st.markdown("---")
     
     st.subheader("Data Source")
-    
+
+    # ── Connection status ──────────────────────────────────────────────────
+    state = st.session_state.dashboard_state
+    if state.is_connected:
+        broker = st.session_state.get("_broker")
+        if broker is not None:
+            st.success(f"✅ Connected to Alpaca ({getattr(broker, 'base_url', 'paper')})")
+        else:
+            st.success("✅ Connected (Demo Mode)")
+    else:
+        st.warning("⚠️ Disconnected — enter API keys below or start demo mode.")
+
+    st.markdown("---")
+
+    # ── Connect to Alpaca form ─────────────────────────────────────────────
+    import os
+    st.subheader("Connect to Alpaca")
+
+    with st.form("alpaca_connect_form"):
+        prefill_key    = os.getenv("ALPACA_API_KEY", "")
+        prefill_secret = os.getenv("ALPACA_SECRET_KEY", "")
+        prefill_url    = os.getenv("ALPACA_BASE_URL", "https://paper-api.alpaca.markets")
+
+        input_key = st.text_input(
+            "API Key",
+            value=prefill_key,
+            type="password",
+            help="From alpaca.markets → Paper Trading dashboard",
+        )
+        input_secret = st.text_input(
+            "API Secret",
+            value=prefill_secret,
+            type="password",
+        )
+        input_url = st.text_input(
+            "Base URL",
+            value=prefill_url,
+            help="paper-api.alpaca.markets for paper trading",
+        )
+
+        submitted = st.form_submit_button("Connect", use_container_width=True)
+
+    if submitted:
+        if not input_key or not input_secret:
+            st.error("API key and secret are required.")
+        else:
+            with st.spinner("Connecting to Alpaca…"):
+                try:
+                    from jsf.broker.alpaca import AlpacaBroker
+                    paper = "paper" in input_url
+                    broker = AlpacaBroker(
+                        api_key=input_key,
+                        api_secret=input_secret,
+                        paper=paper,
+                        base_url=input_url,
+                    )
+                    broker.connect()
+                    connect_broker(broker, initial_capital=100_000.0)
+                    st.session_state["_broker"] = broker
+                    st.success("✅ Connected to Alpaca!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Connection failed: {e}")
+
+    st.markdown("---")
+
     col1, col2 = st.columns(2)
     
     with col1:
         if st.button("Start Demo Mode", use_container_width=True):
             start_demo_mode()
+            st.session_state.pop("_broker", None)
             st.success("Demo mode started!")
             st.rerun()
     
     with col2:
         if st.button("Disconnect", use_container_width=True):
             disconnect()
+            st.session_state.pop("_broker", None)
             st.info("Disconnected")
             st.rerun()
     
@@ -455,7 +522,61 @@ def render_settings_page():
     """)
 
 
-def start_demo_mode():
+def try_auto_connect() -> bool:
+    """Attempt to connect to Alpaca automatically using environment variables.
+    
+    Reads ALPACA_API_KEY / ALPACA_SECRET_KEY from the environment (or .env
+    file if python-dotenv is installed). If valid credentials are found,
+    creates an AlpacaBroker, connects, and wires up the DataCollector.
+    
+    Returns:
+        True if auto-connect succeeded, False otherwise.
+    """
+    # Load .env file if present (silently — no crash if missing)
+    try:
+        from dotenv import load_dotenv
+        import pathlib
+        # Look for .env in cwd and parent dirs
+        for candidate in [pathlib.Path.cwd() / ".env", pathlib.Path.cwd().parent / ".env"]:
+            if candidate.exists():
+                load_dotenv(candidate, override=False)
+                break
+    except ImportError:
+        pass
+
+    import os
+    api_key = os.getenv("ALPACA_API_KEY") or os.getenv("APCA_API_KEY_ID")
+    api_secret = os.getenv("ALPACA_SECRET_KEY") or os.getenv("APCA_API_SECRET_KEY")
+    base_url = os.getenv("ALPACA_BASE_URL", "https://paper-api.alpaca.markets")
+
+    if not api_key or not api_secret:
+        return False
+
+    try:
+        from jsf.broker.alpaca import AlpacaBroker
+        paper = "paper" in base_url
+        broker = AlpacaBroker(
+            api_key=api_key,
+            api_secret=api_secret,
+            paper=paper,
+            base_url=base_url,
+        )
+        broker.connect()
+
+        # Wire up the dashboard collector
+        connect_broker(broker, initial_capital=100_000.0)
+
+        # Store broker reference so Settings can display account info
+        st.session_state["_broker"] = broker
+        return True
+
+    except Exception as e:
+        # Don't crash the dashboard — just stay disconnected
+        st.session_state["_auto_connect_error"] = str(e)
+        return False
+
+
+
     """Start demo mode with mock data."""
     st.session_state.collector = MockDataCollector(
         initial_capital=100000.0,
@@ -524,7 +645,17 @@ def main():
     setup_page_config()
     apply_custom_css()
     init_session_state()
-    
+
+    # Auto-connect from environment variables (once per session)
+    if st.session_state.collector is None and not st.session_state.get("_auto_connect_attempted"):
+        st.session_state["_auto_connect_attempted"] = True
+        if try_auto_connect():
+            st.toast("✅ Connected to Alpaca using saved API keys", icon="✅")
+        else:
+            err = st.session_state.get("_auto_connect_error")
+            if err:
+                st.toast(f"⚠️ Auto-connect failed: {err[:80]}", icon="⚠️")
+
     # Render sidebar
     render_sidebar()
     
