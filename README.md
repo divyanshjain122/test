@@ -78,7 +78,7 @@ After install, verify with:
 
 ```bash
 jsf version
-# jsf-core version 0.7.3
+# jsf-core version 0.7.4
 ```
 
 ### Install from Source (contributors)
@@ -220,7 +220,6 @@ print(f"Max Drawdown : {result.max_drawdown:.2%}")
 ```python
 from jsf.data import load_data
 
-# Requires: pip install jsf-core[trading]
 # Set ALPACA_API_KEY and ALPACA_SECRET_KEY in environment or .env file
 data = load_data(
     source="alpaca",
@@ -269,8 +268,6 @@ The Streamlit dashboard provides a live monitoring UI with P&L, positions, trade
 ### Launch
 
 ```bash
-# Requires: pip install jsf-core[dashboard]
-
 # Option 1: CLI command (recommended)
 jsf dashboard
 
@@ -310,7 +307,6 @@ Go to **Settings** in the dashboard sidebar and enter your Alpaca API key and se
 Connect to Alpaca paper trading to run strategies with real-time market data (no real money).
 
 ```python
-# Requires: pip install jsf-core[trading,alerts]
 from jsf.broker import AlpacaBroker
 from jsf.live import LiveTradingEngine, EngineConfig
 from jsf.strategies import MomentumStrategy
