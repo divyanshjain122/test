@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jsf-core"
-version = "0.7.1"
+version = "0.7.2"
 description = "JBAC Strategy Foundry - A production-grade quantitative research engine"
 readme = "README.md"
 requires-python = ">=3.9"

@@ -445,7 +445,7 @@ def render_settings_page():
     try:
         from jsf import __version__ as jsf_version
     except ImportError:
-        jsf_version = "0.7.1"
+        jsf_version = "0.7.2"
     st.markdown(f"""
     **JSF Trading Dashboard** v{jsf_version}
     

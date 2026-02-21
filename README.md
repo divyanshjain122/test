@@ -186,17 +186,17 @@ See [`config.example.yml`](config.example.yml) for all available options includi
 ### Backtesting a Strategy
 
 ```python
-from jsf.data import SyntheticDataLoader
+from jsf.data import load_data
 from jsf.strategies import MomentumStrategy
 from jsf.simulation import BacktestEngine, BacktestConfig
 
-# Load data (no API key needed — uses synthetic data)
-loader = SyntheticDataLoader(
+# Load synthetic data (no API key needed)
+data = load_data(
+    source="synthetic",
     symbols=["AAPL", "GOOGL", "MSFT", "AMZN"],
     start_date="2020-01-01",
     end_date="2023-12-31",
 )
-data = loader.load()
 
 # Create strategy
 strategy = MomentumStrategy(name="momentum_60d", lookback=60, long_only=True)
@@ -213,21 +213,21 @@ result = engine.run_strategy(strategy, data)
 print(f"Total Return : {result.total_return:.2%}")
 print(f"Sharpe Ratio : {result.sharpe_ratio:.2f}")
 print(f"Max Drawdown : {result.max_drawdown:.2%}")
-print(f"Win Rate     : {result.win_rate:.2%}")
 ```
 
 ### Backtesting with Real Data (Alpaca)
 
 ```python
-from jsf.data import AlpacaDataLoader
+from jsf.data import load_data
 
-loader = AlpacaDataLoader(
+# Requires: pip install jsf-core[trading]
+# Set ALPACA_API_KEY and ALPACA_SECRET_KEY in environment or .env file
+data = load_data(
+    source="alpaca",
     symbols=["AAPL", "MSFT"],
     start_date="2023-01-01",
     end_date="2023-12-31",
-    # Reads ALPACA_API_KEY and ALPACA_SECRET_KEY from .env automatically
 )
-data = loader.load()
 ```
 
 ### Custom Signal
@@ -245,10 +245,15 @@ class MyMomentumSignal(BaseSignal):
         )
 ```
 
-### Running from Examples
+### Running the Example Scripts
+
+Example scripts are included in the repository (not in the pip package). Clone the repo to run them:
 
 ```bash
-# With venv activated:
+git clone https://github.com/JaiAnshSB26/JBAC-Strategy-Foundry.git
+cd JBAC-Strategy-Foundry
+pip install -e ".[dev]"
+
 python examples/quickstart.py                   # Simple backtest
 python examples/complete_backtest_example.py    # Full metrics + charts
 python examples/ml_example.py                   # ML strategy
@@ -259,18 +264,18 @@ python examples/paper_trading_alerts.py         # Live paper trading
 
 ## Running the Dashboard
 
-The Streamlit dashboard provides a live monitoring UI with P&L, positions, trades, and risk analytics.
+The Streamlit dashboard provides a live monitoring UI with P&L, positions, trades, risk analytics, and interactive backtesting.
 
 ### Launch
 
 ```bash
-# Activate venv first, then:
+# Requires: pip install jsf-core[dashboard]
 
-# Windows
-python -m streamlit run src\jsf\dashboard\app.py
+# Option 1: CLI command (recommended)
+jsf dashboard
 
-# macOS / Linux
-python -m streamlit run src/jsf/dashboard/app.py
+# Option 2: Python module
+python -m jsf.dashboard
 ```
 
 Opens at **http://localhost:8501**
@@ -287,9 +292,11 @@ Click **"Start Demo Mode"** in the sidebar. This instantly generates:
 | Page | What it shows |
 |---|---|
 | **Overview** | Current positions table, allocation pie chart |
+| **Portfolio** | Detailed position breakdown, weights, sector allocation |
 | **P&L** | Equity curve, drawdown, daily returns, monthly heatmap, date range filters |
 | **Trades** | Full trade history, buy/sell breakdown, filters by symbol/date, CSV export |
 | **Risk** | VaR, CVaR, volatility, Calmar ratio, exposure analysis |
+| **Backtest** | Interactive strategy tester with all 3 strategy types, parameter sliders, equity/drawdown charts |
 | **Settings** | Connection status, version info, auto-refresh interval |
 
 ### Connect to Your Alpaca Account
@@ -300,17 +307,30 @@ Go to **Settings** in the dashboard sidebar and enter your Alpaca API key and se
 
 ## Live Paper Trading
 
-```bash
-# With venv activated:
-python examples/paper_trading_alerts.py
+Connect to Alpaca paper trading to run strategies with real-time market data (no real money).
+
+```python
+# Requires: pip install jsf-core[trading,alerts]
+from jsf.broker import AlpacaBroker
+from jsf.live import LiveTradingEngine, EngineConfig
+from jsf.strategies import MomentumStrategy
+
+# Initialize broker (reads from ALPACA_API_KEY env var)
+broker = AlpacaBroker(paper=True)
+
+# Create strategy
+strategy = MomentumStrategy(name="live_momentum", lookback=20)
+
+# Configure and start engine
+config = EngineConfig(symbols=["AAPL", "MSFT"], poll_interval=60)
+engine = LiveTradingEngine(broker=broker, strategy=strategy, config=config)
+engine.start()
 ```
 
-This connects to Alpaca paper trading, generates signals, places orders automatically, and sends Telegram alerts for every trade.
-
-**Set up Telegram in 2 minutes:**
+**Set up Telegram alerts:**
 
 ```bash
-python -m jsf.cli.setup_telegram
+jsf setup-telegram
 ```
 
 This wizard guides you through creating a Telegram bot and saves the credentials to `.env`.
