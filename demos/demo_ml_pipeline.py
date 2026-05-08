@@ -32,9 +32,13 @@ from jsf.data import PriceData, load_data
 from jsf.data.sources.yahoo import YahooFinanceLoader, YFINANCE_AVAILABLE
 
 # Use real stock data
-symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
+# symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
+symbols = [
+    'AAPL', 'NVDA', 'AMZN', 'TSLA', 'MSFT', 'SHW', 
+    'JPM', 'BAC', 'WFC', 'HD', 'V', 'GS', 'PG', 'XOM', 'DIS'
+]
 start_date = '2022-01-01'
-end_date = '2024-12-31'
+end_date = '2022-12-31'
 
 use_real_data = False
 if YFINANCE_AVAILABLE:
