@@ -1,0 +1,35 @@
+{
+  "run_timestamp": "2026-05-09_15-03-11",
+  "output_directory": "resultLogs/2026-05-09_15-03-11rf-200-8-regression-6525",
+  "symbols": [
+    "AAPL",
+    "NVDA",
+    "AMZN",
+    "TSLA",
+    "MSFT",
+    "SHW",
+    "JPM",
+    "BAC",
+    "WFC",
+    "HD",
+    "V",
+    "GS",
+    "PG",
+    "XOM",
+    "DIS"
+  ],
+  "start_date": "2019-01-01",
+  "end_date": "2019-12-31",
+  "price_start": "2017-11-07",
+  "warmup_days": 420,
+  "initial_capital": 100000.0,
+  "transaction_cost": 0.001,
+  "slippage": 0.0005,
+  "news_file": "filtered_stock_data.csv",
+  "strategies": [
+    "Baseline Tech",
+    "Tech + Sentiment",
+    "ML Only",
+    "ML + Sentiment"
+  ]
+}

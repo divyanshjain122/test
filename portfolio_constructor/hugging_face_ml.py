@@ -99,6 +99,37 @@ def export_portfolio_weights(name, portfolio, price_index, symbols):
         scale=100.0,
     )
 
+def export_date_wise_news(news_df):
+    """Export cleaned news articles and daily stock-level news counts."""
+    detail_columns = ["date", "symbol", "source", "text"]
+    if "sentiment_score" in news_df.columns:
+        detail_columns.append("sentiment_score")
+
+    if news_df.empty:
+        pd.DataFrame(columns=detail_columns).to_csv(
+            OUTPUT_DIR / "date_wise_stock_news.csv",
+            index=False,
+        )
+        pd.DataFrame(columns=["date", "symbol", "news_count", "avg_sentiment_score"]).to_csv(
+            OUTPUT_DIR / "date_wise_stock_news_summary.csv",
+            index=False,
+        )
+        return
+
+    news_log = news_df.copy()
+    news_log = news_log.sort_values(["date", "symbol", "source", "text"])
+    news_log[detail_columns].to_csv(OUTPUT_DIR / "date_wise_stock_news.csv", index=False)
+
+    aggregations = {"text": "count"}
+    if "sentiment_score" in news_log.columns:
+        aggregations["sentiment_score"] = "mean"
+
+    summary = news_log.groupby(["date", "symbol"], as_index=False).agg(aggregations)
+    summary = summary.rename(columns={"text": "news_count", "sentiment_score": "avg_sentiment_score"})
+    if "avg_sentiment_score" not in summary.columns:
+        summary["avg_sentiment_score"] = np.nan
+    summary.to_csv(OUTPUT_DIR / "date_wise_stock_news_summary.csv", index=False)
+
 def export_run_details(start_date, end_date, price_start, warmup_days):
     """Export run configuration details for reproducibility."""
     details = {
@@ -209,12 +240,14 @@ def main():
 
         # Map scores back to the full news dataframe
         news_df["sentiment_score"] = news_df["text_hash"].map(sentiment_cache)
+        export_date_wise_news(news_df)
         
         daily_sent = news_df.groupby(["date", "symbol"])["sentiment_score"].mean().unstack()
         daily_sent = daily_sent.reindex(index=close_prices.index, columns=close_prices.columns).fillna(0.0)
         sentiment_signal = daily_sent.rolling(window=3, min_periods=1).mean()
         sentiment_signal = sentiment_signal.where(sentiment_signal.abs() >= 0.15, 0.0)
     else:
+        export_date_wise_news(news_df)
         sentiment_signal = pd.DataFrame(0.0, index=close_prices.index, columns=close_prices.columns)
 
     export_daily_matrix(

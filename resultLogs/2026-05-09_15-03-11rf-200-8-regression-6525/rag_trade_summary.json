@@ -1,0 +1,218 @@
+{
+  "strategy": "tech_sentiment",
+  "question": "Summarize trades made and explain likely reasoning using retrieved news and sentiment logs.",
+  "lookback_days": 3,
+  "min_change_pct": 5.0,
+  "events_considered": [
+    {
+      "date": "2019-01-10 00:00:00",
+      "symbol": "PG",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 50.9529,
+      "change_pct": 50.9529
+    },
+    {
+      "date": "2019-01-10 00:00:00",
+      "symbol": "HD",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 49.0471,
+      "change_pct": 49.0471
+    },
+    {
+      "date": "2019-01-11 00:00:00",
+      "symbol": "HD",
+      "action": "increase",
+      "previous_weight_pct": 49.0471,
+      "new_weight_pct": 100.0,
+      "change_pct": 50.9529
+    },
+    {
+      "date": "2019-01-11 00:00:00",
+      "symbol": "PG",
+      "action": "exit",
+      "previous_weight_pct": 50.9529,
+      "new_weight_pct": 0.0,
+      "change_pct": -50.9529
+    },
+    {
+      "date": "2019-01-14 00:00:00",
+      "symbol": "BAC",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 100.0,
+      "change_pct": 100.0
+    },
+    {
+      "date": "2019-01-14 00:00:00",
+      "symbol": "HD",
+      "action": "exit",
+      "previous_weight_pct": 100.0,
+      "new_weight_pct": 0.0,
+      "change_pct": -100.0
+    },
+    {
+      "date": "2019-01-15 00:00:00",
+      "symbol": "BAC",
+      "action": "reduce",
+      "previous_weight_pct": 100.0,
+      "new_weight_pct": 53.2789,
+      "change_pct": -46.7211
+    },
+    {
+      "date": "2019-01-15 00:00:00",
+      "symbol": "SHW",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 46.7211,
+      "change_pct": 46.7211
+    },
+    {
+      "date": "2019-03-14 00:00:00",
+      "symbol": "DIS",
+      "action": "increase",
+      "previous_weight_pct": 2.1925,
+      "new_weight_pct": 39.3344,
+      "change_pct": 37.1419
+    },
+    {
+      "date": "2019-03-19 00:00:00",
+      "symbol": "DIS",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 40.0686,
+      "change_pct": 40.0686
+    },
+    {
+      "date": "2019-05-21 00:00:00",
+      "symbol": "AMZN",
+      "action": "reduce",
+      "previous_weight_pct": 62.0287,
+      "new_weight_pct": 15.0174,
+      "change_pct": -47.0113
+    },
+    {
+      "date": "2019-05-22 00:00:00",
+      "symbol": "PG",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 88.6298,
+      "change_pct": 88.6298
+    },
+    {
+      "date": "2019-05-22 00:00:00",
+      "symbol": "WFC",
+      "action": "exit",
+      "previous_weight_pct": 42.7376,
+      "new_weight_pct": 0.0,
+      "change_pct": -42.7376
+    },
+    {
+      "date": "2019-05-23 00:00:00",
+      "symbol": "GS",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 44.5285,
+      "change_pct": 44.5285
+    },
+    {
+      "date": "2019-05-28 00:00:00",
+      "symbol": "PG",
+      "action": "increase",
+      "previous_weight_pct": 34.0905,
+      "new_weight_pct": 85.97,
+      "change_pct": 51.8795
+    },
+    {
+      "date": "2019-05-30 00:00:00",
+      "symbol": "PG",
+      "action": "reduce",
+      "previous_weight_pct": 100.0,
+      "new_weight_pct": 42.0445,
+      "change_pct": -57.9555
+    },
+    {
+      "date": "2019-06-06 00:00:00",
+      "symbol": "V",
+      "action": "exit",
+      "previous_weight_pct": 75.2438,
+      "new_weight_pct": 0.0,
+      "change_pct": -75.2438
+    },
+    {
+      "date": "2019-06-10 00:00:00",
+      "symbol": "SHW",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 100.0,
+      "change_pct": 100.0
+    },
+    {
+      "date": "2019-06-12 00:00:00",
+      "symbol": "SHW",
+      "action": "reduce",
+      "previous_weight_pct": 81.0927,
+      "new_weight_pct": 33.2465,
+      "change_pct": -47.8462
+    },
+    {
+      "date": "2019-08-27 00:00:00",
+      "symbol": "SHW",
+      "action": "increase",
+      "previous_weight_pct": 43.3788,
+      "new_weight_pct": 100.0,
+      "change_pct": 56.6212
+    },
+    {
+      "date": "2019-08-29 00:00:00",
+      "symbol": "MSFT",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 48.597,
+      "change_pct": 48.597
+    },
+    {
+      "date": "2019-08-30 00:00:00",
+      "symbol": "HD",
+      "action": "new_position",
+      "previous_weight_pct": 0.0,
+      "new_weight_pct": 52.0736,
+      "change_pct": 52.0736
+    },
+    {
+      "date": "2019-08-30 00:00:00",
+      "symbol": "MSFT",
+      "action": "exit",
+      "previous_weight_pct": 48.597,
+      "new_weight_pct": 0.0,
+      "change_pct": -48.597
+    },
+    {
+      "date": "2019-09-03 00:00:00",
+      "symbol": "HD",
+      "action": "reduce",
+      "previous_weight_pct": 52.0736,
+      "new_weight_pct": 14.8082,
+      "change_pct": -37.2655
+    },
+    {
+      "date": "2019-12-13 00:00:00",
+      "symbol": "DIS",
+      "action": "reduce",
+      "previous_weight_pct": 50.2594,
+      "new_weight_pct": 8.0611,
+      "change_pct": -42.1983
+    }
+  ],
+  "metric_summary": {
+    "final_value": 143409.1223192822,
+    "net_total_return": 0.434091223192822,
+    "gross_total_return": 0.5803440071740558,
+    "sharpe_ratio": 2.8514412880098554,
+    "max_drawdown": -0.0700460886147571,
+    "volatility": 0.1660788465611705,
+    "win_rate": 0.5657370517928287
+  },
+  "prompt_preview": "You are an investment research assistant. Use only the provided backtest logs and retrieved news context. Do not claim that the strategy actually read these articles unless the logs prove it. Phrase news links as likely context or possible explanation. User question: Summarize trades made and explain likely reasoning using retrieved news and sentiment logs. Run details: { \"run_timestamp\": \"2026-05-09_15-03-11\", \"output_directory\": \"resultLogs/2026-05-09_15-03-11rf-200-8-regression-6525\", \"symbols\": [ \"AAPL\", \"NVDA\", \"AMZN\", \"TSLA\", \"MSFT\", \"SHW\", \"JPM\", \"BAC\", \"WFC\", \"HD\", \"V\", \"GS\", \"PG\", \"XOM\", \"DIS\" ], \"start_date\": \"2019-01-01\", \"end_date\": \"2019-12-31\", \"price_start\": \"2017-11-07\", \"warmup_days\": 420, \"initial_capital\": 100000.0, \"transaction_cost\": 0.001, \"slippage\": 0.0005, \"news_file\": \"filtered_stock_data.csv\", \"strategies\": [ \"Baseline Tech\", \"Tech + Sentiment\", \"ML Only\", \"ML + Sentiment\" ] } Selected strategy metrics: { \"final_value\": 143409.1223192822, \"net_total_return\": 0.434091223192822, \"gross_total_return\": 0.5803440071740558, \"sharpe_ratio\": 2.8514412880098554, \"max_drawdown\": -0.0700460886147571, \"volatility\": 0.1660788465611705, \"win_rate\": 0.5657370517928287 } Retrieved trade and news context: Trade date: 2019-01-10 | Symbol: PG | Action: new_position Weight: 0.00% -> 50.95% (+50.95 pts) Daily news summary: - 2019-01-07: 2 articles, avg sentiment 0.0 - 2019-01-08: 6 articles, avg sentiment -0.3250472744305928 Sentiment signal: - 2019-01-07: 0.0 - 2019-01-08: 0.0 - 2019-01-09: 0.0 - 2019-01-10: 0.0 Relevant headlines: - 2019-01-08 | Christopher Dier-Scalise | sentiment -0.9751418232917786: TD Ameritrade IMX Continued Its Dip In December, Falling To A More Than Two-Year Low - 2019-01-08 | Benzinga_Newsdesk | sentiment 0.0: Bank of America Reiterates Buy on Procter & Gamble Adds To US1 List - 2019-01-08 | Wayne Duggan | sentiment 0.0: 4 Reasons Why Bank Of America Added Procter & Gamble To Its US1 Lists - 2019-01-07 | TD Ameritrade | sentiment 0.0: Investor Movement Index December Summary Trade date: 2019-01-10 | Symbol: HD | Action: new_position Weight: 0.00% -> 49.05% (+49.05 pts) Daily news summary: - 2019-01-07: 6 articles, avg sentiment 0.437566061814626 - 2019-01-08: 8 articles, avg sentiment 0.4512277841567993 - 2019-01-09: 12 articles, avg sentiment 0.023055076599121 - 2019-01-10: 6 articles, avg sentiment 0.3137174646059672 Sentiment signal: - 2019-01-07: 0.0 - 2019-01-08: 0.2962646153238084 - 2019-01-09: 0.3039496408568488 - 2019-01-10: 0.2626667751206292 Relevant headlines: - 2019-01-10 | Seeking Alpha | sentiment 0.9411523938179016: Lockheed Martin: Steady Dividend Increases And Share Buybacks Will Drive Stock Price - 2019-01-10 | Seeking Alpha | sentiment 0.0: Monthly Review Of DivGro: December 2018 - 2019-01-10 | Zacks | sentiment 0.0: Should You Invest in the Fidelity MSCI Consumer Discretionary Index ETF (FDIS)? - 2019-01-09 | GuruFocus | sentiment 0.8637474179267883: US Market Indexes Continue Rally With Fourth Day of Closing Gains - 2019-01-09 | Seeking Alpha | sentiment -0.7254169583320618: Four retailers seen nabbing Sears sales Trade date: 2019-01-11 | Symbol: HD | Action: increase Weight: 49.05% -> 100.00% (+50.95 pts) Daily news summary: - 2019-01-08: 8 articles, avg sentiment 0.4512277841567993 - 2019-01-09: 12 articles, avg sentiment 0.023055076599121 - 2019-01-10: 6 articles, avg sentiment 0.3137174646059672 Sentiment signal: - 2019-01-08: 0.2962646153238084 - 2019-01-09: 0.3039496408568488 - 2019-01-10: 0.2626667751206292 - 2019-01-11: 0.0 Relevant headlines: - 2019-01-10 | Seeking Alpha | sentiment 0.9411523938179016: Lockheed Martin: Steady Dividend Increases And Share Buybacks Will Drive Stock Price - 2019-01-10 | Seeking Alpha | sentiment 0.0: Monthly Review Of DivGro: December 2018 - 2019-01-10 | Zacks | sentiment 0.0: Should You Invest in the Fidelity MSCI Consumer Discretionary Index ETF (FDIS)? - 2019-01-09 | GuruFocus | sentiment 0.8637474179267883: US\n...[truncated]"
+}

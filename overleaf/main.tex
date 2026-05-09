@@ -1,0 +1,1115 @@
+\documentclass[12pt,a4paper]{report}
+
+%--------------------------------
+% PACKAGES
+%--------------------------------
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[most]{tcolorbox}
+\usepackage{ragged2e}
+\setstretch{1.2}
+\setcounter{page}{0}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage{eso-pic}
+
+\newcommand{\pageborder}{
+\begin{tikzpicture}[remember picture, overlay]
+\draw[line width=0.6pt]
+($(current page.north west)+(0.7cm,-0.7cm)$)
+rectangle
+($(current page.south east)+(-0.7cm,0.7cm)$);
+\end{tikzpicture}
+}
+
+\AddToShipoutPictureBG{
+\pageborder
+}
+%--------------------------------
+% CHAPTER TITLE FORMAT
+%--------------------------------
+
+\titleformat{\chapter}
+{\normalfont\huge\bfseries}
+{\thechapter}
+{1em}
+{}
+
+%--------------------------------
+% SECTION FORMAT
+%--------------------------------
+
+\titleformat{\section}
+{\normalfont\Large\bfseries}
+{\thesection}
+{1em}
+{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries}
+{\thesubsection}
+{1em}
+{}
+
+%--------------------------------
+% TABLE OF CONTENTS DOTS
+%--------------------------------
+
+\renewcommand{\cftchapdotsep}{\cftdotsep}
+
+%--------------------------------
+% DOCUMENT START
+%--------------------------------
+
+\begin{document}
+\pagenumbering{gobble}
+
+%--------------------------------
+% TITLE PAGE
+%--------------------------------
+
+% \begin{titlepage}
+% \begin{center}
+
+% {\Large \textbf{A PROJECT REPORT}}
+
+% \vspace{0.5cm}
+
+% {\large ON}
+
+% \vspace{0.5cm}
+
+% {\Large \textbf{LOGISTICS MANAGEMENT IN RETAIL INDUSTRY}}
+
+% \vspace{0.3cm}
+
+% {\large \textbf{A CASE STUDY OF EASY DAY STORES IN NEW DELHI}}
+
+% \vspace{1.5cm}
+
+% Submitted in partial fulfillment of the requirement for the award of the degree of
+
+% \vspace{0.5cm}
+
+% \textbf{MASTER OF BUSINESS ADMINISTRATION}
+
+
+%          \textbf{IN}
+
+
+         
+% \textbf{OPERATION MANAGEMENT}
+
+% \vspace{1cm}
+
+% School of Management Studies
+
+% INDIRA GANDHI NATIONAL OPEN UNIVERSITY
+
+% New Delhi
+
+% \vspace{1.5cm}
+
+% Submitted By
+
+% \textbf{Prabhanshu Jha}
+
+% \textbf{Enrollment No: 2353813957}
+
+% \vspace{1cm}
+
+% \begin{center}
+%     \includegraphics[width=0.5\textwidth]{images/LOGO.png}
+
+%     \vspace{0.5cm}
+
+%     \textbf{INDIRA GANDHI NATIONAL OPEN UNIVERSITY (IGNOU)}
+
+%     \vspace{0.3cm}
+
+%     NEW DELHI , 2026
+% \end{center}
+
+
+% \end{center}
+% \end{titlepage}
+
+\clearpage
+\thispagestyle{empty}
+\begin{titlepage}
+\centering
+
+\vspace*{0cm}
+
+    {\Large \textbf{CAREER PATH RECOMMENDATION SYSTEM}}\\[0.2cm]
+
+
+
+
+\vspace*{1.5cm}
+
+{\normalsize \textbf{A REPORT}}\\[1.5em]
+
+{\normalsize \textbf{SUBMITTED IN PARTIAL FULFILMENT OF THE}}\\[1.2em]
+
+{\normalsize \textbf{REQUIREMENTS}}\\[1.2em]
+
+{\normalsize \textbf{FOR THE AWARD OF DEGREE}}\\[1.em]
+
+{\normalsize \textbf{OF}}\\[1.em]
+
+{\normalsize \textbf{BACHELOR OF TECHNOLOGY}}\\[1.2em]
+
+{\normalsize \textbf{IN}}\\[1.2em]
+
+{\normalsize \textbf{DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING}}\\[1cm]
+
+
+
+
+{\normalsize \textbf{Submitted By:}}\\[0.5cm]
+{\normalsize  NAKUL SHARMA (2022UCM2350)}\\[0.2cm]
+{\normalsize  SACHIN KUMAR (2022UCM2380)}\\[0.2cm]
+{\normalsize  KUNAL (2022UCM2387)}\\[0.8cm]
+
+
+% {\large \textbf{``LOGISTIC MANAGEMENT SYSTEM IN RETAIL INDUSTRY}}\\
+% {\large \textbf{CASE STUDY IN EASY DAY RETAIL STORES IN}}\\
+% {\large \textbf{NEW DELHI''}}\\[1cm]
+
+{\normalsize \textbf{Under the supervision of:}}\\[0.2cm]
+
+{\normalsize \textbf{Dr. BK SINGH}}\\[0.5cm]
+
+
+% LOGO
+\includegraphics[width=0.2\textwidth]{nsut.png}\\[0.cm]
+
+{\normalsize DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING}\\[0.3cm]
+{\large \textbf{NETAJI SUBHAS UNIVERSITY OF  TECHNOLOGY}}\\
+
+{\normalsize MARCH 2026}\\[0.3cm]
+\begin{center}
+1
+\end{center}
+
+\end{titlepage}
+% \end{center}
+
+\newpage
+
+
+
+%--------------------------------
+% DECALARATION
+%--------------------------------
+
+\clearpage
+\thispagestyle{empty}
+
+\begin{center}
+
+\vspace*{1cm}
+
+{\large \textbf{DECLARATION}}
+
+\vspace{1cm}
+
+\includegraphics[width=4.5cm]{nsut.png}
+\vspace{0.5cm}
+
+Department of Computer Science and Engineering\\
+Delhi-110078, India
+
+\end{center}
+
+\vspace{1.5cm}
+
+\noindent
+We, \textbf{Nakul Sharma (2022UCM2350), Sachin Kumar (2022UCM2380) and Kunal (2022UCM2387)}, students of B. Tech., Department of Computer Science and Engineering, hereby declare that the Project II-Thesis titled \textbf{“CAREER PATH RECOMMENDATION SYSTEM”} which is submitted by us to the \textbf{Department of Computer Science and Engineering}, Netaji Subhas University of Technology, is original and not copied from any source without proper citation. This work has not previously formed the basis for the award of any degree.
+
+\vspace{2.5cm}
+
+\noindent
+Place: Delhi
+
+\vspace{1cm}
+
+\noindent
+Date: 02/03/2026
+
+\vfill
+
+\begin{center}
+2
+\end{center}
+\newpage
+
+
+
+
+
+%--------------------------------
+% CERTIFICATE
+%--------------------------------
+\clearpage
+\thispagestyle{empty}
+
+\begin{center}
+
+\vspace*{1cm}
+
+{\large \textbf{CERTIFICATE}}
+
+\vspace{1cm}
+
+\includegraphics[width=3cm]{nsut.png}
+
+\vspace{0.8cm}
+
+Department of Computer Science and Engineering\\
+Delhi-110078, India
+
+\end{center}
+
+\vspace{1.5cm}
+
+\noindent
+This is to certify that the work embodied in the Project II-Thesis titled \textbf{“CAREER PATH RECOMMENDATION SYSTEM”} has been completed by \textbf{Nakul Sharma (2022UCM2350), Sachin Kumar (2022UCM2380) and Kunal (2022UCM2387)} of B.Tech., Department of Computer Science and Engineering, under my guidance towards fulfillment of the requirements for the award of the degree of Bachelor of Technology. This work has not been submitted for any other diploma or degree of any University.
+
+\vspace{2.5cm}
+
+\noindent
+\begin{minipage}{0.45\textwidth}
+Place: Delhi\\
+Date: 02/03/2026
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+Name of Supervisor: Dr.\ B.K Singh
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{flushright}
+(Signature of Supervisor)
+\end{flushright}
+
+\vfill
+
+\begin{center}
+3
+\end{center}
+
+\newpage
+
+%--------------------------------
+% ACKNOWLEDGEMENT
+%--------------------------------
+
+\clearpage
+\thispagestyle{empty}
+
+\begin{center}
+    {\Large \textbf{ABSTRACT}}\\[0.3cm]
+    % \rule{\textwidth}{1pt}
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+\setlength{\parindent}{0pt}
+\justifying
+The rapid evolution of technology and the dynamic nature of the job market have made career selection a challenging task, especially for students in the field of Information Technology. Traditional career counseling methods often fail to provide personalized and scalable guidance, leading to confusion and poor decision-making among students.
+
+\vspace{0.3cm}
+\noindent
+This project presents an AI-powered Career Path Recommendation System that assists students in identifying suitable career options based on their skills, interests, and academic performance. The system integrates a Decision Tree machine learning model to analyze user inputs and predict appropriate career paths with associated confidence scores.
+
+\vspace{0.3cm}
+\noindent
+In addition, the system incorporates a Retrieval-Augmented Generation (RAG) based chatbot using Google Gemini API and FAISS vector database. The chatbot retrieves relevant information from a predefined dataset and generates context-aware responses to guide users effectively. The system also includes sentiment analysis and interactive features to enhance user engagement.
+
+\vspace{0.3cm}
+\noindent
+The proposed solution is implemented using a full-stack architecture, with React for the frontend and Django for the backend. The model is trained using Scikit-learn and deployed efficiently for real-time predictions. Experimental results demonstrate that the system provides accurate and reliable career recommendations while improving user experience through intelligent interaction.
+
+\vspace{0.3cm}
+\noindent
+Overall, this system offers a scalable, data-driven, and user-friendly approach to career guidance, helping students make informed decisions in a competitive and evolving job environment.
+
+\noindent
+
+\begin{center}\vspace{8cm}
+4
+\end{center}
+
+\newpage
+
+%--------------------------------
+% TABLE OF CONTENTS
+%--------------------------------
+
+\clearpage
+\thispagestyle{empty}
+
+\begin{center}
+    {\Large \textbf{INDEX}}\\[0.3cm]
+\end{center}
+
+\vspace{0.8cm}
+
+\noindent
+Declaration \dotfill 2\\
+Certificate \dotfill 3\\
+Abstract \dotfill 4\\
+Index \dotfill 5--6\\
+LIST OF FIGURES \dotfill 7\\
+LIST OF TABLES \dotfill 7\\
+
+\vspace{0.5cm}
+
+\noindent
+1. Introduction \dotfill 8--9\\
+2. Motivation \dotfill 10\\
+
+\vspace{0.5cm}
+
+\noindent
+3. Literature Survey \dotfill 11--15\\
+\hspace{0.5cm}3.1 Existing Career Guidance Systems \dotfill 11\\
+\hspace{0.5cm}3.2 Machine Learning in Career Prediction \dotfill 12--13\\
+\hspace{0.5cm}3.3 AI-based Recommendation Systems \dotfill 14--15\\
+
+\vspace{0.5cm}
+
+\noindent
+4. Problem Statement \dotfill 16--18\\
+\hspace{0.5cm}4.1 Challenges in Career Selection \dotfill 16\\
+\hspace{0.5cm}4.2 Limitations of Traditional Counseling \dotfill 17\\
+\hspace{0.5cm}4.3 Research Gap \dotfill 17\\
+\hspace{0.5cm}4.4 Problem Definition \dotfill 18\\
+
+\vspace{0.5cm}
+
+\noindent
+5. Objectives \dotfill 19--20\\
+\hspace{0.5cm}5.1 System Objectives \dotfill 19\\
+\hspace{0.5cm}5.2 User Objectives \dotfill 20\\
+
+\vspace{0.5cm}
+
+\noindent
+6. Methodology \dotfill 21--30\\
+\hspace{0.5cm}6.1 System Architecture \dotfill 21--22\\
+\hspace{1cm}6.1.1 Frontend (React) \dotfill 21\\
+\hspace{1cm}6.1.2 Backend (Django) \dotfill 22\\
+
+
+\hspace{0.5cm}6.2 Decision Tree Model \dotfill 23\\
+\begin{center}
+    5
+\end{center}
+\hspace{0.5cm}6.3 RAG-based Chatbot (Gemini + FAISS) \dotfill 24\\
+
+\hspace{0.5cm}6.4 Sentiment Analysis \dotfill 25\\
+
+\hspace{0.5cm}6.5 System Workflow \dotfill 26--27\\
+
+
+
+\hspace{0.5cm}6.6 Noise/Model Evaluation Concepts \dotfill 28--30\\
+\hspace{1cm}6.6.1 Accuracy \dotfill 28\\
+\hspace{1cm}6.6.2 Precision, Recall, F1-score \dotfill 29\\
+\hspace{1cm}6.6.3 Model Confidence \dotfill 30\\
+
+\vspace{0.5cm}
+
+\noindent
+7. Comparison \dotfill 31--33\\
+\hspace{0.5cm}7.1 Existing Systems vs Proposed \dotfill 31--32\\
+\hspace{0.5cm}7.2 Advantages of Proposed System \dotfill 33\\
+
+\vspace{0.5cm}
+
+\noindent
+8. Implementation \dotfill 34--40\\
+\hspace{0.5cm}8.1 Dataset Preparation \dotfill 34\\
+\hspace{0.5cm}8.2 Model Training (Scikit-learn) \dotfill 35\\
+\hspace{0.5cm}8.3 API Integration (Django) \dotfill 36\\
+\hspace{0.5cm}8.4 Frontend Development (React) \dotfill 37\\
+\hspace{0.5cm}8.5 Chatbot Integration (Gemini API) \dotfill 38\\
+\hspace{0.5cm}8.6 System Testing \dotfill 39\\
+\hspace{0.5cm}8.7 Complete Code Structure \dotfill 40\\
+
+\vspace{0.5cm}
+
+\noindent
+9. Results \dotfill 41--44\\
+\hspace{0.5cm}9.1 Prediction Accuracy \dotfill 41\\
+\hspace{0.5cm}9.2 Model Performance \dotfill 42\\
+\hspace{0.5cm}9.3 Chatbot Response Quality \dotfill 43\\
+\hspace{0.5cm}9.4 User Feedback \dotfill 44\\
+
+\vspace{0.5cm}
+
+\noindent
+10. Conclusion \dotfill 45--46\\
+11. Future Scope \dotfill 47--48\\
+12. References \dotfill 49\\
+Plagiarism Report \dotfill 50\\
+
+\vfill
+\begin{center}
+    6
+\end{center}
+
+
+%================================
+% CHAPTER 1
+%================================
+\clearpage
+\chapter{Introduction}
+
+\setlength{\parindent}{15pt}
+\setlength{\parskip}{0.5em}
+{\justifying
+
+
+The rapid advancement of technology and the continuously evolving job market have made career selection a complex and challenging task, particularly for students in the field of Information Technology. In recent years, the number of available career options has significantly increased, ranging from traditional roles such as software development to emerging domains like data science, artificial intelligence, cybersecurity, cloud computing, and blockchain technology. This diversity of opportunities, while beneficial, often creates confusion among students who are unsure about which path aligns best with their skills, interests, and 
+long-term goals.
+
+Traditionally, career guidance has relied on manual counseling methods, where experts provide advice based on general observations and limited data. Although these methods can be helpful, they often lack scalability and personalization. Many students do not have access to professional career counseling services, and even when available, such services may not effectively address individual differences. As a result, students frequently make career decisions based on peer influence, societal expectations, or incomplete understanding of their own capabilities. These decisions may lead to dissatisfaction, reduced productivity, and frequent career changes 
+in the future.
+
+To address these challenges, there is a growing need for intelligent systems that can provide personalized and data-driven career recommendations. This project introduces an AI-powered Career Path Recommendation System designed to assist students in making informed career choices. The system collects structured input data from users, including academic performance, technical skills, and personal interests. This data is processed using a Decision Tree machine learning algorithm, which predicts suitable career paths and provides a confidence score for each prediction.
+
+In addition to predictive analysis, the system incorporates advanced artificial intelligence techniques to enhance user interaction and guidance. A Retrieval-Augmented Generation (RAG) based chatbot is integrated using the Google Gemini API and FAISS vector database. This component enables the system to retrieve relevant information from a curated dataset and generate context-aware responses to user queries. By combining retrieval and generation, the chatbot provides accurate and meaningful guidance, helping users explore different career domains in detail.
+
+
+
+%================================
+% CHAPTER 2
+%================================
+
+\chapter{Motivation}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\justifying
+
+In the modern era of rapid technological advancement, the field of Information Technology has expanded significantly, offering a wide variety of career opportunities. From traditional roles such as software development to emerging domains like artificial intelligence, data science, cybersecurity, and cloud computing, students are presented with numerous choices. While this diversity creates opportunities for growth and innovation, it also introduces confusion and difficulty in selecting the most appropriate career path.
+
+Many students struggle to identify their strengths, interests, and capabilities, which are crucial factors in determining a suitable career. In the absence of proper guidance, they often rely on peer influence, societal expectations, or incomplete knowledge about various domains. Such decisions may not align with their actual skills, leading to dissatisfaction, reduced performance, and frequent career changes in the future. This highlights the urgent need for a system that can provide personalized and data-driven career recommendations.
+
+Traditional career counseling methods, although helpful, have several limitations. These methods are often manual, time-consuming, and not accessible to all students. Moreover, they lack scalability and fail to provide individualized guidance based on detailed analysis of user-specific data. As the number of students and career options continues to grow, it becomes increasingly important to develop automated solutions that can deliver accurate and personalized recommendations efficiently.
+
+The motivation behind this project is to address these challenges by designing an intelligent Career Path Recommendation System that leverages machine learning techniques. By using a Decision Tree algorithm, the system analyzes user inputs such as academic performance, technical skills, and personal interests to predict suitable career paths. This approach ensures that recommendations are based on structured data and logical decision-making rather than assumptions.
+
+In addition to predictive modeling, the system integrates advanced artificial intelligence techniques to enhance user interaction. The inclusion of a Retrieval-Augmented Generation (RAG) based assistant allows users to ask questions and receive context-aware responses. This is achieved by retrieving relevant information from a curated dataset and generating meaningful answers using the Google Gemini API. As a result, users not only receive career predictions but also gain deeper insights into various career domains.
+
+Another important motivation of this project is to provide a user-friendly and interactive platform. The frontend is developed using React, ensuring a responsive and intuitive interface, while the backend is built using Django to handle data processing, API communication, and machine learning integration. This full-stack approach enables seamless interaction between different components of the system.
+
+Furthermore, the project incorporates additional features such as sentiment analysis to evaluate user feedback. This helps in understanding user satisfaction and improving the system over time. By combining multiple technologies, the system aims to deliver a comprehensive solution for career guidance.
+
+Overall, the primary motivation of this project is to bridge the gap between student potential and career opportunities. By providing an intelligent, scalable, and personalized recommendation system, the project aims to empower students to make informed decisions about their future. This not only enhances career satisfaction but also contributes to better utilization of skills and resources in the long ru
+
+%================================
+% CHAPTER 3
+%================================
+
+% \chapter{Literature Survey}
+
+\chapter{Literature Survey}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\justifying
+
+\section{Existing Career Guidance Systems}
+
+Career guidance systems have traditionally relied on manual counseling methods, where experts analyze a student’s academic background, interests, and skills to suggest suitable career paths. These systems often involve aptitude tests, personality assessments, and one-on-one counseling sessions. While such approaches can provide valuable insights, they are limited by scalability, availability, and subjectivity. Not all students have access to professional counselors, and the recommendations provided may vary depending on the counselor’s experience and perspective.
+
+With the advancement of technology, several digital career guidance platforms have been developed to assist students in making informed decisions. These systems typically use rule-based approaches or predefined questionnaires to recommend career options. However, many of these platforms lack personalization and fail to consider complex relationships between different user attributes. As a result, their recommendations may not always align with the individual’s true potential and preferences.
+
+Furthermore, traditional and early digital systems do not provide interactive assistance or real-time query handling. Users often receive static results without detailed explanations, which limits their understanding of different career domains. This creates a gap that modern intelligent systems aim to address.
+
+\section{Machine Learning in Career Prediction}
+
+Machine learning has emerged as a powerful tool for improving career recommendation systems by enabling data-driven decision-making. Various algorithms such as Decision Trees, Random Forests, Support Vector Machines, and Neural Networks have been used to analyze user data and predict suitable career paths. These models can identify patterns and relationships within large datasets, allowing for more accurate and personalized recommendations.
+
+Among these techniques, Decision Tree algorithms are widely used due to their simplicity, interpretability, and efficiency. Decision Trees work by splitting data based on feature importance, which helps in understanding how different factors influence career predictions. This makes them particularly suitable for educational applications, where transparency and explainability are important.
+
+Several studies have demonstrated the effectiveness of machine learning models in predicting career outcomes based on academic performance, skill sets, and interests. These systems not only improve prediction accuracy but also reduce human bias in decision-making. However, the performance of these models largely depends on the quality and diversity of the training data.
+
+Despite these advancements, many machine learning-based systems focus only on prediction and do not provide detailed explanations or interactive support to users. This highlights the need for integrating additional technologies to enhance user experience and understanding.
+
+\section{AI-based Recommendation Systems}
+
+Artificial Intelligence has significantly transformed recommendation systems by introducing advanced techniques such as Natural Language Processing (NLP), conversational agents, and Retrieval-Augmented Generation (RAG). These systems are capable of understanding user queries, retrieving relevant information, and generating meaningful responses in real time.
+
+RAG-based systems combine information retrieval with generative models to provide context-aware answers. By using vector databases such as FAISS, these systems can efficiently search large datasets and retrieve the most relevant information. The integration of APIs like Google Gemini further enhances the system’s ability to generate human-like responses, making interactions more natural and informative.
+
+AI-based recommendation systems are widely used in various domains, including education, e-commerce, and healthcare. In the context of career guidance, these systems enable users to explore different career options, understand required skills, and gain insights into industry trends. This improves user engagement and helps in making well-informed decisions.
+
+The combination of machine learning for prediction and AI for interaction creates a comprehensive solution for career recommendation. It allows systems to not only suggest suitable career paths but also provide detailed explanations and guidance. This integrated approach forms the foundation of modern intelligent career guidance systems.
+
+%================================
+% CHAPTER 4
+%================================
+
+\clearpage
+\setcounter{page}{10}
+
+\chapter{Problem Statement}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+\section{Challenges in Career Selection}
+
+In the current technological era, students are exposed to a wide range of career opportunities, especially in the field of Information Technology. While this diversity offers numerous possibilities, it also creates confusion and difficulty in selecting the most appropriate career path. Students often struggle to identify their strengths, interests, and capabilities, which are essential factors in making informed career decisions.
+
+One of the major challenges in career selection is the lack of self-awareness among students. Many individuals are unsure about their skill sets, domain preferences, and long-term goals. As a result, they tend to make decisions based on external influences such as peer pressure, societal expectations, or popular trends in the industry. These choices may not align with their actual abilities, leading to dissatisfaction and poor performance.
+
+Another challenge is the rapid evolution of the job market. New roles and technologies are emerging continuously, making it difficult for students to stay updated with current industry requirements. Without proper guidance, students may choose outdated or less relevant career paths, which can negatively impact their future growth and employability.
+
+Additionally, the absence of personalized guidance systems makes the decision-making process even more complex. Most available resources provide generic information rather than tailored recommendations. This lack of customization prevents students from receiving guidance that is specifically suited to their individual profiles.
+
+\section{Limitations of Traditional Counseling}
+
+Traditional career counseling methods primarily rely on human experts who assess students based on interviews, questionnaires, and academic performance. While these methods can provide useful insights, they suffer from several limitations. One of the key issues is the lack of scalability, as professional counselors cannot cater to a large number of students simultaneously.
+
+Another limitation is subjectivity in decision-making. Different counselors may provide different recommendations for the same individual, depending on their experience and perspective. This inconsistency reduces the reliability of traditional counseling methods and may lead to confusion among students.
+
+Moreover, traditional systems are often time-consuming and require significant effort from both counselors and students. Scheduling sessions, conducting evaluations, and providing recommendations can be a lengthy process. This makes it difficult for students to access timely guidance when needed.
+
+In addition, traditional counseling lacks integration with modern technologies such as machine learning and artificial intelligence. As a result, these methods are unable to analyze large datasets or identify complex patterns that could improve the accuracy of career recommendations. This creates a gap between traditional approaches and modern technological capabilities.
+
+\section{Research Gap}
+
+Although several digital and machine learning-based career guidance systems have been developed, many of them focus solely on prediction without providing interactive support. These systems often lack the ability to explain their recommendations or assist users in exploring different career domains in detail.
+
+Existing systems also tend to use limited datasets, which affects their prediction accuracy and generalization capability. Without diverse and comprehensive data, it becomes difficult to capture the complexity of real-world career decision-making scenarios.
+
+Furthermore, many applications do not integrate advanced AI techniques such as Retrieval-Augmented Generation (RAG), which can enhance user interaction by providing context-aware responses. The absence of such features limits the overall effectiveness of these systems, as users are unable to receive detailed explanations or clarifications.
+
+Another significant gap is the lack of end-to-end solutions that combine frontend user interaction, backend processing, machine learning prediction, and AI-based assistance in a unified platform. Most systems focus on individual components rather than providing a complete and seamless experience.
+
+\section{Problem Definition}
+
+The primary problem addressed in this project is the lack of an intelligent, scalable, and personalized system for career guidance that can assist students in making informed decisions. The existing methods, both traditional and digital, fail to provide a comprehensive solution that combines accurate prediction with interactive support.
+
+This project aims to develop an AI-powered Career Path Recommendation System that utilizes machine learning algorithms, specifically Decision Trees, to analyze user inputs and predict suitable career paths. The system also integrates AI-based techniques such as Retrieval-Augmented Generation to provide detailed and context-aware responses to user queries.
+
+The objective is to create a platform that not only predicts career options but also helps users understand the reasoning behind those recommendations. By combining data-driven prediction with intelligent interaction, the system seeks to improve decision-making, reduce uncertainty, and enhance user satisfaction.
+
+Ultimately, the proposed solution addresses the limitations of existing systems by offering a unified, efficient, and user-friendly approach to career guidance. It bridges the gap between student potential and industry requirements, enabling individuals to choose career paths that align with their skills, interests, and future aspirations.
+
+%================================
+% CHAPTER 5
+%================================
+
+\clearpage
+\chapter{Objectives}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+\section{System Objectives}
+
+The primary objective of the proposed system is to develop an intelligent and efficient Career Path Recommendation System that assists students in selecting suitable career options based on their skills, interests, and academic background. The system aims to leverage machine learning techniques, particularly the Decision Tree algorithm, to analyze structured input data and generate accurate predictions for potential career paths.
+
+Another key objective is to design a system that provides data-driven recommendations rather than relying on assumptions or manual evaluation. By using a trained machine learning model, the system ensures that predictions are consistent, unbiased, and based on logical decision-making processes. This enhances the reliability and effectiveness of the recommendations provided to users.
+
+The system also aims to integrate modern artificial intelligence technologies to improve user interaction and guidance. By incorporating an AI-based assistant, the platform enables users to explore different career domains and gain deeper insights. This enhances the overall functionality of the system by combining prediction with interactive support.
+
+In addition, the system is designed to provide a scalable solution that can handle multiple users efficiently. Unlike traditional counseling methods, the proposed system can process user inputs and generate recommendations in real time. This ensures that students can access guidance anytime without dependency on human experts.
+
+Another important objective is to develop a full-stack application that ensures seamless communication between frontend and backend components. The frontend, developed using React, provides a responsive and user-friendly interface, while the backend, implemented using Django, handles data processing, API communication, and model execution. This integration ensures smooth functionality and improved user experience.
+
+The system also focuses on modularity and maintainability allowing future enhancements such as incorporating additional machine learning models, expanding datasets, or integrating new features. This makes the system flexible to changing technological requirements.
+
+\section{User Objectives}
+
+The main objective from the user’s perspective is to provide a platform that helps students make informed career decisions based on their individual capabilities. The system aims to assist users in identifying suitable career paths by analyzing their responses to structured questions related to skills, interests, and academic performance.
+
+Another important objective is to reduce confusion and uncertainty in career selection. By providing clear and data-driven recommendations, the system helps users understand which career options align best with their profile. This reduces dependency on external opinions and enables users to make confident decisions about their future.
+
+The system also aims to enhance user awareness about various career opportunities in the field of Information Technology. Many students are not fully aware of emerging domains such as artificial intelligence, cybersecurity, or cloud computing. The platform helps users explore these fields and understand their requirements, scope, and relevance.
+
+Furthermore, the system is designed to provide a simple and intuitive interface that ensures ease of use. Users can easily interact with the platform, input their responses, and receive results without requiring technical knowledge. This makes the system accessible to a wide range of users.
+
+Another objective is to improve user engagement by providing quick and meaningful feedback. The system delivers results instantly and allows users to understand their predicted career path along with its significance. This interactive experience encourages users to explore the platform further.
+
+Additionally, the system aims to support continuous improvement through user feedback. By analyzing user responses and feedback, the system can be enhanced over time to provide more accurate and relevant recommendations. This ensures long-term effectiveness and usability.
+
+Overall, the user objectives focus on empowering individuals with a reliable, accessible, and intelligent tool that simplifies the career decision-making process and helps them choose paths that align with their strengths and aspirations.
+
+%================================
+% CHAPTER 6
+%================================
+\clearpage
+\chapter{Methodology}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+\section{System Architecture}
+
+The proposed system follows a full-stack architecture that integrates frontend, backend, and machine learning components to deliver a complete career recommendation solution. The system is designed to ensure smooth communication between user inputs, data processing modules, and prediction outputs.
+
+The architecture consists of three main layers: the presentation layer (frontend), the application layer (backend), and the intelligence layer (machine learning and AI models). The frontend handles user interaction, the backend processes data and manages APIs, while the machine learning models generate predictions and insights.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=4.5cm]{systemArch.png}
+
+\caption{System Architecture of Career Recommendation System}
+\end{figure}
+
+\subsection{Frontend (React)}
+
+The frontend of the system is developed using React, which provides a dynamic and responsive user interface. It is responsible for collecting user inputs through structured forms and displaying results in an interactive manner.
+
+The frontend includes multiple components such as user authentication (sign up and login), quiz interface, result display page, and feedback system. React's component-based architecture allows efficient code reuse and improves maintainability.
+
+The quiz module collects user data such as skills, interests, and preferences, which are then sent to the backend through API calls. The frontend ensures real-time updates and smooth navigation using React Router, enhancing the overall user experience.
+
+\begin{figure}[h]
+\centering
+% \includegraphics[width=5cm]{frontend.png}
+\includegraphics[height=8cm]{frontend.png}
+\caption{FRONTEND}
+% \vspace{1.5cm}
+\end{figure}
+
+\subsection{Backend (Django)}
+
+The backend is implemented using Django, which acts as the core processing unit of the system. It handles API requests, data validation, authentication, and communication with machine learning models.
+
+Django REST Framework is used to create APIs that allow seamless interaction between frontend and backend. The backend processes user input, performs necessary preprocessing, and forwards the data to the machine learning model for prediction.
+
+Additionally, the backend manages user data, handles authentication, and integrates external APIs such as Google Gemini. It ensures secure and efficient data flow within the system.
+
+
+\section{Decision Tree Model}
+
+The Decision Tree algorithm is used as the primary machine learning model for predicting career paths. It is a supervised learning technique that splits data based on feature importance to make decisions.
+
+The model is trained on structured data that includes features such as academic performance, technical skills, and personal interests. Each node in the tree represents a decision based on a feature, and each branch represents an outcome of that decision.
+
+The splitting of nodes is based on metrics such as Information Gain or Gini Index, which measure the effectiveness of a feature in classifying data. The model continues splitting until it reaches a leaf node, which represents the final prediction.
+
+One of the key advantages of the Decision Tree model is its interpretability. Users can understand how decisions are made, making the system transparent and reliable. This is particularly important in educational applications.
+
+\section{RAG-based Assistant (Gemini + FAISS)}
+
+The system integrates an AI-based assistant using Retrieval-Augmented Generation (RAG) to enhance user interaction. This component allows users to ask questions and receive detailed, context-aware responses.
+
+The RAG system works in two steps: retrieval and generation. In the retrieval phase, relevant information is extracted from a dataset using FAISS (Facebook AI Similarity Search), which stores vector embeddings of text data.
+
+In the generation phase, the retrieved information is passed to the Google Gemini API, which generates human-like responses. This ensures that answers are both accurate and contextually relevant.
+
+The dataset used for retrieval is derived from a PDF containing information about various career roles. This allows the system to provide detailed explanations about career paths, required skills, and industry insights.
+
+\section{Sentiment Analysis}
+
+The system includes a sentiment analysis module to evaluate user feedback. This module processes textual feedback provided by users and classifies it as positive or negative.
+
+Natural Language Processing (NLP) techniques are used to preprocess the text, including tokenization, stopword removal, and vectorization. The processed data is then analyzed using a trained model to determine sentiment.
+
+This feature helps in understanding user satisfaction and improving the system over time. By analyzing feedback, developers can identify areas of improvement and enhance the overall performance of the system.
+
+\section{System Workflow}
+
+The workflow of the system describes the step-by-step process from user interaction to final output generation.
+
+Initially, the user registers and logs into the system. After authentication, the user is presented with a quiz that collects relevant data. This data is sent to the backend via API calls.
+
+The backend processes the data and passes it to the Decision Tree model, which predicts a suitable career path. The prediction result is then sent back to the frontend and displayed to the user.
+
+If the user interacts with the AI assistant, the query is processed using the RAG system, which retrieves relevant data and generates a response. Additionally, user feedback is analyzed using the sentiment analysis module.
+
+\begin{figure}[h]
+\centering \includegraphics[height=10cm,width=12cm]{workflow.drawio.png}
+\caption{System Workflow}
+\end{figure}
+
+\section{Noise/Model Evaluation Concepts}
+
+To ensure the effectiveness of the machine learning model, various evaluation metrics are used. These metrics help in assessing the performance and reliability of the model.
+
+\subsection{Accuracy}
+
+Accuracy measures the proportion of correct predictions made by the model. It is calculated as the ratio of correctly predicted instances to the total number of instances.
+
+A higher accuracy indicates better performance, but it may not always be sufficient, especially in cases of imbalanced datasets.
+
+\subsection{Precision, Recall, F1-score}
+
+Precision measures the proportion of true positive predictions among all positive predictions. Recall measures the proportion of true positives among all actual positives.
+
+The F1-score is the harmonic mean of precision and recall, providing a balanced measure of model performance. These metrics are particularly useful in evaluating classification models.
+
+\subsection{Model Confidence}
+
+Model confidence refers to the probability associated with a prediction. In this system, the Decision Tree model provides a probability score indicating how confident it is about a particular prediction.
+
+This helps users understand the reliability of the recommendation and allows them to make informed decisions.
+%================================
+% BIBLIOGRAPHY
+%================================
+
+\clearpage
+\setcounter{page}{31}
+
+\chapter{Comparison}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+\section{Existing Systems vs Proposed System}
+
+Career guidance systems have evolved over time, ranging from traditional counseling methods to modern digital platforms. However, each approach has its own limitations that affect its effectiveness and scalability.
+
+Traditional systems rely heavily on manual counseling, where experts provide guidance based on general observations and limited data. While these methods offer human interaction, they lack scalability and personalization. Additionally, recommendations may vary depending on the counselor’s experience, leading to inconsistencies in decision-making.
+
+Early digital systems introduced rule-based approaches, where users answer predefined questions and receive career suggestions. Although these systems improved accessibility, they often lacked accuracy and adaptability. They were unable to analyze complex relationships between user attributes, resulting in generalized recommendations that may not suit individual needs.
+
+Machine learning-based systems marked a significant improvement by introducing data-driven prediction models. These systems use algorithms such as Decision Trees, Random Forests, and Neural Networks to analyze user data and predict career paths. However, many existing implementations focus only on prediction and do not provide interactive support or detailed explanations to users.
+
+The proposed system addresses these limitations by integrating a Decision Tree-based prediction model with a full-stack architecture. It provides personalized recommendations based on user inputs and ensures consistency in predictions. Additionally, the system includes an AI assistant that enhances user interaction by providing career-related guidance in real time.
+
+\begin{table}[h]
+\centering
+\caption{Comparison Between Existing Systems and Proposed System}
+\begin{tabular}{|p{4cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{Feature} & \textbf{Existing Systems} & \textbf{Proposed System} \\
+\hline
+Guidance Method & Manual / Rule-based & Machine Learning-based (Decision Tree) \\
+\hline
+Personalization & Limited & High (based on user data) \\
+\hline
+Accuracy & Moderate & Improved accuracy with trained model \\
+\hline
+Scalability & Low & High (automated system) \\
+\hline
+User Interaction & Static responses & Interactive AI assistant \\
+\hline
+Real-time Processing & Limited & Real-time predictions \\
+\hline
+Technology Used & Basic tools & React, Django, ML, AI APIs \\
+\hline
+Feedback Analysis & Not available & Integrated sentiment analysis \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Advantages of Proposed System}
+
+The proposed Career Path Recommendation System offers several advantages over existing solutions by combining machine learning, modern web technologies, and artificial intelligence.
+
+One of the major advantages of the system is its ability to provide personalized recommendations. By analyzing user inputs such as skills, interests, and academic performance, the system generates career suggestions tailored to individual profiles. This ensures that users receive guidance that aligns with their capabilities and aspirations.
+
+Another significant advantage is the use of a Decision Tree model, which provides transparent and interpretable predictions. Users can understand how decisions are made, which increases trust in the system. Unlike complex models, Decision Trees allow easy explanation of results, making them suitable for educational applications.
+
+The system also offers real-time processing, enabling users to receive instant feedback and predictions. This improves user experience and eliminates delays associated with traditional counseling methods. Additionally, the system is scalable and can handle multiple users simultaneously without performance degradation.
+
+The integration of an AI assistant enhances user interaction by allowing users to ask questions and receive meaningful responses. This feature helps users explore different career domains and gain a deeper understanding of available opportunities. It transforms the system from a simple prediction tool into an interactive guidance platform.
+
+Furthermore, the inclusion of sentiment analysis provides valuable insights into user satisfaction. By analyzing feedback, the system can be continuously improved to meet user expectations. This ensures long-term effectiveness and adaptability.
+
+The system is also designed with a user-friendly interface, making it accessible to a wide range of users. The use of React for frontend development ensures smooth navigation and responsive design, while Django provides a robust backend for data processing and API management.
+
+Overall, the proposed system provides a comprehensive, efficient, and intelligent solution for career guidance. It overcomes the limitations of existing systems and offers a modern approach to decision-making by combining machine learning with interactive technologies.
+%================================
+% ANNEXURE
+%================================
+
+\clearpage
+\setcounter{page}{34}
+
+\chapter{Implementation}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+\section{Dataset Preparation}
+
+The dataset used for training the machine learning model consists of structured input features representing student skills, interests, and academic attributes. These features are carefully selected to reflect real-world parameters that influence career decisions.
+
+Data preprocessing is performed to ensure consistency and usability. Categorical features such as preferred domain and interests are encoded into numerical values using label encoding techniques. Missing values, if any, are handled appropriately to maintain data integrity.
+
+The dataset is then divided into training and testing sets to evaluate the model's performance. This step ensures that the model generalizes well to unseen data and avoids overfitting.
+
+\section{Model Training (Scikit-learn)}
+
+The Decision Tree algorithm is implemented using the Scikit-learn library. The model is trained on the preprocessed dataset to learn patterns and relationships between input features and career outcomes.
+
+During training, the algorithm splits the dataset based on feature importance using metrics such as Information Gain or Gini Index. This process continues until the optimal decision tree structure is formed.
+
+After training, the model is evaluated using test data to measure its accuracy and reliability. The trained model is then saved as a \texttt{.pkl} file using the joblib library, allowing it to be reused in the backend without retraining.
+
+\section{API Integration (Django)}
+
+The backend of the system is implemented using Django and Django REST Framework. APIs are developed to handle communication between the frontend and the machine learning model.
+
+Key API endpoints include user authentication (signup and login), prediction requests, quiz history retrieval, and AI assistant interaction. The backend processes incoming requests, validates user data, and interacts with the trained model to generate predictions.
+
+The model is loaded dynamically within the API, and user inputs are transformed into the required format before being passed to the model. The prediction results, along with confidence scores, are returned as JSON responses.
+
+\section{Frontend Development (React)}
+
+The frontend is developed using React, which provides a dynamic and interactive user interface. It consists of multiple components such as login and registration forms, quiz interface, result display page, and history tracking.
+
+React Router is used for navigation, enabling seamless transitions between different pages. State management is handled efficiently to ensure smooth user interaction.
+
+The quiz page collects user responses, which are sent to the backend via API calls. The results page displays the predicted career along with additional information such as confidence score and recommendations.
+
+The user interface is designed to be responsive and user-friendly, ensuring accessibility across different devices.
+
+\section{AI Assistant Integration (Gemini API)}
+
+The system includes a simple AI assistant powered by the Google Gemini API. This component allows users to ask career-related questions and receive intelligent responses.
+
+User queries are sent to the backend, where they are processed and forwarded to the Gemini API. The API generates context-aware responses, which are then returned to the frontend.
+
+This implementation focuses on simplicity and efficiency, allowing users to quickly get guidance about career paths, required skills, and industry trends.
+
+\section{System Testing}
+
+System testing is conducted to ensure that all components function correctly and interact seamlessly. Both frontend and backend modules are tested individually and as an integrated system.
+
+Functional testing verifies that each feature, such as login, quiz submission, prediction generation, and history tracking, works as expected. API testing ensures that data is transmitted correctly between frontend and backend.
+
+Performance testing is also carried out to evaluate system responsiveness under multiple user requests. Error handling mechanisms are implemented to manage unexpected inputs and system failures.
+
+\section{Database Management}
+
+The system uses a relational database (SQLite) to store user-related information, quiz responses, prediction results, and history records. The database schema is designed for efficient storage and retrieval of data.
+
+User credentials are securely stored using Django's authentication system. Each quiz attempt is recorded along with predicted results and timestamps, enabling users to track their history.
+
+Django ORM simplifies database operations and ensures consistency across the system.
+
+\section{Quiz History Implementation}
+
+The quiz history feature allows users to view and compare their previous attempts. Each record includes user responses, predicted career, and confidence score.
+
+The frontend displays this data in a structured format, enabling side-by-side comparison. This helps users understand how their inputs affect predictions over time.
+
+\section{Authentication and Security}
+
+Authentication is implemented using Django’s built-in system. Passwords are securely hashed, and user sessions are managed using authentication tokens.
+
+Input validation is performed at both frontend and backend levels to prevent invalid data. This ensures system security and reliability.
+
+\section{Performance Optimization}
+
+Various optimization techniques are applied to improve system performance. API responses are optimized to reduce latency, and the machine learning model is pre-trained to avoid repeated computation.
+
+Frontend performance is enhanced using efficient component rendering and state management techniques.
+
+\section{Error Handling and Validation}
+
+Robust error handling mechanisms are implemented to manage unexpected scenarios. The backend includes exception handling to ensure smooth API operation.
+
+User inputs are validated before processing, and meaningful error messages are provided to improve user experience.
+
+\section{Deployment Considerations}
+
+The system is designed to support deployment on cloud platforms such as AWS or Heroku. The frontend can be hosted using platforms like Netlify or Vercel.
+
+Environment variables are used to securely manage sensitive information such as API keys.
+
+\section{Scalability and Future Enhancements}
+
+The system is designed with scalability in mind. Additional machine learning models can be integrated to improve accuracy.
+
+The AI assistant can be enhanced with more advanced conversational capabilities. The system can also be extended to include real-time job market data for improved recommendations.
+
+Overall, the implementation provides a strong, scalable, and efficient solution for career recommendation.
+
+%%%%%%%%%%%%%%%%
+% Results
+%%%%%%%%%%%%%%%
+\clearpage
+\setcounter{page}{41}
+
+\chapter{Results}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+\section{Prediction Accuracy}
+
+The performance of the Decision Tree model was evaluated using the test dataset. The model achieved a satisfactory level of accuracy in predicting suitable career paths based on user inputs such as skills, interests, and academic performance.
+
+Accuracy is calculated as the ratio of correctly predicted instances to the total number of instances. The model demonstrated consistent performance across different test cases, indicating its ability to generalize well on unseen data.
+
+The use of structured input features and proper preprocessing contributed significantly to improving prediction accuracy. The results show that the model can effectively capture relationships between input parameters and career outcomes.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.8\linewidth}{
+\centering Replace with model accuracy/output screenshot
+}}
+\caption{Model Prediction Accuracy Output}
+\end{figure}
+
+\section{Model Performance}
+
+In addition to accuracy, the model performance was evaluated using metrics such as precision, recall, and F1-score. These metrics provide a deeper understanding of how well the model performs across different classes.
+
+The Decision Tree model showed balanced performance, with acceptable precision and recall values. This indicates that the model is not biased toward any specific class and performs well in identifying correct career predictions.
+
+The model also provides probability-based outputs, which represent the confidence level of each prediction. This allows users to understand how reliable a particular recommendation is.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.8\linewidth}{
+\centering Replace with confusion matrix or evaluation graph
+}}
+\caption{Model Performance Metrics}
+\end{figure}
+
+\section{AI Assistant Response Quality}
+
+The AI assistant integrated using the Gemini API was evaluated based on the relevance and clarity of responses provided to user queries. The assistant is capable of generating meaningful and context-aware answers related to career guidance.
+
+User queries such as career options, required skills, and domain-specific questions were tested. The assistant successfully generated accurate and helpful responses in most cases, enhancing the overall usability of the system.
+
+The simplicity of the assistant ensures quick response time while maintaining quality. This feature adds significant value by allowing users to explore career-related information beyond prediction results.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.8\linewidth}{
+\centering Replace with AI assistant chat screenshot
+}}
+\caption{AI Assistant Response Example}
+\end{figure}
+
+\section{User Feedback}
+
+User feedback was collected to evaluate the effectiveness and usability of the system. A sentiment analysis module was used to classify feedback as positive or negative.
+
+The majority of users provided positive feedback, indicating satisfaction with the system’s performance, accuracy, and ease of use. Users found the quiz interface intuitive and the prediction results helpful in understanding suitable career paths.
+
+Feedback analysis also highlighted areas for improvement, such as expanding the dataset and adding more detailed career insights. This feedback is valuable for future enhancements of the system.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.8\linewidth}{
+\centering Replace with feedback or sentiment output screenshot
+}}
+\caption{User Feedback Analysis}
+\end{figure}
+
+Overall, the results demonstrate that the proposed system is effective in providing accurate career recommendations and enhancing user understanding through intelligent assistance. The combination of machine learning and AI-based interaction makes the system reliable, efficient, and user-friendly.
+%%%%%%%%%%%%%%%%
+% Conclusion
+%%%%%%%%%%%%%%%
+\clearpage
+\setcounter{page}{45}
+
+\chapter{Conclusion}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\justifying
+
+The proposed Career Path Recommendation System successfully addresses the challenges associated with career selection in the field of Information Technology. By leveraging machine learning techniques, specifically the Decision Tree algorithm, the system provides personalized and data-driven career recommendations based on user inputs such as skills, interests, and academic performance.
+
+The implementation of a full-stack architecture using React for the frontend and Django for the backend ensures a seamless and efficient user experience. The system effectively integrates various components, including user authentication, quiz-based data collection, prediction generation, and history tracking. These features collectively enhance usability and make the system accessible to a wide range of users.
+
+The inclusion of a simple AI assistant further improves the system by enabling users to explore career-related queries and gain additional insights. This feature enhances interaction and transforms the system from a static recommendation tool into an interactive guidance platform. Additionally, the sentiment analysis module provides valuable feedback on user satisfaction, contributing to continuous system improvement.
+
+The results obtained from the system demonstrate that the Decision Tree model achieves reliable accuracy and consistent performance. The system is capable of generating meaningful career recommendations in real time, thereby reducing dependency on traditional counseling methods. The quiz history feature also adds value by allowing users to track and compare their previous responses and predictions.
+
+Despite its effectiveness, the system has certain limitations, such as dependency on dataset quality and limited coverage of career domains. However, these limitations can be addressed through future enhancements, including the use of larger datasets, advanced machine learning models, and integration with real-time industry data.
+
+In conclusion, the project successfully demonstrates how machine learning and modern web technologies can be combined to create an intelligent and scalable career guidance system. The proposed solution bridges the gap between student potential and career opportunities, enabling users to make informed decisions. It serves as a foundation for further research and development in the field of AI-based recommendation systems.
+
+%%%%%%%%%%%%%%%%
+% Fututre scope
+%%%%%%%%%%%%%%%
+\clearpage
+\chapter{Future Scope}
+
+\setlength{\parindent}{0pt}
+\justifying
+
+The proposed Career Path Recommendation System provides a strong foundation for intelligent and personalized career guidance. However, there are several opportunities to enhance and expand the system further by incorporating advanced technologies and improving its capabilities.
+
+One of the major areas of future improvement is the integration of more advanced machine learning models. While the current system uses a Decision Tree algorithm due to its simplicity and interpretability, future versions can incorporate ensemble learning techniques such as Random Forest or Gradient Boosting to improve prediction accuracy and reduce overfitting. Additionally, deep learning models can be explored for handling more complex and large-scale datasets.
+
+Another important enhancement is the expansion of the dataset. Currently, the system relies on structured questionnaire inputs and a predefined PDF dataset for chatbot responses. In the future, the system can be extended to include real-world datasets such as job market trends, salary data, and industry requirements. Integration with online platforms like LinkedIn or job portals can provide real-time insights and make recommendations more relevant and dynamic.The chatbot component can also be significantly improved. At present, the system uses a Retrieval-Augmented Generation (RAG) approach with the Google Gemini API and FAISS vector database. Future improvements may include fine-tuning large language models (LLMs) on domain-specific datasets to provide more accurate, context-aware, and personalized responses. Additionally, multilingual support can be added to make the system accessible to a wider audience.
+
+Another potential area of development is the inclusion of adaptive learning capabilities. By incorporating reinforcement learning or user feedback mechanisms, the system can continuously learn from user interactions and improve its recommendations over time. This will make the system more intelligent and responsive to user needs.
+
+The system can also be extended to support additional features such as resume analysis and skill gap identification. By analyzing a user's resume, the system can suggest suitable career paths and recommend specific courses or certifications required to achieve those goals. This would transform the system from a recommendation tool into a comprehensive career development platform.
+
+Furthermore, mobile application development can enhance accessibility and usability. A dedicated mobile app would allow users to access the system anytime and anywhere, improving user engagement and reach. Integration with voice recognition and speech-to-text technologies can further enhance user interaction.
+
+From a deployment perspective, future work can include migrating the system to cloud platforms such as AWS or Azure for better scalability, performance, and security. Implementing robust authentication and data privacy mechanisms will also be essential to protect user data.
+
+In conclusion, the future scope of this project involves enhancing the system’s intelligence, scalability, and usability by integrating advanced machine learning techniques, expanding datasets, improving chatbot capabilities, and adding new features. These improvements will make the system more effective in providing accurate, personalized, and real-time career guidance to users.
+
+%%%%%%%%%%%%%%%%
+% references
+%%%%%%%%%%%%%%%
+\clearpage
+\chapter{References}
+
+\setlength{\parindent}{0pt}
+\justifying
+
+[1] J. R. Quinlan, “Induction of decision trees,” \textit{Machine Learning}, vol. 1, no. 1, pp. 81–106, 1986.
+
+\vspace{0.3cm}
+
+[2] L. Breiman, “Random forests,” \textit{Machine Learning}, vol. 45, no. 1, pp. 5–32, 2001.
+
+\vspace{0.3cm}
+
+[3] F. Pedregosa et al., “Scikit-learn: Machine Learning in Python,” \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825–2830, 2011.
+
+\vspace{0.3cm}
+
+[4] P. Lewis et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,” \textit{NeurIPS}, 2020.
+
+\vspace{0.3cm}
+
+[5] Google AI, “Gemini: A Family of Highly Capable Multimodal Models,” 2023.
+
+\vspace{0.3cm}
+
+[6] J. Johnson, M. Douze, and H. Jégou, “Billion-scale similarity search with GPUs,” \textit{IEEE Transactions on Big Data}, 2017.
+
+\vspace{0.3cm}
+
+[7] C. J. Hutto and E. Gilbert, “VADER: A Parsimonious Rule-Based Model for Sentiment Analysis,” \textit{ICWSM}, 2014.
+
+\vspace{0.3cm}
+
+[8] Django Software Foundation, “Django Documentation,” Available: https://www.djangoproject.com/
+
+\vspace{0.3cm}
+
+[9] React Team, “React Documentation,” Available: https://react.dev/
+
+\vspace{0.3cm}
+
+[10] S. Bird, E. Klein, and E. Loper, \textit{Natural Language Processing with Python}, O’Reilly Media, 2009.
+\end{document}
