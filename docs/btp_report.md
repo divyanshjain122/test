@@ -609,7 +609,7 @@ This section can include links to year-wise segregated line graphs comparing the
 | Maximum Drawdown | [maxDrawdown.png](maxDrawdown.png) |
 | Volatility | [volatility.png](volatility.png) |
 | Returns | [returns.png](returns.png) |
-![growth of 100 dollar over the year](growth of 100 dollar invertment.png)
+![growth of 100 dollar over the year](growth.png)
 
 ## 16. Summary of Techniques by Approach
 
