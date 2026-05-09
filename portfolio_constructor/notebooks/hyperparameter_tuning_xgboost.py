@@ -176,7 +176,7 @@ def main():
         'n_estimators': [100, 200],
         'max_depth': [3, 6],
         'learning_rate': [0.01, 0.1],
-        'sent_weight': [0., 0.3] 
+        'sent_weight': [0.2, 0.3] 
     }
     
     # Create combinations including learning_rate

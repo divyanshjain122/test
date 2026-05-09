@@ -156,7 +156,7 @@ def main():
     grid = {
         'n_estimators': [50, 100, 200],
         'max_depth': [3, 5, 8],
-        'sent_weight': [0.0, 0.2, 0.4] 
+        'sent_weight': [ 0.2, 0.4] 
     }
     
     combinations = list(product(grid['n_estimators'], grid['max_depth'], grid['sent_weight']))
